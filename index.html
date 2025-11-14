@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="x-ua-compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Angel-1 Quantum Simulator</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0b0f14;
+    color: #e8ecef;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
+    border-bottom: 2px solid #22303d;
+    padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  
+  .subtitle {
+    font-size: 13px;
+    color: #9ca3af;
+    font-weight: 400;
+  }
+  
+  /* Main visualization area */
+  main {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  
+  /* Controls panel at bottom */
+  footer {
+    background: #0f1620;
+    border-top: 2px solid #22303d;
+    padding: 16px 24px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+  }
+  
+  .controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: #d1d5db;
+  }
+  
+  .control-value {
+    font-size: 12px;
+    color: #60a5fa;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+  }
+  
+  input[type=range] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #1a1f2e;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  input[type=range]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  /* Buttons */
+  .button-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
+    border: 1px solid #22303d;
+    border-radius: 6px;
+    color: #e8ecef;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  
+  button:hover {
+    background: linear-gradient(135deg, #2d4a70 0%, #22303d 100%);
+    border-color: #60a5fa;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(96, 165, 250, 0.2);
+  }
+  
+  button:active {
+    transform: translateY(0);
+  }
+  
+  button.primary {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    border-color: #60a5fa;
+  }
+  
+  button.primary:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  }
+  
+  button.danger {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    border-color: #f87171;
+  }
+  
+  button.danger:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  }
+  
+  /* Stats overlay */
+  .stats {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(15, 22, 32, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid #22303d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .stats-value {
+    color: #10b981;
+    font-weight: 600;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 22px;
+    }
+    .controls-grid {
+      grid-template-columns: 1fr;
+    }
+    .stats {
+      font-size: 10px;
+      padding: 8px 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Angel-1 Quantum Simulator</h1>
+  <div class="subtitle">Discrete Schrödinger Equation on 2D Lattice · Real-time Wave Function Evolution</div>
+</header>
+
+<main>
+  <svg id="v" viewBox="-360 -280 720 560"></svg>
+  <div class="stats" id="stats">
+    <div>Time Steps: <span class="stats-value" id="stat-t">0</span></div>
+    <div>Grid: <span class="stats-value">16×12</span> (192 nodes)</div>
+    <div>Topology: <span class="stats-value">4-neighbor</span></div>
+  </div>
+</main>
+
+<footer>
+  <div class="button-group">
+    <button id="p" class="primary">Pause</button>
+    <button id="r">Reset</button>
+    <button id="fd">Force Draw</button>
+    <button id="save">Save PNG</button>
+  </div>
+  
+  <div class="controls-grid">
+    <div class="control-group">
+      <div class="control-label">
+        <span>α (Linear Dispersion)</span>
+        <span class="control-value" id="val-a">0.90</span>
+      </div>
+      <input id="a" type="range" min="0.1" max="1.5" step="0.01" value="0.9">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>β (Nonlinearity)</span>
+        <span class="control-value" id="val-b">0.35</span>
+      </div>
+      <input id="b" type="range" min="0" max="1" step="0.01" value="0.35">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>Δt (Time Step)</span>
+        <span class="control-value" id="val-d">0.02</span>
+      </div>
+      <input id="d" type="range" min="0.01" max="0.2" step="0.01" value="0.02">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>Jitter (Noise)</span>
+        <span class="control-value" id="val-j">0.00</span>
+      </div>
+      <input id="j" type="range" min="0" max="0.05" step="0.001" value="0.00">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>Speed (Steps/Frame)</span>
+        <span class="control-value" id="val-s">8</span>
+      </div>
+      <input id="s" type="range" min="1" max="20" step="1" value="8">
+    </div>
+  </div>
+</footer>
+
+<script>
+// Grid configuration
+const GRID_COLS = 16;
+const GRID_ROWS = 12;
+const SPACING = 45;
+
+const S={n:GRID_COLS*GRID_ROWS, k:1, alpha:0.9, beta:0.35, dt:0.02, jitter:0.00, speed:8};
+let psiR=[], psiI=[], rho=[], grid=[], t=0, play=true;
+let rhoE=[], phi=[], torque=[];
+const v=document.getElementById('v');
+
+function idx(row, col) {
+  return row * GRID_COLS + col;
+}
+
+function getNeighbors(i) {
+  const row = Math.floor(i / GRID_COLS);
+  const col = i % GRID_COLS;
+  const neighbors = [];
+  if (col > 0) neighbors.push(idx(row, col - 1));
+  if (col < GRID_COLS - 1) neighbors.push(idx(row, col + 1));
+  if (row > 0) neighbors.push(idx(row - 1, col));
+  if (row < GRID_ROWS - 1) neighbors.push(idx(row + 1, col));
+  return neighbors;
+}
+
+function ui(){
+  const map={a:'alpha',b:'beta',d:'dt',j:'jitter',s:'speed'};
+  ['a','b','d','j','s'].forEach(id=>{
+    const input = document.getElementById(id);
+    const valDisplay = document.getElementById('val-' + id);
+    input.oninput=e=>{ 
+      S[map[id]]=parseFloat(e.target.value);
+      valDisplay.textContent = e.target.value;
+    };
+  });
+  
+  const pb=document.getElementById('p'); 
+  const setBtn=()=>pb.textContent=play?'Pause':'Play';
+  pb.onclick=()=>{ play=!play; setBtn(); };
+  document.getElementById('r').onclick=()=>{ reset(); for(let i=0;i<12;i++) step(); draw(true); };
+  document.getElementById('fd').onclick=()=>draw(false);
+  setBtn();
+}
+
+function reset(){
+  psiR=[...Array(S.n)].map(()=>Math.random()*2-1);
+  psiI=[...Array(S.n)].map(()=>Math.random()*2-1);
+  norm();
+  rho = Array(S.n).fill(0);
+  rhoE= Array(S.n).fill(0);
+  phi   = Array(S.n).fill(0);
+  torque= Array(S.n).fill(0);
+  
+  grid = [];
+  for(let row=0; row<GRID_ROWS; row++){
+    for(let col=0; col<GRID_COLS; col++){
+      grid.push({
+        x: (col - GRID_COLS/2 + 0.5) * SPACING,
+        y: (row - GRID_ROWS/2 + 0.5) * SPACING
+      });
+    }
+  }
+  t=0;
+  document.getElementById('stat-t').textContent = t;
+}
+
+function norm(){ 
+  let s=0; 
+  for(let i=0; i<S.n; i++) s += psiR[i]*psiR[i] + psiI[i]*psiI[i];
+  s = Math.sqrt(s) || 1e-12; 
+  for(let i=0; i<S.n; i++){ psiR[i]/=s; psiI[i]/=s; } 
+}
+
+function L(a, i){ 
+  const neighbors = getNeighbors(i);
+  let sum = 0;
+  for(const n of neighbors) sum += a[n];
+  return sum - neighbors.length * a[i];
+}
+
+function step(){
+  for(let i=0; i<S.n; i++){
+    rho[i] = psiR[i]*psiR[i] + psiI[i]*psiI[i];
+    rhoE[i] = 0.9*rhoE[i] + 0.1*rho[i];
+    phi[i] = Math.atan2(psiI[i], psiR[i]);
+  }
+  
+  const nr = new Array(S.n), ni = new Array(S.n);
+  for(let i=0; i<S.n; i++){
+    const Lr = L(psiR, i), Li = L(psiI, i), r = rho[i];
+    const Ar = S.alpha*Lr - S.beta*r*psiR[i];
+    const Ai = S.alpha*Li - S.beta*r*psiI[i];
+    nr[i] = psiR[i] + S.dt*(-Ai) + (Math.random()*2-1)*S.jitter*0.02;
+    ni[i] = psiI[i] + S.dt*( Ar) + (Math.random()*2-1)*S.jitter*0.02;
+  }
+  psiR = nr; psiI = ni; norm(); t++;
+
+  for(let i=0; i<S.n; i++){
+    const neighbors = getNeighbors(i);
+    let maxDphi = 0;
+    for(const n of neighbors){
+      const dphi = ((phi[n] - phi[i] + 9.4248) % 6.2832) - 3.1416;
+      maxDphi = Math.max(maxDphi, Math.abs(dphi));
+    }
+    torque[i] = maxDphi;
+  }
+}
+
+function draw(init=false){
+  if(init){ 
+    v.innerHTML=''; 
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g'); 
+    g.id='g'; 
+    v.appendChild(g); 
+  }
+  const g = document.getElementById('g'); 
+  g.innerHTML='';
+  const max = Math.max(1e-12, ...rhoE);
+
+  for(let i=0; i<S.n; i++){
+    const neighbors = getNeighbors(i);
+    for(const n of neighbors){
+      if(i < n){
+        const grad = Math.abs(rhoE[n] - rhoE[i]);
+        if(grad < 0.6/S.n){
+          const e = line(grid[i], grid[n]); 
+          e.setAttribute('stroke','#60a5fa'); 
+          e.setAttribute('stroke-width','1.5'); 
+          e.setAttribute('opacity','.5');
+          g.appendChild(e);
+        }
+      }
+    }
+  }
+  
+  const MAX_RADIUS = Math.floor(SPACING / 2) - 2;
+  
+  for(let i=0; i<S.n; i++){
+    const p = grid[i];
+    const rsrc = rhoE[i];
+    const rad = 3 + (MAX_RADIUS - 3)*(rsrc/max);
+    
+    g.appendChild(circle(p.x, p.y, rad, 'none', '#10b981', .35));
+    
+    const neighbors = getNeighbors(i);
+    let curv = 0;
+    if(neighbors.length >= 2){
+      const avgNeighbor = neighbors.reduce((sum, n) => sum + rhoE[n], 0) / neighbors.length;
+      curv = Math.abs(avgNeighbor - rhoE[i]);
+    }
+    if(curv > 2.5*max/S.n) {
+      g.appendChild(circle(p.x, p.y, 2.0, '#f87171'));
+    }
+    
+    const hue = 240 - 240*(torque[i]/Math.PI);
+    g.appendChild(circle(p.x, p.y, 1.2, `hsl(${hue},100%,60%)`));
+  }
+  
+  // Update stats
+  if(t % 10 === 0) {
+    document.getElementById('stat-t').textContent = t;
+  }
+}
+
+function circle(x, y, r, fill, stroke, op){
+  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx', x); 
+  c.setAttribute('cy', y); 
+  c.setAttribute('r', r);
+  if(fill) c.setAttribute('fill', fill);
+  if(stroke){ 
+    c.setAttribute('stroke', stroke); 
+    if(op) c.setAttribute('stroke-opacity', op); 
+  }
+  return c;
+}
+
+function line(a, b){ 
+  const e = document.createElementNS('http://www.w3.org/2000/svg','line');
+  e.setAttribute('x1', a.x); 
+  e.setAttribute('y1', a.y); 
+  e.setAttribute('x2', b.x); 
+  e.setAttribute('y2', b.y); 
+  return e; 
+}
+
+ui(); 
+reset(); 
+for(let i=0; i<12; i++) step(); 
+draw(true);
+
+(function loop(){ 
+  if(play){ 
+    for(let s=0; s<S.speed; s++) step(); 
+  } 
+  draw(false); 
+  requestAnimationFrame(loop); 
+})();
+
+document.getElementById('save').onclick=()=>{
+  const svg = document.getElementById('v');
+  const xml = new XMLSerializer().serializeToString(svg);
+  const img = new Image();
+  const url = URL.createObjectURL(new Blob([xml], {type:'image/svg+xml'}));
+  img.onload=()=>{
+    const c = document.createElement('canvas'); 
+    c.width = 2000; 
+    c.height = 2000;
+    const ctx = c.getContext('2d'); 
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    const a = document.createElement('a'); 
+    a.download = 'angel1_quantum_sim.png'; 
+    a.href = c.toDataURL(); 
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+};
+</script>
+</body>
+</html>
