@@ -1,11 +1,10 @@
 <!doctype html>
-
-<html lang="en">  
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta http-equiv="x-ua-compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Angel-1 Quantum Simulator</title>
+<title>Angel-1 Chronon Simulator</title>
 <style>
   * {
     margin: 0;
@@ -23,7 +22,6 @@
     overflow: hidden;
   }
   
-  /* Header */
   header {
     background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
     border-bottom: 2px solid #22303d;
@@ -47,7 +45,6 @@
     font-weight: 400;
   }
   
-  /* Main visualization area */
   main {
     flex: 1;
     position: relative;
@@ -63,7 +60,6 @@
     display: block;
   }
   
-  /* Controls panel at bottom */
   footer {
     background: #0f1620;
     border-top: 2px solid #22303d;
@@ -131,7 +127,6 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   }
   
-  /* Buttons */
   .button-group {
     display: flex;
     gap: 8px;
@@ -172,16 +167,6 @@
     background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   }
   
-  button.danger {
-    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
-    border-color: #f87171;
-  }
-  
-  button.danger:hover {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  }
-  
-  /* Stats overlay */
   .stats {
     position: absolute;
     top: 12px;
@@ -202,7 +187,6 @@
     font-weight: 600;
   }
   
-  /* Responsive */
   @media (max-width: 768px) {
     h1 {
       font-size: 22px;
@@ -220,16 +204,16 @@
 <body>
 
 <header>
-  <h1>Angel-1 Quantum Simulator</h1>
-  <div class="subtitle">Discrete Schrödinger Equation on 2D Lattice · Real-time Wave Function Evolution</div>
+  <h1>Angel-1 Chronon Simulator</h1>
+  <div class="subtitle">Volume-Conserving Chronon Washers · Chirality & Frequency Rotation</div>
 </header>
 
 <main>
   <svg id="v" viewBox="-360 -280 720 560"></svg>
   <div class="stats" id="stats">
     <div>Time Steps: <span class="stats-value" id="stat-t">0</span></div>
-    <div>Grid: <span class="stats-value">16×12</span> (192 nodes)</div>
-    <div>Topology: <span class="stats-value">4-neighbor</span></div>
+    <div>Grid: <span class="stats-value">16×12</span> (192 chronons)</div>
+    <div>Topology: <span class="stats-value">Washer (Annular)</span></div>
   </div>
 </main>
 
@@ -393,6 +377,78 @@ function step(){
   }
 }
 
+// Draw rotating washer (annular ring) with volume conservation
+function drawWasher(g, cx, cy, majorRadius, rotationAngle) {
+  // Volume conservation: girth inversely proportional to radius
+  // Normalized: radius 1 = girth 1, radius 2 = girth 0.5, radius 3 = girth 0.333...
+  const baseGirth = 8; // Base girth for smallest chronons
+  const girth = baseGirth / Math.max(0.3, majorRadius / 5);
+  
+  const outerR = majorRadius;
+  const innerR = Math.max(1, majorRadius - girth);
+  
+  // Create washer path with vertical split (left/right)
+  // We'll create two half-washers and color them differently
+  
+  // Left half (black)
+  const leftPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const leftD = `
+    M ${cx} ${cy - outerR}
+    A ${outerR} ${outerR} 0 0 0 ${cx} ${cy + outerR}
+    L ${cx} ${cy + innerR}
+    A ${innerR} ${innerR} 0 0 1 ${cx} ${cy - innerR}
+    Z
+  `;
+  leftPath.setAttribute('d', leftD);
+  leftPath.setAttribute('fill', '#1a1a1a');
+  leftPath.setAttribute('opacity', '0.9');
+  
+  // Rotate the left half
+  leftPath.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
+  g.appendChild(leftPath);
+  
+  // Right half (white)
+  const rightPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const rightD = `
+    M ${cx} ${cy - outerR}
+    A ${outerR} ${outerR} 0 0 1 ${cx} ${cy + outerR}
+    L ${cx} ${cy + innerR}
+    A ${innerR} ${innerR} 0 0 0 ${cx} ${cy - innerR}
+    Z
+  `;
+  rightPath.setAttribute('d', rightD);
+  rightPath.setAttribute('fill', '#e8e8e8');
+  rightPath.setAttribute('opacity', '0.9');
+  
+  // Rotate the right half
+  rightPath.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
+  g.appendChild(rightPath);
+  
+  // Outline for clarity
+  const outline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  outline.setAttribute('cx', cx);
+  outline.setAttribute('cy', cy);
+  outline.setAttribute('r', outerR);
+  outline.setAttribute('fill', 'none');
+  outline.setAttribute('stroke', '#60a5fa');
+  outline.setAttribute('stroke-width', '0.5');
+  outline.setAttribute('opacity', '0.3');
+  g.appendChild(outline);
+  
+  // Inner outline
+  if (innerR > 1) {
+    const innerOutline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    innerOutline.setAttribute('cx', cx);
+    innerOutline.setAttribute('cy', cy);
+    innerOutline.setAttribute('r', innerR);
+    innerOutline.setAttribute('fill', 'none');
+    innerOutline.setAttribute('stroke', '#60a5fa');
+    innerOutline.setAttribute('stroke-width', '0.5');
+    innerOutline.setAttribute('opacity', '0.3');
+    g.appendChild(innerOutline);
+  }
+}
+
 function draw(init=false){
   if(init){ 
     v.innerHTML=''; 
@@ -404,31 +460,47 @@ function draw(init=false){
   g.innerHTML='';
   const max = Math.max(1e-12, ...rhoE);
 
+  // Draw connections
   for(let i=0; i<S.n; i++){
     const neighbors = getNeighbors(i);
     for(const n of neighbors){
       if(i < n){
         const grad = Math.abs(rhoE[n] - rhoE[i]);
         if(grad < 0.6/S.n){
-          const e = line(grid[i], grid[n]); 
-          e.setAttribute('stroke','#60a5fa'); 
-          e.setAttribute('stroke-width','1.5'); 
-          e.setAttribute('opacity','.5');
-          g.appendChild(e);
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1', grid[i].x);
+          line.setAttribute('y1', grid[i].y);
+          line.setAttribute('x2', grid[n].x);
+          line.setAttribute('y2', grid[n].y);
+          line.setAttribute('stroke','#60a5fa'); 
+          line.setAttribute('stroke-width','1'); 
+          line.setAttribute('opacity','.3');
+          g.appendChild(line);
         }
       }
     }
   }
   
+  // Draw chronon washers
   const MAX_RADIUS = Math.floor(SPACING / 2) - 2;
   
   for(let i=0; i<S.n; i++){
     const p = grid[i];
     const rsrc = rhoE[i];
-    const rad = 3 + (MAX_RADIUS - 3)*(rsrc/max);
+    const majorRadius = 3 + (MAX_RADIUS - 3)*(rsrc/max);
     
-    g.appendChild(circle(p.x, p.y, rad, 'none', '#10b981', .35));
+    // Rotation speed inversely proportional to radius (volume conservation)
+    // Larger radius = faster rotation (travels more distance)
+    // Speed factor: radius 1 = 1x, radius 2 = 2x, radius 3 = 3x
+    const radiusRatio = majorRadius / 5; // Normalize to ~1
+    const rotationSpeed = radiusRatio; // Larger = faster
     
+    // Rotation angle from phase, scaled by speed
+    const rotationAngle = phi[i] * rotationSpeed;
+    
+    drawWasher(g, p.x, p.y, majorRadius, rotationAngle);
+    
+    // High curvature markers (red dots)
     const neighbors = getNeighbors(i);
     let curv = 0;
     if(neighbors.length >= 2){
@@ -436,39 +508,19 @@ function draw(init=false){
       curv = Math.abs(avgNeighbor - rhoE[i]);
     }
     if(curv > 2.5*max/S.n) {
-      g.appendChild(circle(p.x, p.y, 2.0, '#f87171'));
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx', p.x);
+      dot.setAttribute('cy', p.y);
+      dot.setAttribute('r', '1.5');
+      dot.setAttribute('fill', '#f87171');
+      g.appendChild(dot);
     }
-    
-    const hue = 240 - 240*(torque[i]/Math.PI);
-    g.appendChild(circle(p.x, p.y, 1.2, `hsl(${hue},100%,60%)`));
   }
   
   // Update stats
   if(t % 10 === 0) {
     document.getElementById('stat-t').textContent = t;
   }
-}
-
-function circle(x, y, r, fill, stroke, op){
-  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-  c.setAttribute('cx', x); 
-  c.setAttribute('cy', y); 
-  c.setAttribute('r', r);
-  if(fill) c.setAttribute('fill', fill);
-  if(stroke){ 
-    c.setAttribute('stroke', stroke); 
-    if(op) c.setAttribute('stroke-opacity', op); 
-  }
-  return c;
-}
-
-function line(a, b){ 
-  const e = document.createElementNS('http://www.w3.org/2000/svg','line');
-  e.setAttribute('x1', a.x); 
-  e.setAttribute('y1', a.y); 
-  e.setAttribute('x2', b.x); 
-  e.setAttribute('y2', b.y); 
-  return e; 
 }
 
 ui(); 
@@ -496,7 +548,7 @@ document.getElementById('save').onclick=()=>{
     const ctx = c.getContext('2d'); 
     ctx.drawImage(img, 0, 0, c.width, c.height);
     const a = document.createElement('a'); 
-    a.download = 'angel1_quantum_sim.png'; 
+    a.download = 'angel1_chronons.png'; 
     a.href = c.toDataURL(); 
     a.click();
     URL.revokeObjectURL(url);
@@ -506,5 +558,3 @@ document.getElementById('save').onclick=()=>{
 </script>
 </body>
 </html>
-
-
