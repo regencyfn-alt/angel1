@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="x-ua-compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Angel-1 Chronon Simulator</title>
+<title>Angel-1 Chronon Simulator · 8×8 Expandable</title>
 <style>
   * {
     margin: 0;
@@ -71,7 +71,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 12px 24px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
   }
   
@@ -79,6 +79,13 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+  }
+  
+  .control-group.highlight {
+    background: rgba(96, 165, 250, 0.1);
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(96, 165, 250, 0.3);
   }
   
   .control-label {
@@ -204,15 +211,16 @@
 <body>
 
 <header>
-  <h1>Angel-1 Chronon Simulator</h1>
-  <div class="subtitle">Volume-Conserving Chronon Washers · Chirality & Frequency Rotation</div>
+  <h1>Angel-1 Chronon Simulator · Expandable Grid</h1>
+  <div class="subtitle">Dynamic Grid Expansion · Volume-Conserving Washers · Chirality & Frequency</div>
 </header>
 
 <main>
-  <svg id="v" viewBox="-360 -280 720 560"></svg>
+  <svg id="v" viewBox="-260 -260 520 520"></svg>
   <div class="stats" id="stats">
     <div>Time Steps: <span class="stats-value" id="stat-t">0</span></div>
-    <div>Grid: <span class="stats-value">16×12</span> (192 chronons)</div>
+    <div>Grid: <span class="stats-value" id="stat-grid">8×8</span> (<span class="stats-value" id="stat-n">64</span> chronons)</div>
+    <div>Zoom: <span class="stats-value" id="stat-zoom">1.00</span>×</div>
     <div>Topology: <span class="stats-value">Washer (Annular)</span></div>
   </div>
 </main>
@@ -226,6 +234,32 @@
   </div>
   
   <div class="controls-grid">
+    <!-- VIEW CONTROLS (HIGHLIGHTED) -->
+    <div class="control-group highlight">
+      <div class="control-label">
+        <span>🔍 Zoom Level</span>
+        <span class="control-value" id="val-zoom">1.00</span>
+      </div>
+      <input id="zoom" type="range" min="0.5" max="3" step="0.1" value="1">
+    </div>
+    
+    <div class="control-group highlight">
+      <div class="control-label">
+        <span>↔️ Grid Width (Columns)</span>
+        <span class="control-value" id="val-cols">8</span>
+      </div>
+      <input id="cols" type="range" min="4" max="24" step="1" value="8">
+    </div>
+    
+    <div class="control-group highlight">
+      <div class="control-label">
+        <span>↕️ Grid Height (Rows)</span>
+        <span class="control-value" id="val-rows">8</span>
+      </div>
+      <input id="rows" type="range" min="4" max="24" step="1" value="8">
+    </div>
+    
+    <!-- PHYSICS CONTROLS -->
     <div class="control-group">
       <div class="control-label">
         <span>α (Linear Dispersion)</span>
@@ -261,20 +295,21 @@
     <div class="control-group">
       <div class="control-label">
         <span>Speed (Steps/Frame)</span>
-        <span class="control-value" id="val-s">8</span>
+        <span class="control-value" id="val-s">4</span>
       </div>
-      <input id="s" type="range" min="1" max="20" step="1" value="8">
+      <input id="s" type="range" min="1" max="20" step="1" value="4">
     </div>
   </div>
 </footer>
 
 <script>
-// Grid configuration
-const GRID_COLS = 16;
-const GRID_ROWS = 12;
-const SPACING = 45;
+// Dynamic grid configuration
+let GRID_COLS = 8;
+let GRID_ROWS = 8;
+const SPACING = 60;
+let zoomLevel = 1.0;
 
-const S={n:GRID_COLS*GRID_ROWS, k:1, alpha:0.9, beta:0.35, dt:0.02, jitter:0.00, speed:8};
+const S={n:GRID_COLS*GRID_ROWS, k:1, alpha:0.9, beta:0.35, dt:0.02, jitter:0.00, speed:4};
 let psiR=[], psiI=[], rho=[], grid=[], t=0, play=true;
 let rhoE=[], phi=[], torque=[];
 const v=document.getElementById('v');
@@ -294,6 +329,13 @@ function getNeighbors(i) {
   return neighbors;
 }
 
+function updateViewBox() {
+  const baseSize = 260;
+  const size = baseSize / zoomLevel;
+  v.setAttribute('viewBox', `${-size} ${-size} ${size*2} ${size*2}`);
+  document.getElementById('stat-zoom').textContent = zoomLevel.toFixed(2);
+}
+
 function ui(){
   const map={a:'alpha',b:'beta',d:'dt',j:'jitter',s:'speed'};
   ['a','b','d','j','s'].forEach(id=>{
@@ -305,12 +347,94 @@ function ui(){
     };
   });
   
+  // Zoom control
+  document.getElementById('zoom').oninput = e => {
+    zoomLevel = parseFloat(e.target.value);
+    document.getElementById('val-zoom').textContent = zoomLevel.toFixed(2);
+    updateViewBox();
+  };
+  
+  // Grid expansion controls
+  document.getElementById('cols').oninput = e => {
+    const newCols = parseInt(e.target.value);
+    document.getElementById('val-cols').textContent = newCols;
+    resizeGrid(newCols, GRID_ROWS);
+  };
+  
+  document.getElementById('rows').oninput = e => {
+    const newRows = parseInt(e.target.value);
+    document.getElementById('val-rows').textContent = newRows;
+    resizeGrid(GRID_COLS, newRows);
+  };
+  
   const pb=document.getElementById('p'); 
   const setBtn=()=>pb.textContent=play?'Pause':'Play';
   pb.onclick=()=>{ play=!play; setBtn(); };
   document.getElementById('r').onclick=()=>{ reset(); for(let i=0;i<12;i++) step(); draw(true); };
   document.getElementById('fd').onclick=()=>draw(false);
   setBtn();
+}
+
+function resizeGrid(newCols, newRows) {
+  if (newCols === GRID_COLS && newRows === GRID_ROWS) return;
+  
+  const oldCols = GRID_COLS;
+  const oldRows = GRID_ROWS;
+  const oldN = S.n;
+  
+  GRID_COLS = newCols;
+  GRID_ROWS = newRows;
+  S.n = GRID_COLS * GRID_ROWS;
+  
+  // Create new arrays
+  const newPsiR = [...Array(S.n)].map(() => Math.random()*2-1);
+  const newPsiI = [...Array(S.n)].map(() => Math.random()*2-1);
+  const newRho = Array(S.n).fill(0);
+  const newRhoE = Array(S.n).fill(0);
+  const newPhi = Array(S.n).fill(0);
+  const newTorque = Array(S.n).fill(0);
+  
+  // Copy existing data where grids overlap
+  for(let row = 0; row < Math.min(oldRows, newRows); row++) {
+    for(let col = 0; col < Math.min(oldCols, newCols); col++) {
+      const oldIdx = row * oldCols + col;
+      const newIdx = row * newCols + col;
+      if (oldIdx < oldN && newIdx < S.n) {
+        newPsiR[newIdx] = psiR[oldIdx];
+        newPsiI[newIdx] = psiI[oldIdx];
+        newRho[newIdx] = rho[oldIdx];
+        newRhoE[newIdx] = rhoE[oldIdx];
+        newPhi[newIdx] = phi[oldIdx];
+        newTorque[newIdx] = torque[oldIdx];
+      }
+    }
+  }
+  
+  psiR = newPsiR;
+  psiI = newPsiI;
+  rho = newRho;
+  rhoE = newRhoE;
+  phi = newPhi;
+  torque = newTorque;
+  
+  norm();
+  
+  // Rebuild grid positions
+  grid = [];
+  for(let row=0; row<GRID_ROWS; row++){
+    for(let col=0; col<GRID_COLS; col++){
+      grid.push({
+        x: (col - GRID_COLS/2 + 0.5) * SPACING,
+        y: (row - GRID_ROWS/2 + 0.5) * SPACING
+      });
+    }
+  }
+  
+  // Update stats display
+  document.getElementById('stat-grid').textContent = `${GRID_COLS}×${GRID_ROWS}`;
+  document.getElementById('stat-n').textContent = S.n;
+  
+  draw(true);
 }
 
 function reset(){
@@ -352,7 +476,7 @@ function L(a, i){
 function step(){
   for(let i=0; i<S.n; i++){
     rho[i] = psiR[i]*psiR[i] + psiI[i]*psiI[i];
-    rhoE[i] = 0.9*rhoE[i] + 0.1*rho[i];
+    rhoE[i] = 0.95*rhoE[i] + 0.05*rho[i];
     phi[i] = Math.atan2(psiI[i], psiR[i]);
   }
   
@@ -377,18 +501,12 @@ function step(){
   }
 }
 
-// Draw rotating washer (annular ring) with volume conservation
 function drawWasher(g, cx, cy, majorRadius, rotationAngle) {
-  // Volume conservation: girth inversely proportional to radius
-  // Normalized: radius 1 = girth 1, radius 2 = girth 0.5, radius 3 = girth 0.333...
-  const baseGirth = 8; // Base girth for smallest chronons
-  const girth = baseGirth / Math.max(0.3, majorRadius / 5);
+  const baseGirth = 12;
+  const girth = baseGirth / Math.max(0.3, majorRadius / 8);
   
   const outerR = majorRadius;
   const innerR = Math.max(1, majorRadius - girth);
-  
-  // Create washer path with vertical split (left/right)
-  // We'll create two half-washers and color them differently
   
   // Left half (black)
   const leftPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -402,8 +520,6 @@ function drawWasher(g, cx, cy, majorRadius, rotationAngle) {
   leftPath.setAttribute('d', leftD);
   leftPath.setAttribute('fill', '#1a1a1a');
   leftPath.setAttribute('opacity', '0.9');
-  
-  // Rotate the left half
   leftPath.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
   g.appendChild(leftPath);
   
@@ -419,12 +535,10 @@ function drawWasher(g, cx, cy, majorRadius, rotationAngle) {
   rightPath.setAttribute('d', rightD);
   rightPath.setAttribute('fill', '#e8e8e8');
   rightPath.setAttribute('opacity', '0.9');
-  
-  // Rotate the right half
   rightPath.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
   g.appendChild(rightPath);
   
-  // Outline for clarity
+  // Outline
   const outline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   outline.setAttribute('cx', cx);
   outline.setAttribute('cy', cy);
@@ -432,10 +546,9 @@ function drawWasher(g, cx, cy, majorRadius, rotationAngle) {
   outline.setAttribute('fill', 'none');
   outline.setAttribute('stroke', '#60a5fa');
   outline.setAttribute('stroke-width', '0.5');
-  outline.setAttribute('opacity', '0.3');
+  outline.setAttribute('opacity', '0.4');
   g.appendChild(outline);
   
-  // Inner outline
   if (innerR > 1) {
     const innerOutline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     innerOutline.setAttribute('cx', cx);
@@ -444,7 +557,7 @@ function drawWasher(g, cx, cy, majorRadius, rotationAngle) {
     innerOutline.setAttribute('fill', 'none');
     innerOutline.setAttribute('stroke', '#60a5fa');
     innerOutline.setAttribute('stroke-width', '0.5');
-    innerOutline.setAttribute('opacity', '0.3');
+    innerOutline.setAttribute('opacity', '0.4');
     g.appendChild(innerOutline);
   }
 }
@@ -474,7 +587,7 @@ function draw(init=false){
           line.setAttribute('y2', grid[n].y);
           line.setAttribute('stroke','#60a5fa'); 
           line.setAttribute('stroke-width','1'); 
-          line.setAttribute('opacity','.3');
+          line.setAttribute('opacity','.25');
           g.appendChild(line);
         }
       }
@@ -483,24 +596,20 @@ function draw(init=false){
   
   // Draw chronon washers
   const MAX_RADIUS = Math.floor(SPACING / 2) - 2;
+  const MIN_RADIUS = 8;
   
   for(let i=0; i<S.n; i++){
     const p = grid[i];
     const rsrc = rhoE[i];
-    const majorRadius = 3 + (MAX_RADIUS - 3)*(rsrc/max);
+    const majorRadius = MIN_RADIUS + (MAX_RADIUS - MIN_RADIUS)*(rsrc/max);
     
-    // Rotation speed inversely proportional to radius (volume conservation)
-    // Larger radius = faster rotation (travels more distance)
-    // Speed factor: radius 1 = 1x, radius 2 = 2x, radius 3 = 3x
-    const radiusRatio = majorRadius / 5; // Normalize to ~1
-    const rotationSpeed = radiusRatio; // Larger = faster
-    
-    // Rotation angle from phase, scaled by speed
+    const radiusRatio = majorRadius / 8;
+    const rotationSpeed = radiusRatio;
     const rotationAngle = phi[i] * rotationSpeed;
     
     drawWasher(g, p.x, p.y, majorRadius, rotationAngle);
     
-    // High curvature markers (red dots)
+    // High curvature markers
     const neighbors = getNeighbors(i);
     let curv = 0;
     if(neighbors.length >= 2){
@@ -525,6 +634,7 @@ function draw(init=false){
 
 ui(); 
 reset(); 
+updateViewBox();
 for(let i=0; i<12; i++) step(); 
 draw(true);
 
@@ -548,7 +658,7 @@ document.getElementById('save').onclick=()=>{
     const ctx = c.getContext('2d'); 
     ctx.drawImage(img, 0, 0, c.width, c.height);
     const a = document.createElement('a'); 
-    a.download = 'angel1_chronons.png'; 
+    a.download = 'angel1_expandable_chronons.png'; 
     a.href = c.toDataURL(); 
     a.click();
     URL.revokeObjectURL(url);
