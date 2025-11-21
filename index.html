@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Angel-1 · Complete Faithful Geometry</title>
+<title>Angel-1 · Michron Physics (4π Spinor Model)</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { 
@@ -278,41 +278,13 @@ button:hover {
 button:active {
   transform: translateY(0);
 }
-
-.girth-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  padding: 8px;
-  background: white;
-  border-radius: 4px;
-}
-
-.girth-group label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #e94560;
-  min-width: 30px;
-}
-
-.girth-group input[type="range"] {
-  flex: 1;
-}
-
-.girth-group span {
-  font-size: 11px;
-  color: #666666;
-  min-width: 35px;
-  text-align: right;
-}
 </style>
-<script type='text/javascript' src='https://www.genspark.ai/nFD-IMeqF8Ywc7M9zhQHXhMiLKi7dDVdKLSMYAI6kIaycj3CLR1it917AtQYX53mpvwugAShBMlxsV_tj4p4OUY6G31OI387jbNxfgBqgLTNX1KF90Lny-RZyqGzltxu88vUoDCP3ZkJ3185z0ACeo0zo6njyFVFb4yRFimgT_E='></script></head>
+<script type='text/javascript' src='https://www.genspark.ai/AID2YqvM8xmgwFpP1PEFRIzSEHkW43ZVOber9GnRPr79497QHKLHo8ycZbISQFxrojhe9XBAPZnuwRJOlMSUvrGNmFTmTtncq7MTHmrwpmrBHlXPD_x0dz2tFBM-wnVF9ar8K-Wna0Pr0p_wzXn08PTzqqE6nP2_RPwosEUfCxc='></script></head>
 <body>
 
 <div id="header">
-  <h1>ANGEL-1</h1>
-  <div class="subtitle">Complete Faithful Geometry · Transactional Symmetry Simulator</div>
+  <h1>ANGEL-1 · MICHRON PHYSICS</h1>
+  <div class="subtitle">4π Spinor Model · Volume-Conserving Toroid Oscillation</div>
 </div>
 
 <div id="main">
@@ -354,88 +326,48 @@ button:active {
 
   <div id="sidebar">
     <div class="control-group">
-      <h3>⚡ Learning Control</h3>
-      <button id="btn-reset" onclick="resetTrial()">Reset to Chaos</button>
+      <h3>⚡ Control</h3>
+      <button id="btn-reset" onclick="resetSimulation()">Reset to Anti-Phase</button>
       <button id="btn-pause" onclick="togglePause()" style="margin-top: 10px;">Pause</button>
     </div>
 
     <div class="control-group">
-      <h3>📊 Harmony Metrics</h3>
+      <h3>📊 Michron Metrics</h3>
       <div class="metric-row">
-        <span class="metric-label">Harmony Score:</span>
-        <span class="metric-value" id="harmony-score">0%</span>
+        <span class="metric-label">Phase Coherence:</span>
+        <span class="metric-value" id="phase-coherence">0%</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">Avg Oscillation:</span>
-        <span class="metric-value" id="avg-oscillation">0°</span>
+        <span class="metric-label">Avg Expansion:</span>
+        <span class="metric-value" id="avg-expansion">0%</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">Chirality Balance:</span>
-        <span class="metric-value" id="chirality-balance">0</span>
+        <span class="metric-label">Interaction Energy:</span>
+        <span class="metric-value" id="interaction-energy">0</span>
       </div>
     </div>
 
     <div class="control-group">
-      <h3>🔧 Girth Controls (Washer Thickness)</h3>
-      <div class="girth-group">
-        <label>T3:</label>
-        <input type="range" id="girth-t3" min="1" max="10" value="2" step="0.5" oninput="updateGirthDisplay()">
-        <span id="girth-t3-val">2.0</span>
-      </div>
-      <div class="girth-group">
-        <label>T2:</label>
-        <input type="range" id="girth-t2" min="1" max="10" value="4" step="0.5" oninput="updateGirthDisplay()">
-        <span id="girth-t2-val">4.0</span>
-      </div>
-      <div class="girth-group">
-        <label>T1:</label>
-        <input type="range" id="girth-t1" min="1" max="10" value="8" step="0.5" oninput="updateGirthDisplay()">
-        <span id="girth-t1-val">8.0</span>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <h3>⚙️ Physics Parameters</h3>
+      <h3>⚙️ Oscillation Parameters</h3>
       <div class="slider-group">
-        <label>Alpha (Learning Rate):</label>
-        <input type="range" id="alpha" min="0" max="1" step="0.01" value="0.3" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="alpha-val">0.30</div>
+        <label>Angular Velocity (ω):</label>
+        <input type="range" id="omega" min="0.1" max="5" step="0.1" value="1.0" oninput="updateSliderDisplay()">
+        <div class="slider-value" id="omega-val">1.00 rad/s</div>
       </div>
       <div class="slider-group">
-        <label>Beta (Mutation Rate):</label>
-        <input type="range" id="beta" min="0" max="1" step="0.01" value="0.1" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="beta-val">0.10</div>
-      </div>
-      <div class="slider-group">
-        <label>Delta-t (Time Step):</label>
-        <input type="range" id="delta-t" min="0.1" max="2" step="0.1" value="1.0" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="delta-t-val">1.00</div>
-      </div>
-      <div class="slider-group">
-        <label>Jitter (Randomness):</label>
-        <input type="range" id="jitter" min="0" max="1" step="0.01" value="0.2" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="jitter-val">0.20</div>
-      </div>
-      <div class="slider-group">
-        <label>Speed (Angular Velocity):</label>
-        <input type="range" id="speed" min="0.5" max="5" step="0.5" value="3.0" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="speed-val">3.00</div>
+        <label>Expansion Ratio (Rr/Rm):</label>
+        <input type="range" id="expansion-ratio" min="1.5" max="3" step="0.1" value="2.0" oninput="updateSliderDisplay()">
+        <div class="slider-value" id="expansion-ratio-val">2.00</div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// === GRID CONFIG ===
+// === CONFIGURATION ===
 let COLS = 20;
 const ROWS = 9;
 let SPACING = 40;
-
-function getCanvasSize() {
-  const WIDTH = COLS * SPACING;
-  const HEIGHT = ROWS * SPACING;
-  return { WIDTH, HEIGHT };
-}
 
 // === COLOR STATE ===
 let COLORS = {
@@ -446,12 +378,13 @@ let COLORS = {
 };
 
 // === GLOBAL STATE ===
-let chronons = [];
+let michrons = [];
 let isPaused = false;
 let columnTypes = Array(COLS).fill('T1');
+let lastFrameTime = performance.now();
 
-// === CHRONON CLASS (With Faithful Geometry) ===
-class Chronon {
+// === MICHRON CLASS (4π Spinor Physics) ===
+class Michron {
   constructor(col, row, subCol, subRow, type) {
     this.col = col;
     this.row = row;
@@ -459,7 +392,7 @@ class Chronon {
     this.subRow = subRow;
     this.type = type;
     
-    // Position calculation
+    // Calculate position in grid
     let boxSize;
     if (type === 'T1') boxSize = SPACING;
     else if (type === 'T2') boxSize = SPACING / 2;
@@ -468,165 +401,141 @@ class Chronon {
     this.x = col * SPACING + subCol * boxSize + boxSize/2;
     this.y = row * SPACING + subRow * boxSize + boxSize/2;
     
-    // mC:rC ratio defines segmentation (FIXED GEOMETRY)
-    // T3 = 2mC:1rC = 240° negative, 120° positive
-    // T2 = 1mC:1rC = 180° negative, 180° positive
-    // T1 = 1mC:2rC = 120° negative, 240° positive
-    this.mCratio = type === 'T3' ? 2/3 : type === 'T2' ? 0.5 : 1/3;
+    // Michron parameters (based on type)
+    this.setMichronParameters(type, boxSize);
     
-    // Radius (girth affects this)
-    const baseRadius = boxSize * 0.35;
-    const girthMult = this.getGirthMultiplier();
-    this.maxRadius = baseRadius * girthMult;
-    this.minRadius = baseRadius * girthMult * 0.5; // At 90° contracts to 50%
-    this.radius = this.maxRadius;
+    // Phase angle θ ∈ [0, 4π]
+    // Initialize with anti-phase checkerboard
+    const isOdd = (col + row + subCol + subRow) % 2;
+    this.theta = isOdd ? 0 : Math.PI; // Anti-phase initialization
     
-    // Arc position: 0° = center (touching neighbors), ±90° = extremes
-    this.arcPos = Math.random() * 180 - 90; // Start random between -90 and +90
+    // Chirality (direction of oscillation)
+    this.chirality = isOdd ? 1 : -1;
     
-    // Chirality: +1 = right (expanding), -1 = left (contracting)
-    this.chirality = Math.random() > 0.5 ? 1 : -1;
+    // Visual rotation (for segmented display)
+    this.visualRotation = 0;
     
-    // Rotation angle for visual segmentation
-    this.rotationAngle = Math.random() * 360;
-    
-    // Collision flash
-    this.collisionFlash = 0;
-    
-    // Neighbors
+    // Neighbors (will be linked later)
     this.neighbors = [];
+    
+    // Calculate initial R and r
+    this.updateGeometry();
   }
   
-  getGirthMultiplier() {
-    const t3Girth = parseFloat(document.getElementById('girth-t3').value);
-    const t2Girth = parseFloat(document.getElementById('girth-t2').value);
-    const t1Girth = parseFloat(document.getElementById('girth-t1').value);
+  setMichronParameters(type, boxSize) {
+    const expansionRatio = parseFloat(document.getElementById('expansion-ratio').value);
     
-    if (this.type === 'T3') return t3Girth / 2;
-    if (this.type === 'T2') return t2Girth / 4;
-    if (this.type === 'T1') return t1Girth / 8;
-    return 1;
+    if (type === 'T1') {
+      this.Rm = boxSize * 0.25;  // Contracted radius (25% of box)
+      this.Rr = boxSize * 0.5;   // Expanded radius (50% of box)
+      this.mCratio = 1/3; // 1mC:2rC (33% dark)
+    } else if (type === 'T2') {
+      this.Rm = boxSize * 0.25;
+      this.Rr = boxSize * 0.5;
+      this.mCratio = 0.5; // 1mC:1rC (50% dark)
+    } else if (type === 'T3') {
+      this.Rm = boxSize * 0.25;
+      this.Rr = boxSize * 0.5;
+      this.mCratio = 2/3; // 2mC:1rC (67% dark)
+    }
+    
+    // Volume constant: C = Rr * r_at_max²
+    // At maximum expansion, r should be minimum
+    const r_at_max = this.Rr * 0.3; // Thin ring at max expansion
+    this.C = this.Rr * r_at_max * r_at_max;
   }
   
-  update() {
-    // BOUNDED OSCILLATION: 0° → ±90° → back to 0°
-    // This is the GEOMETRIC INTERFERENCE model
+  updateGeometry() {
+    // R(θ) = Rm + (Rr - Rm) * sin²(θ/4)
+    const sinTerm = Math.sin(this.theta / 4);
+    this.R = this.Rm + (this.Rr - this.Rm) * sinTerm * sinTerm;
     
-    // Check if at center (0° position - maximum contact)
-    const atCenter = Math.abs(this.arcPos) < 2;
+    // r(θ) = sqrt(C / R(θ))  [Volume conservation]
+    this.r = Math.sqrt(this.C / this.R);
     
-    if (atCenter) {
-      // AT CENTER: Check neighbors for chirality forcing
-      const votes = this.checkNeighborChirality();
-      
-      // Neighbor majority FORCES chirality direction
-      if (votes.right > votes.left) {
-        if (this.chirality === -1) {
-          this.chirality = 1;
-          this.collisionFlash = 1.0;
-        }
-      } else if (votes.left > votes.right) {
-        if (this.chirality === 1) {
-          this.chirality = -1;
-          this.collisionFlash = 1.0;
-        }
-      }
-      // If equal votes (2/2), maintain current chirality
+    // Wavelength: λ = 1/sqrt(R - r)
+    const diff = this.R - this.r;
+    if (diff > 0) {
+      this.lambda = 1 / Math.sqrt(diff);
+    } else {
+      this.lambda = Infinity;
     }
     
-    // Move based on chirality (oscillate toward extremes or back to center)
-    let angularVelocity = parseFloat(document.getElementById('speed').value);
-    
-    // CONCRESENCE: All types reach 0° simultaneously
-    // T3 moves slower, T1 moves faster
-    if (this.type === 'T1') angularVelocity *= 1.0;
-    else if (this.type === 'T2') angularVelocity *= 0.5;
-    else if (this.type === 'T3') angularVelocity *= 0.25;
-    
-    // Move in current chirality direction
-    this.arcPos += angularVelocity * this.chirality;
-    
-    // BOUNCE at ±90° (GEOMETRIC BOUND - physical interference prevents further rotation)
-    if (Math.abs(this.arcPos) >= 90) {
-      this.chirality *= -1; // Reverse direction (bounce back toward center)
-      this.arcPos = Math.sign(this.arcPos) * 90; // Clamp to boundary
-      this.collisionFlash = 1.0;
-    }
-    
-    // Update radius based on arc position
-    // At 0° = max radius (full contact with neighbors)
-    // At ±90° = min radius (contracted away from neighbors)
-    const oscillationFactor = Math.abs(this.arcPos) / 90; // 0 to 1
-    this.radius = this.maxRadius - (this.maxRadius - this.minRadius) * oscillationFactor;
-    
-    // Visual rotation for segmented torus
-    this.rotationAngle += angularVelocity * 0.5;
-    
-    // Decay collision flash
-    if (this.collisionFlash > 0) {
-      this.collisionFlash -= 0.1;
-    }
+    // Visual rotation speed (faster when contracted)
+    this.twistRate = 1 / Math.sqrt(this.R / this.Rm);
   }
   
-  checkNeighborChirality() {
-    let leftCount = 0;
-    let rightCount = 0;
+  update(deltaTime) {
+    // Angular velocity from UI
+    const omega = parseFloat(document.getElementById('omega').value);
     
-    // Only count neighbors also near center (touching/contacting)
+    // Phase evolution: θ(t) = ωt
+    // Chirality determines direction
+    this.theta += omega * deltaTime * this.chirality;
+    
+    // Wrap θ to [0, 4π] (spinor periodicity)
+    while (this.theta >= 4 * Math.PI) this.theta -= 4 * Math.PI;
+    while (this.theta < 0) this.theta += 4 * Math.PI;
+    
+    // Update geometry from phase
+    this.updateGeometry();
+    
+    // Visual rotation (represents helical twist)
+    this.visualRotation += this.twistRate * omega * deltaTime * 50;
+    
+    // Check for anti-phase forcing with neighbors
+    this.checkAntiPhaseInteraction();
+  }
+  
+  checkAntiPhaseInteraction() {
+    // Neighbors should be anti-phase: θ_i = θ_j + π
     this.neighbors.forEach(n => {
-      if (Math.abs(n.arcPos) < 15) { // Within contact threshold
-        if (n.chirality === 1) rightCount++;
-        else leftCount++;
+      const phaseDiff = Math.abs(this.theta - n.theta);
+      const antiPhaseDiff = Math.abs(phaseDiff - Math.PI);
+      
+      // If too close in phase (should be anti-phase), apply force
+      if (antiPhaseDiff > Math.PI / 4) {
+        // Weak repulsion to restore anti-phase
+        const correction = 0.01 * Math.sign(Math.PI - phaseDiff);
+        this.theta += correction;
       }
     });
-    
-    return { left: leftCount, right: rightCount };
+  }
+  
+  getInteractionStrength(neighbor) {
+    // Iij ∝ r_i*r_j - R_i*R_j
+    return this.r * neighbor.r - this.R * neighbor.R;
+  }
+  
+  isInContact(neighbor) {
+    // Geometric contact: distance < R_i + R_j
+    const dx = this.x - neighbor.x;
+    const dy = this.y - neighbor.y;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    return distance < (this.R + neighbor.R) * 1.1; // 10% overlap tolerance
   }
   
   draw() {
     let elements = [];
     
-    // Collision flash (yellow pulse when chirality forced)
-    if (this.collisionFlash > 0) {
-      const flash = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      flash.setAttribute('cx', this.x);
-      flash.setAttribute('cy', this.y);
-      flash.setAttribute('r', this.radius * 1.5);
-      flash.setAttribute('fill', `rgba(255, 255, 0, ${this.collisionFlash * 0.5})`);
-      flash.setAttribute('stroke', 'none');
-      elements.push(flash);
-    }
-    
-    // Draw WASHER/RING with segmented colors
+    // Draw toroid ring with segmented mC:rC colors
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    group.setAttribute('transform', `translate(${this.x}, ${this.y}) rotate(${this.rotationAngle})`);
+    group.setAttribute('transform', `translate(${this.x}, ${this.y}) rotate(${this.visualRotation})`);
     
-    // Washer dimensions
-    const outerRadius = this.radius;
-    const innerRadius = this.radius * 0.5; // Donut hole (50% of outer)
-    const strokeWidth = outerRadius - innerRadius;
-    const ringRadius = (outerRadius + innerRadius) / 2;
+    // Ring dimensions
+    const outerRadius = this.R;
+    const strokeWidth = this.r * 2; // Girth (minor diameter)
     
-    // Calculate angles for segmentation
+    // Calculate segment angles
     const negAngle = this.mCratio * 360; // Dark segment
     const posAngle = (1 - this.mCratio) * 360; // Light segment
     
-    // Draw negative (mass - dark) ring segment
-    const negPath = this.createRingArcPath(0, negAngle, ringRadius, strokeWidth);
-    const negArc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    negArc.setAttribute('d', negPath);
-    negArc.setAttribute('fill', 'none');
-    negArc.setAttribute('stroke', COLORS.negative);
-    negArc.setAttribute('stroke-width', strokeWidth);
+    // Draw negative (mass - dark) segment
+    const negArc = this.createRingSegment(0, negAngle, outerRadius, strokeWidth, COLORS.negative);
     group.appendChild(negArc);
     
-    // Draw positive (radiance - light) ring segment
-    const posPath = this.createRingArcPath(negAngle, negAngle + posAngle, ringRadius, strokeWidth);
-    const posArc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    posArc.setAttribute('d', posPath);
-    posArc.setAttribute('fill', 'none');
-    posArc.setAttribute('stroke', COLORS.positive);
-    posArc.setAttribute('stroke-width', strokeWidth);
+    // Draw positive (radiance - light) segment
+    const posArc = this.createRingSegment(negAngle, negAngle + posAngle, outerRadius, strokeWidth, COLORS.positive);
     group.appendChild(posArc);
     
     elements.push(group);
@@ -634,16 +543,24 @@ class Chronon {
     return elements;
   }
   
-  createRingArcPath(startAngle, endAngle, radius, strokeWidth) {
-    // Create arc path for ring segment (washer/donut)
+  createRingSegment(startAngle, endAngle, radius, strokeWidth, color) {
     const start = this.polarToCartesian(0, 0, radius, startAngle);
     const end = this.polarToCartesian(0, 0, radius, endAngle);
     const largeArcFlag = endAngle - startAngle > 180 ? "1" : "0";
     
-    return [
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const d = [
       "M", start.x, start.y,
       "A", radius, radius, 0, largeArcFlag, 1, end.x, end.y
     ].join(" ");
+    
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', strokeWidth);
+    path.setAttribute('stroke-linecap', 'round');
+    
+    return path;
   }
   
   polarToCartesian(centerX, centerY, radius, angleInDegrees) {
@@ -657,24 +574,24 @@ class Chronon {
 
 // === INITIALIZATION ===
 function init() {
-  chronons = [];
+  michrons = [];
   
   for (let col = 0; col < COLS; col++) {
     const type = columnTypes[col];
     
     for (let row = 0; row < ROWS; row++) {
       if (type === 'T1') {
-        chronons.push(new Chronon(col, row, 0, 0, 'T1'));
+        michrons.push(new Michron(col, row, 0, 0, 'T1'));
       } else if (type === 'T2') {
         for (let sc = 0; sc < 2; sc++) {
           for (let sr = 0; sr < 2; sr++) {
-            chronons.push(new Chronon(col, row, sc, sr, 'T2'));
+            michrons.push(new Michron(col, row, sc, sr, 'T2'));
           }
         }
       } else if (type === 'T3') {
         for (let sc = 0; sc < 3; sc++) {
           for (let sr = 0; sr < 3; sr++) {
-            chronons.push(new Chronon(col, row, sc, sr, 'T3'));
+            michrons.push(new Michron(col, row, sc, sr, 'T3'));
           }
         }
       }
@@ -682,12 +599,12 @@ function init() {
   }
   
   // Link neighbors
-  chronons.forEach(c => {
-    c.neighbors = chronons.filter(n => {
-      if (n === c) return false;
-      const dx = Math.abs(n.col - c.col);
-      const dy = Math.abs(n.row - c.row);
-      return (dx <= 1 && dy <= 1);
+  michrons.forEach(m => {
+    m.neighbors = michrons.filter(n => {
+      if (n === m) return false;
+      const dcol = Math.abs(n.col - m.col);
+      const drow = Math.abs(n.row - m.row);
+      return (dcol <= 1 && drow <= 1);
     });
   });
   
@@ -695,12 +612,17 @@ function init() {
   draw();
 }
 
-// === MAIN LOOP ===
-function animate() {
+// === ANIMATION LOOP ===
+function animate(currentTime) {
   if (!isPaused) {
-    chronons.forEach(c => c.update());
+    const deltaTime = (currentTime - lastFrameTime) / 1000; // Convert to seconds
+    lastFrameTime = currentTime;
+    
+    michrons.forEach(m => m.update(deltaTime));
     draw();
     updateMetrics();
+  } else {
+    lastFrameTime = currentTime;
   }
   requestAnimationFrame(animate);
 }
@@ -708,7 +630,8 @@ function animate() {
 // === DRAWING ===
 function draw() {
   const svg = document.getElementById('svg-canvas');
-  const { WIDTH, HEIGHT } = getCanvasSize();
+  const WIDTH = COLS * SPACING;
+  const HEIGHT = ROWS * SPACING;
   
   svg.setAttribute('width', WIDTH);
   svg.setAttribute('height', HEIGHT);
@@ -738,14 +661,47 @@ function draw() {
     svg.appendChild(line);
   }
   
-  // Draw chronons
-  chronons.forEach(c => {
-    const elements = c.draw();
+  // Draw michrons
+  michrons.forEach(m => {
+    const elements = m.draw();
     elements.forEach(el => svg.appendChild(el));
   });
 }
 
-// === COLUMN CONTROLS ===
+// === METRICS ===
+function updateMetrics() {
+  let totalExpansion = 0;
+  let phaseCoherence = 0;
+  let totalInteraction = 0;
+  let pairCount = 0;
+  
+  michrons.forEach(m => {
+    // Expansion percentage
+    const expansionPercent = ((m.R - m.Rm) / (m.Rr - m.Rm)) * 100;
+    totalExpansion += expansionPercent;
+    
+    // Phase coherence with neighbors
+    m.neighbors.forEach(n => {
+      const phaseDiff = Math.abs(m.theta - n.theta);
+      const antiPhaseScore = Math.abs(phaseDiff - Math.PI) / Math.PI;
+      phaseCoherence += (1 - antiPhaseScore);
+      
+      const interaction = m.getInteractionStrength(n);
+      totalInteraction += Math.abs(interaction);
+      pairCount++;
+    });
+  });
+  
+  const avgExpansion = (totalExpansion / michrons.length).toFixed(1);
+  const coherencePercent = ((phaseCoherence / pairCount) * 100).toFixed(1);
+  const avgInteraction = (totalInteraction / pairCount).toFixed(2);
+  
+  document.getElementById('avg-expansion').textContent = `${avgExpansion}%`;
+  document.getElementById('phase-coherence').textContent = `${coherencePercent}%`;
+  document.getElementById('interaction-energy').textContent = avgInteraction;
+}
+
+// === UI CONTROLS ===
 function renderColumnControls() {
   const container = document.getElementById('column-controls');
   container.innerHTML = '';
@@ -782,32 +738,13 @@ function removeColumn() {
   }
 }
 
-// === ZOOM CONTROL ===
 function updateZoom() {
   const slider = document.getElementById('zoom-slider');
   SPACING = parseInt(slider.value);
   document.getElementById('zoom-value').textContent = `${SPACING}px`;
-  
-  // Recalculate all chronon positions
-  chronons.forEach(c => {
-    let boxSize;
-    if (c.type === 'T1') boxSize = SPACING;
-    else if (c.type === 'T2') boxSize = SPACING / 2;
-    else if (c.type === 'T3') boxSize = SPACING / 3;
-    
-    c.x = c.col * SPACING + c.subCol * boxSize + boxSize/2;
-    c.y = c.row * SPACING + c.subRow * boxSize + boxSize/2;
-    
-    const baseRadius = boxSize * 0.35;
-    const girthMult = c.getGirthMultiplier();
-    c.maxRadius = baseRadius * girthMult;
-    c.minRadius = baseRadius * girthMult * 0.5;
-  });
-  
-  draw();
+  init();
 }
 
-// === COLOR CONTROLS ===
 function updateColors() {
   COLORS.bg = document.getElementById('color-bg').value;
   COLORS.grid = document.getElementById('color-grid').value;
@@ -816,71 +753,17 @@ function updateColors() {
   draw();
 }
 
-// === METRICS ===
-function updateMetrics() {
-  let totalOscillation = 0;
-  let harmonyPairs = 0;
-  let totalPairs = 0;
-  let rightChiral = 0;
-  let leftChiral = 0;
-  
-  chronons.forEach(c => {
-    totalOscillation += Math.abs(c.arcPos);
-    if (c.chirality === 1) rightChiral++;
-    else leftChiral++;
-    
-    // Count harmony (opposite chirality neighbors in contact)
-    c.neighbors.forEach(n => {
-      if (Math.abs(c.arcPos) < 15 && Math.abs(n.arcPos) < 15) {
-        totalPairs++;
-        if (c.chirality !== n.chirality) {
-          harmonyPairs++;
-        }
-      }
-    });
-  });
-  
-  const avgOsc = (totalOscillation / chronons.length).toFixed(1);
-  const harmonyScore = totalPairs > 0 ? ((harmonyPairs / totalPairs) * 100).toFixed(1) : 0;
-  const chiralityBalance = rightChiral - leftChiral;
-  
-  document.getElementById('harmony-score').textContent = `${harmonyScore}%`;
-  document.getElementById('avg-oscillation').textContent = `${avgOsc}°`;
-  document.getElementById('chirality-balance').textContent = chiralityBalance;
-}
-
-// === UI UPDATES ===
 function updateSliderDisplay() {
-  document.getElementById('alpha-val').textContent = parseFloat(document.getElementById('alpha').value).toFixed(2);
-  document.getElementById('beta-val').textContent = parseFloat(document.getElementById('beta').value).toFixed(2);
-  document.getElementById('delta-t-val').textContent = parseFloat(document.getElementById('delta-t').value).toFixed(2);
-  document.getElementById('jitter-val').textContent = parseFloat(document.getElementById('jitter').value).toFixed(2);
-  document.getElementById('speed-val').textContent = parseFloat(document.getElementById('speed').value).toFixed(2);
+  const omega = parseFloat(document.getElementById('omega').value);
+  const ratio = parseFloat(document.getElementById('expansion-ratio').value);
+  
+  document.getElementById('omega-val').textContent = `${omega.toFixed(2)} rad/s`;
+  document.getElementById('expansion-ratio-val').textContent = ratio.toFixed(2);
 }
 
-function updateGirthDisplay() {
-  document.getElementById('girth-t3-val').textContent = parseFloat(document.getElementById('girth-t3').value).toFixed(1);
-  document.getElementById('girth-t2-val').textContent = parseFloat(document.getElementById('girth-t2').value).toFixed(1);
-  document.getElementById('girth-t1-val').textContent = parseFloat(document.getElementById('girth-t1').value).toFixed(1);
-  
-  // Update all chronon radii
-  chronons.forEach(c => {
-    let boxSize;
-    if (c.type === 'T1') boxSize = SPACING;
-    else if (c.type === 'T2') boxSize = SPACING / 2;
-    else if (c.type === 'T3') boxSize = SPACING / 3;
-    
-    const baseRadius = boxSize * 0.35;
-    const girthMult = c.getGirthMultiplier();
-    c.maxRadius = baseRadius * girthMult;
-    c.minRadius = baseRadius * girthMult * 0.5;
-  });
-  
-  draw();
-}
-
-function resetTrial() {
+function resetSimulation() {
   init();
+  lastFrameTime = performance.now();
 }
 
 function togglePause() {
@@ -890,9 +773,8 @@ function togglePause() {
 
 // === START ===
 init();
-animate();
+requestAnimationFrame(animate);
 updateSliderDisplay();
-updateGirthDisplay();
 </script>
 
 </body>
