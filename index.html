@@ -1,930 +1,1106 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta http-equiv="x-ua-compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Angel-1 Chronon Template · Structured Spacetime Grid</title>
+<meta charset="utf-8"/>
+<title>Angel-1 · Harmony Learning Trial</title>
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    background: #0b0f14;
-    color: #e8ecef;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  
-  header {
-    background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
-    border-bottom: 2px solid #22303d;
-    padding: 12px 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  }
-  
-  h1 {
-    font-size: 24px;
-    font-weight: 600;
-    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 4px;
-  }
-  
-  .subtitle {
-    font-size: 12px;
-    color: #9ca3af;
-    font-weight: 400;
-  }
-  
-  main {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-  
-  footer {
-    background: #0f1620;
-    border-top: 2px solid #22303d;
-    padding: 12px 24px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
-  }
-  
-  .controls-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  
-  .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .control-group.highlight {
-    background: rgba(96, 165, 250, 0.1);
-    padding: 6px;
-    border-radius: 6px;
-    border: 1px solid rgba(96, 165, 250, 0.3);
-  }
-  
-  .control-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    font-weight: 500;
-    color: #d1d5db;
-  }
-  
-  .control-value {
-    font-size: 11px;
-    color: #60a5fa;
-    font-family: 'Courier New', monospace;
-    font-weight: 600;
-  }
-  
-  input[type=range] {
-    width: 100%;
-    height: 5px;
-    border-radius: 3px;
-    background: #1a1f2e;
-    outline: none;
-    -webkit-appearance: none;
-  }
-  
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  }
-  
-  input[type=range]::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  }
-  
-  .button-group {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-  
-  button {
-    padding: 8px 16px;
-    background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
-    border: 1px solid #22303d;
-    border-radius: 6px;
-    color: #e8ecef;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-  }
-  
-  button:hover {
-    background: linear-gradient(135deg, #2d4a70 0%, #22303d 100%);
-    border-color: #60a5fa;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(96, 165, 250, 0.2);
-  }
-  
-  button:active {
-    transform: translateY(0);
-  }
-  
-  button.primary {
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-    border-color: #60a5fa;
-  }
-  
-  button.primary:hover {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  }
-  
-  button.danger {
-    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
-    border-color: #f87171;
-  }
-  
-  button.danger:hover {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  }
-  
-  .stats {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(15, 22, 32, 0.9);
-    backdrop-filter: blur(8px);
-    border: 1px solid #22303d;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 11px;
-    color: #9ca3af;
-    line-height: 1.6;
-    font-family: 'Courier New', monospace;
-  }
-  
-  .stats-value {
-    color: #10b981;
-    font-weight: 600;
-  }
-  
-  .legend {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    background: rgba(15, 22, 32, 0.9);
-    backdrop-filter: blur(8px);
-    border: 1px solid #22303d;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 11px;
-    color: #9ca3af;
-    line-height: 1.8;
-    font-family: 'Courier New', monospace;
-  }
-  
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .legend-swatch {
-    width: 40px;
-    height: 14px;
-    border-radius: 3px;
-    border: 1px solid #60a5fa;
-  }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { 
+  font-family: 'Segoe UI', system-ui, sans-serif; 
+  background: #0a0a0a; 
+  color: #e0e0e0;
+  overflow-x: hidden;
+}
+
+#header {
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-bottom: 2px solid #0f3460;
+}
+
+#header h1 {
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  color: #e94560;
+  margin-bottom: 10px;
+}
+
+#header .subtitle {
+  font-size: 14px;
+  color: #a0a0a0;
+  letter-spacing: 1px;
+}
+
+#main {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  min-height: calc(100vh - 200px);
+}
+
+#canvas-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 20px;
+  position: relative;
+}
+
+#column-controls {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #16213e;
+  border-radius: 6px;
+  flex-wrap: wrap;
+  max-width: 820px;
+}
+
+.column-dropdown {
+  width: 38px;
+  padding: 4px 2px;
+  background: #0f3460;
+  color: #4ecca3;
+  border: 1px solid #e94560;
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+#color-controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #16213e;
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+.color-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-picker-group label {
+  font-size: 11px;
+  color: #a0a0a0;
+  min-width: 80px;
+}
+
+.color-picker-group input[type="color"] {
+  width: 40px;
+  height: 30px;
+  border: 1px solid #0f3460;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+
+#svg-canvas {
+  background: white;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+#sidebar {
+  width: 340px;
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.control-group {
+  background: #16213e;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 3px solid #e94560;
+}
+
+.control-group h3 {
+  font-size: 14px;
+  color: #e94560;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #0f3460;
+  font-size: 13px;
+}
+
+.metric-row:last-child {
+  border-bottom: none;
+}
+
+.metric-label {
+  color: #a0a0a0;
+}
+
+.metric-value {
+  color: #4ecca3;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.metric-value.warning {
+  color: #ffa500;
+}
+
+.metric-value.danger {
+  color: #e94560;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #e94560 0%, #0f3460 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.slider-container {
+  margin: 10px 0;
+}
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-bottom: 5px;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: #0f3460;
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #e94560;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #e94560;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.trial-history {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+}
+
+.trial-entry {
+  padding: 4px 8px;
+  margin: 2px 0;
+  background: #0f3460;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.trial-entry.best {
+  background: #1a5f3f;
+  border-left: 3px solid #4ecca3;
+}
+
+#status-bar {
+  padding: 15px 20px;
+  background: #1a1a2e;
+  border-top: 2px solid #0f3460;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4ecca3;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.learning-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-box {
+  background: #0f3460;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.stat-box .value {
+  font-size: 20px;
+  color: #4ecca3;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.stat-box .label {
+  font-size: 10px;
+  color: #a0a0a0;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
 </style>
-<script type='text/javascript' src='https://www.genspark.ai/szhVmKJbm53QE7VFHVP7NlxYRC03FNKSZhsMEkZ1lzHfNpRcxLCE8WtAjWom-bOHa68GJgtANm0myc3X_Lf1qH-At9d5RCsHiyHa1BYIa-QgQKPQTcKQJ6pRFKxiUtO8pSOyvyIHcWfNKggILUwbBZVlkTb5RWfw_XE_cn85vpY='></script></head>
+<script type='text/javascript' src='https://www.genspark.ai/g22Y81qMGYyM62gcA0lF_Ard4ZcWdu2MTJHAkPZ5t2a8WD-uu1wRcmcJNrgfv8m6GdEOD5_TKWZMy-Z9zAq0cRXAL0c8Ge4J3lmfNBkuw3hJh9KvsDn_09K4GJKB4nb3s0ySoAeDQWwKmiPRnzNwLuBvm0GWBxznq5-oNsS4i5Q='></script></head>
 <body>
 
-<header>
-  <h1>Angel-1 Chronon Template · Axioms of Proximity & Connection</h1>
-  <div class="subtitle">20×9 Grid · Dense T3 Bridges · Medium T2 Zones · Sparse T1 Core · Size Gradient Visible</div>
-</header>
+<div id="header">
+  <h1>ANGEL-1 · CHRONON HARMONY LEARNING</h1>
+  <div class="subtitle">Distributed Local Learning | Chaos → Harmony Time Trial</div>
+</div>
 
-<main>
-  <svg id="v" viewBox="-620 -280 1240 560"></svg>
-  <div class="stats" id="stats">
-    <div>Time Steps: <span class="stats-value" id="stat-t">0</span></div>
-    <div>Chronons: <span class="stats-value" id="stat-count">0</span></div>
-    <div>T1: <span class="stats-value" id="stat-t1">0</span> | T2: <span class="stats-value" id="stat-t2">0</span> | T3: <span class="stats-value" id="stat-t3-count">0</span></div>
-    <div>T3 Speed: <span class="stats-value" id="stat-t3">0.167×</span></div>
-    <div>Radiance Wash: <span class="stats-value" id="stat-wash">OFF</span></div>
+<div id="main">
+  <div id="canvas-container">
+    <div id="color-controls">
+      <div class="color-picker-group">
+        <label>Background:</label>
+        <input type="color" id="color-bg" value="#ffffff" onchange="updateColors()">
+      </div>
+      <div class="color-picker-group">
+        <label>Grid Lines:</label>
+        <input type="color" id="color-grid" value="#cccccc" onchange="updateColors()">
+      </div>
+      <div class="color-picker-group">
+        <label>Positive (+):</label>
+        <input type="color" id="color-positive" value="#ffffff" onchange="updateColors()">
+      </div>
+      <div class="color-picker-group">
+        <label>Negative (-):</label>
+        <input type="color" id="color-negative" value="#000000" onchange="updateColors()">
+      </div>
+    </div>
+    <div id="column-controls"></div>
+    <svg id="svg-canvas" width="800" height="540"></svg>
   </div>
-  
-  <div class="legend">
-    <div><strong>Chronon Types:</strong></div>
-    <div class="legend-item">
-      <div class="legend-swatch" style="background: linear-gradient(to right, #e8e8e8 83%, #1a1a1a 17%);"></div>
-      <span>T1: 60×60 (thin, 300°W+60°B)</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-swatch" style="background: linear-gradient(to right, #999 50%, #444 50%);"></div>
-      <span>T2: 30×30 (medium, 180° each)</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-swatch" style="background: linear-gradient(to right, #1a1a1a 83%, #e8e8e8 17%);"></div>
-      <span>T3: 15×15 (thick, 300°B+60°W)</span>
-    </div>
-    <div style="margin-top: 8px; color: #f87171;">● Red nodes = inert polarity</div>
-  </div>
-</main>
 
-<footer>
-  <div class="button-group">
-    <button id="p" class="primary">Pause</button>
-    <button id="r">Reset</button>
-    <button id="wash" class="danger">Toggle Radiance Wash</button>
-    <button id="proton" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">🔫 Proton Gun (Click Grid)</button>
-    <button id="save">Save PNG</button>
+  <div id="sidebar">
+    <div class="control-group">
+      <h3>⚡ Learning Control</h3>
+      <button id="btn-reset" onclick="resetTrial()">Reset to Chaos</button>
+      <button id="btn-pause" onclick="togglePause()" style="margin-top: 10px;">Pause</button>
+    </div>
+
+    <div class="control-group">
+      <h3>📊 Current Trial</h3>
+      <div class="metric-row">
+        <span class="metric-label">Time Elapsed:</span>
+        <span class="metric-value" id="time-elapsed">0.00s</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Moments:</span>
+        <span class="metric-value" id="moments">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Harmony Score:</span>
+        <span class="metric-value" id="harmony-score">0%</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Stability:</span>
+        <span class="metric-value" id="stability">Chaotic</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Collisions:</span>
+        <span class="metric-value warning" id="collisions">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Chirality Flips:</span>
+        <span class="metric-value warning" id="flips">0</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>🧠 Learning Statistics</h3>
+      <div class="learning-stats">
+        <div class="stat-box">
+          <div class="value" id="trial-count">0</div>
+          <div class="label">Trials</div>
+        </div>
+        <div class="stat-box">
+          <div class="value" id="best-time">--</div>
+          <div class="label">Best Time</div>
+        </div>
+        <div class="stat-box">
+          <div class="value" id="avg-time">--</div>
+          <div class="label">Avg Time</div>
+        </div>
+        <div class="stat-box">
+          <div class="value" id="improvement">0%</div>
+          <div class="label">Improvement</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>🎛️ Physics Parameters</h3>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Alpha (α - Linear Dispersion):</span>
+          <span id="val-alpha">0.9</span>
+        </div>
+        <input type="range" id="alpha" min="0.1" max="1.5" step="0.05" value="0.9" 
+               oninput="document.getElementById('val-alpha').textContent = this.value">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Beta (β - Nonlinearity):</span>
+          <span id="val-beta">0.35</span>
+        </div>
+        <input type="range" id="beta" min="0" max="1" step="0.05" value="0.35"
+               oninput="document.getElementById('val-beta').textContent = this.value">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Learning Rate:</span>
+          <span id="val-learning">0.15</span>
+        </div>
+        <input type="range" id="learning-rate" min="0" max="0.5" step="0.05" value="0.15" 
+               oninput="document.getElementById('val-learning').textContent = this.value">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Mutation Rate:</span>
+          <span id="val-mutation">0.1</span>
+        </div>
+        <input type="range" id="mutation-rate" min="0" max="0.3" step="0.05" value="0.1"
+               oninput="document.getElementById('val-mutation').textContent = this.value">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Speed:</span>
+          <span id="val-speed">5</span>
+        </div>
+        <input type="range" id="speed" min="1" max="20" step="1" value="5"
+               oninput="document.getElementById('val-speed').textContent = this.value">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>⚙️ Girth Controls</h3>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>T1 Girth:</span>
+          <span id="val-girth-t1">8</span>
+        </div>
+        <input type="range" id="girth-t1" min="2" max="20" step="1" value="8" 
+               oninput="document.getElementById('val-girth-t1').textContent = this.value; updateGirths()">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>T2 Girth:</span>
+          <span id="val-girth-t2">4</span>
+        </div>
+        <input type="range" id="girth-t2" min="1" max="10" step="0.5" value="4"
+               oninput="document.getElementById('val-girth-t2').textContent = this.value; updateGirths()">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>T3 Girth:</span>
+          <span id="val-girth-t3">2</span>
+        </div>
+        <input type="range" id="girth-t3" min="0.5" max="5" step="0.5" value="2"
+               oninput="document.getElementById('val-girth-t3').textContent = this.value; updateGirths()">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>📜 Trial History</h3>
+      <div class="trial-history" id="trial-history">
+        <div style="color: #666; text-align: center; padding: 20px;">
+          No trials yet. Click "Reset to Chaos" to begin.
+        </div>
+      </div>
+    </div>
   </div>
-  
-  <div class="controls-grid">
-    <div class="control-group highlight">
-      <div class="control-label">
-        <span>🔍 Zoom Level</span>
-        <span class="control-value" id="val-zoom">1.00</span>
-      </div>
-      <input id="zoom" type="range" min="0.5" max="3" step="0.1" value="1">
-    </div>
-    
-    <div class="control-group">
-      <div class="control-label">
-        <span>α (Linear Dispersion)</span>
-        <span class="control-value" id="val-a">0.90</span>
-      </div>
-      <input id="a" type="range" min="0.1" max="1.5" step="0.01" value="0.9">
-    </div>
-    
-    <div class="control-group">
-      <div class="control-label">
-        <span>β (Nonlinearity)</span>
-        <span class="control-value" id="val-b">0.35</span>
-      </div>
-      <input id="b" type="range" min="0" max="1" step="0.01" value="0.35">
-    </div>
-    
-    <div class="control-group">
-      <div class="control-label">
-        <span>Speed (Steps/Frame)</span>
-        <span class="control-value" id="val-s">4</span>
-      </div>
-      <input id="s" type="range" min="1" max="20" step="1" value="4">
-    </div>
+</div>
+
+<div id="status-bar">
+  <div class="status-item">
+    <div class="status-indicator"></div>
+    <span>System Active</span>
   </div>
-</footer>
+  <div class="status-item">
+    <span id="grid-info">20 columns × 9 rows | T1 Core Learning</span>
+  </div>
+</div>
 
 <script>
-// Chronon Template Grid Configuration
+// ============================================
+// CHRONON HARMONY LEARNING SIMULATION
+// ============================================
+
+const svg = document.getElementById('svg-canvas');
 const COLS = 20;
-const ROWS_T1 = 9;
-const SPACING_T1 = 60;
+const ROWS = 9;
+const SPACING = 40;
+const WIDTH = COLS * SPACING;
+const HEIGHT = ROWS * SPACING;
 
-// Physics parameters
-const S = {alpha: 0.9, beta: 0.35, dt: 0.02, jitter: 0.00, speed: 4};
-let t = 0, play = true, radianceWash = false;
-let zoomLevel = 1.0;
+svg.setAttribute('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
 
-// Chronon data structures
-let chronons = [];
-const v = document.getElementById('v');
-let protonGunActive = false;
-let particles = []; // Active particles traversing the grid
+// Grid definition
+let gridDef = [
+  'T3','T3', 'T2','T2','T2', 'T1','T1','T1','T1','T1',
+  'T1','T1','T1','T1','T1', 'T2','T2','T2', 'T3','T3'
+];
 
-// Chronon type definitions
-const CHRONON_TYPES = {
-  T1: { 
-    boxSize: 60,
-    baseSpeed: 1.0,
-    girth: 8,  // THIN washers (2× T2 girth)
-    lightDeg: 300,  // 300° white, 60° black
-    darkDeg: 60,
-    lightColor: '#e8e8e8',
-    darkColor: '#1a1a1a',
-    oscillationRange: 18,  // 5% of 360 (normal matter)
-    naturalOscillation: 3  // Uses ~17% of range naturally
-  },
-  T2: { 
-    boxSize: 30,
-    baseSpeed: 0.5,  // Half of T1
-    girth: 4,  // MEDIUM washers (2× T3 girth)
-    lightDeg: 180,  // 180° each (neutral)
-    darkDeg: 180,
-    lightColor: '#999999',
-    darkColor: '#444444',
-    oscillationRange: 97,  // 27% of 360 (dark matter)
-    naturalOscillation: 15  // Uses ~15% of range naturally
-  },
-  T3: { 
-    boxSize: 15,
-    baseSpeed: 0.167,  // 1/6th of T1 (3x slower than T2)
-    girth: 2,  // THINNEST washers (base girth)
-    lightDeg: 60,   // 300° black, 60° white
-    darkDeg: 300,
-    lightColor: '#e8e8e8',
-    darkColor: '#1a1a1a',
-    oscillationRange: 245,  // 68% of 360 (dark energy)
-    naturalOscillation: 40  // Uses ~16% of range naturally
-  }
+// Color settings
+let colors = {
+  background: '#ffffff',
+  gridLines: '#cccccc',
+  positive: '#ffffff',
+  negative: '#000000'
 };
 
-function createChrononGrid() {
-  chronons = [];
-  
-  // Column layout with subdivisions:
-  // 1-2: T3 (4×4 subdivisions per T1 cell)
-  // 3-5: T2 (2×2 subdivisions per T1 cell)
-  // 6-15: T1 (1×1, no subdivision)
-  // 16-18: T2 (2×2 subdivisions per T1 cell)
-  // 19-20: T3 (4×4 subdivisions per T1 cell)
-  
-  let countT1 = 0, countT2 = 0, countT3 = 0;
-  
-  for (let col = 0; col < COLS; col++) {
-    let type, subdivisions;
+// Chronon arrays
+let chronons = [];
+let totalChronons = 0;
+
+// Simulation state
+let paused = false;
+let moments = 0;
+let startTime = 0;
+let collisionCount = 0;
+let flipCount = 0;
+
+// Learning state
+let trialCount = 0;
+let trialTimes = [];
+let bestTime = Infinity;
+let bestStrategies = [];
+
+// ============================================
+// CHRONON CLASS
+// ============================================
+
+class Chronon {
+  constructor(col, row, type, boxSize, subCol = 0, subRow = 0) {
+    this.col = col;
+    this.row = row;
+    this.type = type;
+    this.boxSize = boxSize;
+    this.subCol = subCol;
+    this.subRow = subRow;
     
-    if (col < 2 || col >= 18) {
-      // T3 columns: 4×4 subdivisions
-      type = 'T3';
-      subdivisions = 4;
-    } else if ((col >= 2 && col < 5) || (col >= 15 && col < 18)) {
-      // T2 columns: 2×2 subdivisions
-      type = 'T2';
-      subdivisions = 2;
+    // Position (center of box) - precise positioning in subdivided boxes
+    this.x = col * SPACING + subCol * boxSize + boxSize/2;
+    this.y = row * SPACING + subRow * boxSize + boxSize/2;
+    
+    // Physics
+    // Start at random position within ±90° from North (0°)
+    // 0° = North (top), so range is [-90, +90] or [270, 90] in 0-359 space
+    const randomOffset = (Math.random() - 0.5) * 180; // -90 to +90
+    this.arcPos = randomOffset; // Can be negative, will normalize in drawing
+    this.chirality = Math.random() < 0.5 ? 1 : -1; // 1=right/CW, -1=left/CCW
+    this.radius = boxSize * 0.45; // Start at max (full size)
+    
+    // Learning strategy parameters
+    this.strategy = {
+      rotSpeed: 2 + Math.random() * 3, // degrees per moment
+      pauseProb: 0.1 + Math.random() * 0.2, // probability to pause
+      flipThreshold: 80 + Math.random() * 10 // when to flip at 90
+    };
+    
+    // Performance tracking
+    this.successScore = 0;
+    this.contactTime = 0;
+    this.isolationTime = 0;
+    this.lastFlipMoment = -100;
+    
+    // Visual
+    this.baseGirth = type === 'T3' ? 2 : (type === 'T2' ? 4 : 8);
+    this.girth = this.baseGirth;
+    this.neighbors = [];
+  }
+  
+  findNeighbors() {
+    this.neighbors = chronons.filter(c => {
+      if (c === this) return false;
+      if (c.type !== this.type) return false;
+      
+      // Check if adjacent (considering subdivisions)
+      const dx = Math.abs(c.x - this.x);
+      const dy = Math.abs(c.y - this.y);
+      const neighborDist = this.boxSize * 1.5; // Adjacent if within 1.5 box sizes
+      
+      return dx <= neighborDist && dy <= neighborDist && (dx + dy) > 0;
+    });
+  }
+  
+  update() {
+    // Local learning: adjust behavior based on recent success
+    const learningRate = parseFloat(document.getElementById('learning-rate').value);
+    
+    // Check if in contact with neighbors
+    const inContact = this.neighbors.some(n => this.isInContact(n));
+    
+    if (inContact) {
+      this.contactTime++;
+      this.isolationTime = 0;
+      this.successScore += 1; // Reward for maintaining contact
     } else {
-      // T1 columns: no subdivision
-      type = 'T1';
-      subdivisions = 1;
+      this.isolationTime++;
+      this.contactTime = 0;
+      if (this.isolationTime > 3) {
+        this.successScore -= 10; // Penalty for isolation
+      }
     }
     
-    const typeData = CHRONON_TYPES[type];
-    const boxSize = typeData.boxSize;
+    // Decide action: rotate or pause
+    const shouldPause = Math.random() < this.strategy.pauseProb;
     
-    // For each T1 row
-    for (let t1Row = 0; t1Row < ROWS_T1; t1Row++) {
-      // Subdivide into smaller boxes
-      for (let subRow = 0; subRow < subdivisions; subRow++) {
-        for (let subCol = 0; subCol < subdivisions; subCol++) {
-          // Calculate position
-          const colX = (col - COLS/2) * SPACING_T1;
-          const rowY = (t1Row - ROWS_T1/2) * SPACING_T1;
-          
-          const x = colX + (subCol - subdivisions/2 + 0.5) * boxSize;
-          const y = rowY + (subRow - subdivisions/2 + 0.5) * boxSize;
-          
-          chronons.push({
-            x, y,
+    if (!shouldPause) {
+      // Rotate based on strategy (1 full rotation per second baseline)
+      // At speed=1, we want 360° per second = 360/60 = 6° per frame at 60fps
+      // Simplified: use rotSpeed as degrees per update moment
+      const rotSpeed = this.strategy.rotSpeed * this.getTypeSpeedMultiplier();
+      this.arcPos += rotSpeed * this.chirality;
+      
+      // Normalize arcPos to [-180, 180] range with 0 at North
+      while (this.arcPos > 180) this.arcPos -= 360;
+      while (this.arcPos < -180) this.arcPos += 360;
+      
+      // Left spin: flip at 90 degrees from North
+      if (this.chirality === -1 && Math.abs(this.arcPos) >= this.strategy.flipThreshold) {
+        this.chirality = 1; // Flip to right
+        this.arcPos = 0; // Reset to North (zero)
+        flipCount++;
+        this.lastFlipMoment = moments;
+        this.successScore += 2; // Reward for successful flip
+      }
+      
+      // Check for collisions
+      this.neighbors.forEach(n => {
+        if (this.isColliding(n)) {
+          this.handleCollision(n);
+        }
+      });
+    }
+    
+    // Update radius based on arc position (0 = max, 90 = min for left spin)
+    this.updateRadius();
+  }
+  
+  isInContact(other) {
+    const dist = Math.hypot(this.x - other.x, this.y - other.y);
+    const touchDist = this.radius + other.radius + 2;
+    return dist <= touchDist;
+  }
+  
+  isColliding(other) {
+    // Same chirality and overlapping = destructive collision
+    if (this.chirality === other.chirality) {
+      const dist = Math.hypot(this.x - other.x, this.y - other.y);
+      return dist < this.radius + other.radius - 2;
+    }
+    return false;
+  }
+  
+  handleCollision(other) {
+    collisionCount++;
+    
+    // Bounce = Flip
+    if (this.successScore < other.successScore) {
+      this.chirality *= -1;
+      flipCount++;
+      this.successScore -= 5; // Penalty for losing collision
+    } else {
+      other.chirality *= -1;
+      flipCount++;
+      other.successScore -= 5;
+    }
+  }
+  
+  updateRadius() {
+    const maxRadius = this.boxSize * 0.45;
+    const minRadius = this.boxSize * 0.2;
+    
+    if (this.chirality === -1) {
+      // Left spin: contract from 0 to ±90
+      const t = Math.min(Math.abs(this.arcPos) / 90, 1);
+      this.radius = maxRadius - t * (maxRadius - minRadius);
+    } else {
+      // Right spin: stay at max (full size)
+      this.radius = maxRadius;
+    }
+  }
+  
+  getTypeSpeedMultiplier() {
+    if (this.type === 'T1') return 1.0;
+    if (this.type === 'T2') return 0.5;
+    if (this.type === 'T3') return 0.167;
+    return 1.0;
+  }
+  
+  learnFromNeighbors() {
+    // Distributed learning: adopt successful strategies from neighbors
+    const learningRate = parseFloat(document.getElementById('learning-rate').value);
+    const mutationRate = parseFloat(document.getElementById('mutation-rate').value);
+    
+    // Find best neighbor
+    const bestNeighbor = this.neighbors.reduce((best, n) => 
+      n.successScore > (best?.successScore || -Infinity) ? n : best
+    , null);
+    
+    if (bestNeighbor && bestNeighbor.successScore > this.successScore) {
+      // Blend strategies
+      this.strategy.rotSpeed = 
+        this.strategy.rotSpeed * (1 - learningRate) + 
+        bestNeighbor.strategy.rotSpeed * learningRate;
+      
+      this.strategy.pauseProb = 
+        this.strategy.pauseProb * (1 - learningRate) + 
+        bestNeighbor.strategy.pauseProb * learningRate;
+      
+      this.strategy.flipThreshold = 
+        this.strategy.flipThreshold * (1 - learningRate) + 
+        bestNeighbor.strategy.flipThreshold * learningRate;
+    }
+    
+    // Random mutation for exploration
+    if (Math.random() < mutationRate) {
+      this.strategy.rotSpeed += (Math.random() - 0.5) * 0.5;
+      this.strategy.pauseProb += (Math.random() - 0.5) * 0.05;
+      this.strategy.flipThreshold += (Math.random() - 0.5) * 5;
+      
+      // Clamp values
+      this.strategy.rotSpeed = Math.max(0.5, Math.min(5, this.strategy.rotSpeed));
+      this.strategy.pauseProb = Math.max(0, Math.min(0.5, this.strategy.pauseProb));
+      this.strategy.flipThreshold = Math.max(70, Math.min(90, this.strategy.flipThreshold));
+    }
+  }
+  
+  draw() {
+    const outerR = this.radius;
+    const innerR = Math.max(0.5, this.radius - this.girth);
+    
+    // Rotation angle (arcPos already in degrees, 0 = North)
+    const rotAngle = (this.arcPos * Math.PI / 180);
+    
+    // Washer as two circles
+    const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    outer.setAttribute('cx', this.x);
+    outer.setAttribute('cy', this.y);
+    outer.setAttribute('r', outerR);
+    outer.setAttribute('fill', this.chirality === 1 ? colors.positive : colors.negative);
+    outer.setAttribute('stroke', '#666');
+    outer.setAttribute('stroke-width', '0.5');
+    
+    const inner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    inner.setAttribute('cx', this.x);
+    inner.setAttribute('cy', this.y);
+    inner.setAttribute('r', innerR);
+    inner.setAttribute('fill', colors.background);
+    
+    // Red node
+    const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    node.setAttribute('cx', this.x);
+    node.setAttribute('cy', this.y);
+    node.setAttribute('r', '1.5');
+    node.setAttribute('fill', 'red');
+    
+    // Rotation indicator (small line)
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', this.x);
+    line.setAttribute('y1', this.y);
+    line.setAttribute('x2', this.x + outerR * Math.cos(rotAngle));
+    line.setAttribute('y2', this.y + outerR * Math.sin(rotAngle));
+    line.setAttribute('stroke', this.chirality === 1 ? '#00ff00' : '#ff0000');
+    line.setAttribute('stroke-width', '1');
+    line.setAttribute('opacity', '0.6');
+    
+    return [outer, inner, node, line];
+  }
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+function initGrid() {
+  chronons = [];
+  let idx = 0;
+  
+  for (let c = 0; c < COLS; c++) {
+    const type = gridDef[c];
+    let boxSize, subsPerCol;
+    
+    if (type === 'T1') {
+      boxSize = SPACING;
+      subsPerCol = 1; // 1x1 = 1 chronon per T1 cell
+    } else if (type === 'T2') {
+      boxSize = SPACING / 2;
+      subsPerCol = 2; // 2x2 = 4 chronons per T1 cell
+    } else { // T3
+      boxSize = SPACING / 3;
+      subsPerCol = 3; // 3x3 = 9 chronons per T1 cell
+    }
+    
+    // For each T1 row height
+    for (let r = 0; r < ROWS; r++) {
+      // Subdivide within this T1 cell
+      for (let subR = 0; subR < subsPerCol; subR++) {
+        for (let subC = 0; subC < subsPerCol; subC++) {
+          const chronon = new Chronon(
+            c,
+            r,
             type,
             boxSize,
-            psiR: Math.random() * 2 - 1,
-            psiI: Math.random() * 2 - 1,
-            rho: 1.0,  // Start at max density
-            rhoE: 1.0,  // Start at max to fill boxes
-            phi: 0,  // All start with right chirality (same direction)
-            arcPosition: 0,  // Start at max size (arc 0)
-            chirality: 1,  // +1 = right, -1 = left
-            disturbance: 0,  // External force applied
-            neighbors: []
-          });
-          
-          if (type === 'T1') countT1++;
-          else if (type === 'T2') countT2++;
-          else countT3++;
+            subC,
+            subR
+          );
+          chronons.push(chronon);
+          idx++;
         }
       }
     }
   }
-  
-  // Normalize wave functions
-  normalizeAll();
   
   // Build neighbor connections
-  buildNeighbors();
+  chronons.forEach(c => c.findNeighbors());
   
-  // Set all chronons to maximum size (fill boxes)
-  for (const c of chronons) {
-    c.rho = 1.0;
-    c.rhoE = 1.0;
-  }
+  totalChronons = chronons.length;
+  console.log(`Initialized ${totalChronons} chronons`);
+}
+
+// ============================================
+// GIRTH UPDATE
+// ============================================
+
+function updateGirths() {
+  const t1Girth = parseFloat(document.getElementById('girth-t1').value);
+  const t2Girth = parseFloat(document.getElementById('girth-t2').value);
+  const t3Girth = parseFloat(document.getElementById('girth-t3').value);
   
-  // Update stats
-  document.getElementById('stat-count').textContent = chronons.length;
-  document.getElementById('stat-t1').textContent = countT1;
-  document.getElementById('stat-t2').textContent = countT2;
-  document.getElementById('stat-t3-count').textContent = countT3;
+  chronons.forEach(c => {
+    if (c.type === 'T1') c.girth = t1Girth;
+    else if (c.type === 'T2') c.girth = t2Girth;
+    else if (c.type === 'T3') c.girth = t3Girth;
+  });
 }
 
-function normalizeAll() {
-  let s = 0;
-  for (const c of chronons) {
-    s += c.psiR * c.psiR + c.psiI * c.psiI;
-  }
-  s = Math.sqrt(s) || 1e-12;
-  for (const c of chronons) {
-    c.psiR /= s;
-    c.psiI /= s;
-  }
+function updateColors() {
+  colors.background = document.getElementById('color-bg').value;
+  colors.gridLines = document.getElementById('color-grid').value;
+  colors.positive = document.getElementById('color-positive').value;
+  colors.negative = document.getElementById('color-negative').value;
+  
+  svg.style.background = colors.background;
 }
 
-function buildNeighbors() {
-  // Chronons must be touching or touchable by others in their class
-  for (let i = 0; i < chronons.length; i++) {
-    chronons[i].neighbors = [];
-    const c1 = chronons[i];
-    const maxDist = c1.boxSize * 1.5; // Touch adjacent boxes
-    
-    for (let j = 0; j < chronons.length; j++) {
-      if (i === j) continue;
-      const c2 = chronons[j];
-      const dx = c2.x - c1.x;
-      const dy = c2.y - c1.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      
-      // Connect if close enough (boundary kissing)
-      if (dist < maxDist) {
-        chronons[i].neighbors.push(j);
-      }
-    }
-  }
-}
-
-function updateViewBox() {
-  const baseW = 620, baseH = 280;
-  const w = baseW / zoomLevel, h = baseH / zoomLevel;
-  v.setAttribute('viewBox', `${-w} ${-h} ${w*2} ${h*2}`);
-}
-
-function ui() {
-  const map = {a:'alpha', b:'beta', s:'speed'};
-  ['a','b','s'].forEach(id => {
-    const input = document.getElementById(id);
-    const valDisplay = document.getElementById('val-' + id);
-    input.oninput = e => {
-      S[map[id]] = parseFloat(e.target.value);
-      valDisplay.textContent = e.target.value;
+function createColumnControls() {
+  const container = document.getElementById('column-controls');
+  container.innerHTML = '';
+  
+  for (let i = 0; i < COLS; i++) {
+    const select = document.createElement('select');
+    select.className = 'column-dropdown';
+    select.innerHTML = `
+      <option value="T1" ${gridDef[i] === 'T1' ? 'selected' : ''}>T1</option>
+      <option value="T2" ${gridDef[i] === 'T2' ? 'selected' : ''}>T2</option>
+      <option value="T3" ${gridDef[i] === 'T3' ? 'selected' : ''}>T3</option>
+    `;
+    select.onchange = function() {
+      gridDef[i] = this.value;
+      rebuildGrid();
     };
-  });
-  
-  document.getElementById('zoom').oninput = e => {
-    zoomLevel = parseFloat(e.target.value);
-    document.getElementById('val-zoom').textContent = zoomLevel.toFixed(2);
-    updateViewBox();
-  };
-  
-  const pb = document.getElementById('p');
-  const setBtn = () => pb.textContent = play ? 'Pause' : 'Play';
-  pb.onclick = () => { play = !play; setBtn(); };
-  
-  document.getElementById('r').onclick = () => {
-    createChrononGrid();
-    for (let i = 0; i < 12; i++) step();
-    draw(true);
-  };
-  
-  document.getElementById('wash').onclick = () => {
-    radianceWash = !radianceWash;
-    document.getElementById('stat-wash').textContent = radianceWash ? 'ON' : 'OFF';
-    document.getElementById('stat-t3').textContent = radianceWash ? '3.0×' : '0.167×';
-  };
-  
-  document.getElementById('proton').onclick = () => {
-    protonGunActive = !protonGunActive;
-    document.getElementById('proton').textContent = protonGunActive ? '🎯 Click to Fire!' : '🔫 Proton Gun (Click Grid)';
-    v.style.cursor = protonGunActive ? 'crosshair' : 'default';
-  };
-  
-  // Click to fire proton horizontally across grid
-  v.addEventListener('click', (e) => {
-    if (!protonGunActive) return;
-    
-    const rect = v.getBoundingClientRect();
-    const svgY = (e.clientY - rect.top) / rect.height * 560 - 280;
-    
-    // Fire from left edge, travel horizontally right
-    particles.push({
-      x: -600,  // Start from left side
-      y: svgY,
-      vx: 5,    // Move right
-      vy: 0,
-      energy: 1.0,
-      wavelength: 500, // nm (green light initially)
-      age: 0,
-      maxAge: 300,
-      trail: []  // Store trail positions
-    });
-  });
-  
-  setBtn();
+    container.appendChild(select);
+  }
 }
+
+function rebuildGrid() {
+  initGrid();
+  resetTrial();
+}
+
+// ============================================
+// SIMULATION
+// ============================================
 
 function step() {
-  // Update particles (protons traversing grid)
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    
-    // Find nearest chronon
-    let nearest = null;
-    let minDist = Infinity;
-    for (const c of chronons) {
-      const dx = c.x - p.x;
-      const dy = c.y - p.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < minDist) {
-        minDist = dist;
-        nearest = c;
-      }
-    }
-    
-    if (nearest && minDist < nearest.boxSize) {
-      // Interact with chronon
-      const typeData = CHRONON_TYPES[nearest.type];
-      
-      // Apply disturbance to chronon
-      nearest.disturbance += p.energy * 0.5;
-      
-      // T3: Redshift (energy absorption)
-      if (nearest.type === 'T3') {
-        p.energy *= 0.95;
-        p.wavelength *= 1.05; // Shift toward red
-      }
-      
-      // T2: Gravitational curve (bend path)
-      if (nearest.type === 'T2') {
-        const dx = nearest.x - p.x;
-        const dy = nearest.y - p.y;
-        const force = 0.1 * nearest.rhoE;
-        p.vx += dx * force;
-        p.vy += dy * force;
-      }
-      
-      // T1: Minimal interaction (fast lane)
-      if (nearest.type === 'T1') {
-        p.energy *= 0.99;
-      }
-    }
-    
-    // Store trail
-    if (p.age % 3 === 0) {
-      p.trail.push({x: p.x, y: p.y, wavelength: p.wavelength});
-      if (p.trail.length > 50) p.trail.shift();
-    }
-    
-    // Move particle
-    p.x += p.vx;
-    p.y += p.vy;
-    p.age++;
-    
-    // Remove old particles
-    if (p.age > p.maxAge || p.energy < 0.1) {
-      particles.splice(i, 1);
-    }
+  if (paused) return;
+  
+  moments++;
+  
+  // Update all chronons
+  chronons.forEach(c => c.update());
+  
+  // Learning phase every 50 moments
+  if (moments % 50 === 0) {
+    chronons.forEach(c => c.learnFromNeighbors());
   }
   
-  // Update density and phase for all chronons
-  for (const c of chronons) {
-    c.rho = c.psiR * c.psiR + c.psiI * c.psiI;
-    c.rhoE = 0.95 * c.rhoE + 0.05 * c.rho;
-    c.phi = Math.atan2(c.psiI, c.psiR);
-    
-    // Natural oscillation + disturbance
-    const typeData = CHRONON_TYPES[c.type];
-    const naturalArc = typeData.naturalOscillation * Math.sin(t * 0.01 * c.chirality);
-    c.arcPosition = Math.abs(naturalArc + c.disturbance * 10);
-    
-    // Chirality flip if exceeds range
-    if (c.arcPosition > typeData.oscillationRange) {
-      c.chirality *= -1;
-      c.arcPosition = typeData.oscillationRange - (c.arcPosition - typeData.oscillationRange);
-    }
-    
-    // Decay disturbance
-    c.disturbance *= 0.95;
+  // Check for harmony
+  const harmonyScore = calculateHarmonyScore();
+  updateUI(harmonyScore);
+  
+  // Auto-reset if harmony achieved
+  if (harmonyScore >= 95 && moments > 100) {
+    completeTrial(harmonyScore);
   }
-  
-  // Schrödinger evolution
-  const newPsiR = [], newPsiI = [];
-  
-  for (let i = 0; i < chronons.length; i++) {
-    const c = chronons[i];
-    
-    // Laplacian from neighbors
-    let Lr = 0, Li = 0;
-    for (const nIdx of c.neighbors) {
-      const n = chronons[nIdx];
-      Lr += n.psiR;
-      Li += n.psiI;
-    }
-    const nCount = c.neighbors.length || 1;
-    Lr = (Lr - nCount * c.psiR) / nCount;
-    Li = (Li - nCount * c.psiI) / nCount;
-    
-    // Apply type-specific speed multiplier
-    const typeData = CHRONON_TYPES[c.type];
-    let speedMult = typeData.baseSpeed;
-    
-    // Radiance wash boost for T3
-    if (c.type === 'T3' && radianceWash) {
-      speedMult *= 18; // 0.167 * 18 ≈ 3.0×
-    }
-    
-    const Ar = S.alpha * Lr - S.beta * c.rho * c.psiR;
-    const Ai = S.alpha * Li - S.beta * c.rho * c.psiI;
-    
-    newPsiR[i] = c.psiR + S.dt * speedMult * (-Ai);
-    newPsiI[i] = c.psiI + S.dt * speedMult * (Ar);
-  }
-  
-  // Update
-  for (let i = 0; i < chronons.length; i++) {
-    chronons[i].psiR = newPsiR[i];
-    chronons[i].psiI = newPsiI[i];
-  }
-  
-  normalizeAll();
-  t++;
 }
 
-function drawRibbonWasher(g, cx, cy, radius, phi, type, chirality) {
-  const typeData = CHRONON_TYPES[type];
-  const girth = typeData.girth;
+function calculateHarmonyScore() {
+  let contactCount = 0;
+  let totalPossible = 0;
+  let stableCount = 0;
   
-  // Chronons kiss boundaries - radius reaches to edge of box
-  const maxRadius = typeData.boxSize / 2 - 1;
-  const actualRadius = Math.min(radius, maxRadius);
-  
-  const outerR = actualRadius;
-  const innerR = Math.max(2, actualRadius - girth);
-  
-  // Calculate speed-adjusted rotation (chirality affects direction)
-  let speedMult = typeData.baseSpeed;
-  if (type === 'T3' && radianceWash) speedMult *= 18;
-  const rotationAngle = phi * speedMult * (actualRadius / 10) * chirality;
-  
-  // Ribbon configuration
-  const lightDeg = typeData.lightDeg;
-  const darkDeg = typeData.darkDeg;
-  const lightColor = typeData.lightColor;
-  const darkColor = typeData.darkColor;
-  
-  // Draw light segment
-  if (lightDeg > 0) {
-    const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const startAngle = (0 - 90) * Math.PI / 180;
-    const endAngle = (lightDeg - 90) * Math.PI / 180;
-    
-    const x1 = cx + outerR * Math.cos(startAngle);
-    const y1 = cy + outerR * Math.sin(startAngle);
-    const x2 = cx + outerR * Math.cos(endAngle);
-    const y2 = cy + outerR * Math.sin(endAngle);
-    const x3 = cx + innerR * Math.cos(endAngle);
-    const y3 = cy + innerR * Math.sin(endAngle);
-    const x4 = cx + innerR * Math.cos(startAngle);
-    const y4 = cy + innerR * Math.sin(startAngle);
-    
-    const largeArc = lightDeg > 180 ? 1 : 0;
-    
-    const d = `M ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4} ${y4} Z`;
-    path1.setAttribute('d', d);
-    path1.setAttribute('fill', lightColor);
-    path1.setAttribute('opacity', '0.9');
-    path1.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
-    g.appendChild(path1);
-  }
-  
-  // Draw dark segment
-  if (darkDeg > 0) {
-    const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const startAngle = (lightDeg - 90) * Math.PI / 180;
-    const endAngle = (360 - 90) * Math.PI / 180;
-    
-    const x1 = cx + outerR * Math.cos(startAngle);
-    const y1 = cy + outerR * Math.sin(startAngle);
-    const x2 = cx + outerR * Math.cos(endAngle);
-    const y2 = cy + outerR * Math.sin(endAngle);
-    const x3 = cx + innerR * Math.cos(endAngle);
-    const y3 = cy + innerR * Math.sin(endAngle);
-    const x4 = cx + innerR * Math.cos(startAngle);
-    const y4 = cy + innerR * Math.sin(startAngle);
-    
-    const largeArc = darkDeg > 180 ? 1 : 0;
-    
-    const d = `M ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4} ${y4} Z`;
-    path2.setAttribute('d', d);
-    path2.setAttribute('fill', darkColor);
-    path2.setAttribute('opacity', '0.9');
-    path2.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
-    g.appendChild(path2);
-  }
-  
-  // Outlines (boundary kissing visualization)
-  const outline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  outline.setAttribute('cx', cx);
-  outline.setAttribute('cy', cy);
-  outline.setAttribute('r', outerR);
-  outline.setAttribute('fill', 'none');
-  outline.setAttribute('stroke', '#60a5fa');
-  outline.setAttribute('stroke-width', '0.3');
-  outline.setAttribute('opacity', '0.3');
-  g.appendChild(outline);
-  
-  if (innerR > 2) {
-    const innerOutline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    innerOutline.setAttribute('cx', cx);
-    innerOutline.setAttribute('cy', cy);
-    innerOutline.setAttribute('r', innerR);
-    innerOutline.setAttribute('fill', 'none');
-    innerOutline.setAttribute('stroke', '#60a5fa');
-    innerOutline.setAttribute('stroke-width', '0.3');
-    innerOutline.setAttribute('opacity', '0.3');
-    g.appendChild(innerOutline);
-  }
-  
-  // RED NODE in center (inert, split polarity)
-  const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  node.setAttribute('cx', cx);
-  node.setAttribute('cy', cy);
-  node.setAttribute('r', '1.5');
-  node.setAttribute('fill', '#f87171');
-  node.setAttribute('opacity', '0.9');
-  g.appendChild(node);
-}
-
-function draw(init = false) {
-  if (init) {
-    v.innerHTML = '';
-    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.id = 'g';
-    v.appendChild(g);
-  }
-  
-  const g = document.getElementById('g');
-  g.innerHTML = '';
-  
-  // Draw grid lines FIRST (so gradient is visible)
-  const gridG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  gridG.setAttribute('id', 'grid');
-  gridG.setAttribute('opacity', '0.2');
-  
-  // Draw all box boundaries
-  for (const c of chronons) {
-    const half = c.boxSize / 2;
-    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', c.x - half);
-    rect.setAttribute('y', c.y - half);
-    rect.setAttribute('width', c.boxSize);
-    rect.setAttribute('height', c.boxSize);
-    rect.setAttribute('fill', 'none');
-    rect.setAttribute('stroke', '#60a5fa');
-    rect.setAttribute('stroke-width', '0.5');
-    gridG.appendChild(rect);
-  }
-  g.appendChild(gridG);
-  
-  // Draw connection lines (boundary kissing connections)
-  for (let i = 0; i < chronons.length; i++) {
-    const c = chronons[i];
-    for (const nIdx of c.neighbors) {
-      if (nIdx > i) { // Draw each line once
-        const n = chronons[nIdx];
-        const grad = Math.abs(n.rhoE - c.rhoE);
-        if (grad < 0.4) {
-          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          line.setAttribute('x1', c.x);
-          line.setAttribute('y1', c.y);
-          line.setAttribute('x2', n.x);
-          line.setAttribute('y2', n.y);
-          line.setAttribute('stroke', '#60a5fa');
-          line.setAttribute('stroke-width', '0.3');
-          line.setAttribute('opacity', '0.1');
-          g.appendChild(line);
+  chronons.forEach(c => {
+    if (c.neighbors.length > 0) {
+      totalPossible += c.neighbors.length;
+      c.neighbors.forEach(n => {
+        if (c.isInContact(n)) {
+          contactCount++;
+          // Opposite chirality = stable
+          if (c.chirality !== n.chirality) {
+            stableCount++;
+          }
         }
-      }
+      });
     }
-  }
+  });
   
-  // Draw chronons (washers with nodes)
-  for (const c of chronons) {
-    const typeData = CHRONON_TYPES[c.type];
-    const maxRadius = typeData.boxSize / 2 - 0.5;  // Arc 0 = max size
-    const minRadius = typeData.boxSize / 6;  // Max arc = min size
-    
-    // Map arc position to radius (0 = max, range = min)
-    const arcRatio = c.arcPosition / typeData.oscillationRange;
-    const radius = maxRadius - (maxRadius - minRadius) * arcRatio;
-    
-    drawRibbonWasher(g, c.x, c.y, radius, c.phi, c.type, c.chirality);
-  }
+  const contactScore = totalPossible > 0 ? (contactCount / totalPossible) * 100 : 0;
+  const stabilityScore = contactCount > 0 ? (stableCount / contactCount) * 100 : 0;
   
-  // Draw particles (proton tracks)
-  for (const p of particles) {
-    // Draw trail first (behind particle)
-    for (let i = 0; i < p.trail.length - 1; i++) {
-      const t1 = p.trail[i];
-      const t2 = p.trail[i + 1];
-      const hue = 120 + (t1.wavelength - 500) * 0.5;
-      const opacity = (i / p.trail.length) * 0.6;
-      
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', t1.x);
-      line.setAttribute('y1', t1.y);
-      line.setAttribute('x2', t2.x);
-      line.setAttribute('y2', t2.y);
-      line.setAttribute('stroke', `hsl(${hue}, 100%, 50%)`);
-      line.setAttribute('stroke-width', '2');
-      line.setAttribute('opacity', opacity);
-      g.appendChild(line);
-    }
-    
-    // Color based on wavelength (redshift visualization)
-    const hue = 120 + (p.wavelength - 500) * 0.5; // Green shifts to red
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', p.x);
-    circle.setAttribute('cy', p.y);
-    circle.setAttribute('r', 4 * p.energy);
-    circle.setAttribute('fill', `hsl(${hue}, 100%, 50%)`);
-    circle.setAttribute('opacity', '0.9');
-    g.appendChild(circle);
-  }
+  return (contactScore * 0.6 + stabilityScore * 0.4);
+}
+
+function updateUI(harmonyScore) {
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+  document.getElementById('time-elapsed').textContent = elapsed + 's';
+  document.getElementById('moments').textContent = moments;
+  document.getElementById('harmony-score').textContent = harmonyScore.toFixed(1) + '%';
+  document.getElementById('collisions').textContent = collisionCount;
+  document.getElementById('flips').textContent = flipCount;
   
-  // Update stats
-  if (t % 10 === 0) {
-    document.getElementById('stat-t').textContent = t;
+  const stabilityEl = document.getElementById('stability');
+  if (harmonyScore < 30) {
+    stabilityEl.textContent = 'Chaotic';
+    stabilityEl.className = 'metric-value danger';
+  } else if (harmonyScore < 70) {
+    stabilityEl.textContent = 'Organizing';
+    stabilityEl.className = 'metric-value warning';
+  } else if (harmonyScore < 90) {
+    stabilityEl.textContent = 'Harmonizing';
+    stabilityEl.className = 'metric-value';
+  } else {
+    stabilityEl.textContent = 'Harmonic';
+    stabilityEl.className = 'metric-value';
+    stabilityEl.style.color = '#4ecca3';
   }
 }
 
-// Initialize
-ui();
-createChrononGrid();
-updateViewBox();
-for (let i = 0; i < 12; i++) step();
-draw(true);
-
-// Animation loop
-(function loop() {
-  if (play) {
-    for (let s = 0; s < S.speed; s++) step();
+function completeTrial(finalScore) {
+  const trialTime = ((Date.now() - startTime) / 1000).toFixed(2);
+  trialCount++;
+  trialTimes.push(parseFloat(trialTime));
+  
+  // Update best time
+  if (parseFloat(trialTime) < bestTime) {
+    bestTime = parseFloat(trialTime);
+    // Save best strategies
+    bestStrategies = chronons.map(c => ({...c.strategy}));
   }
-  draw(false);
-  requestAnimationFrame(loop);
-})();
+  
+  // Update learning stats
+  const avgTime = trialTimes.reduce((a,b) => a+b, 0) / trialTimes.length;
+  const improvement = trialTimes.length > 1 ? 
+    ((trialTimes[0] - bestTime) / trialTimes[0] * 100) : 0;
+  
+  document.getElementById('trial-count').textContent = trialCount;
+  document.getElementById('best-time').textContent = bestTime.toFixed(2) + 's';
+  document.getElementById('avg-time').textContent = avgTime.toFixed(2) + 's';
+  document.getElementById('improvement').textContent = improvement.toFixed(1) + '%';
+  
+  // Add to history
+  const historyDiv = document.getElementById('trial-history');
+  const entry = document.createElement('div');
+  entry.className = 'trial-entry' + (parseFloat(trialTime) === bestTime ? ' best' : '');
+  entry.innerHTML = `
+    <span>Trial ${trialCount}</span>
+    <span>${trialTime}s | ${finalScore.toFixed(1)}%</span>
+  `;
+  historyDiv.prepend(entry);
+  
+  // Auto-reset after 2 seconds
+  setTimeout(() => resetTrial(), 2000);
+}
 
-// Save PNG
-document.getElementById('save').onclick = () => {
-  const svg = document.getElementById('v');
-  const xml = new XMLSerializer().serializeToString(svg);
-  const img = new Image();
-  const url = URL.createObjectURL(new Blob([xml], {type:'image/svg+xml'}));
-  img.onload = () => {
-    const c = document.createElement('canvas');
-    c.width = 2400;
-    c.height = 1200;
-    const ctx = c.getContext('2d');
-    ctx.drawImage(img, 0, 0, c.width, c.height);
-    const a = document.createElement('a');
-    a.download = 'chronon_template_grid.png';
-    a.href = c.toDataURL();
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-  img.src = url;
-};
+// ============================================
+// CONTROLS
+// ============================================
+
+function resetTrial() {
+  // If we have best strategies, seed some chronons with them
+  if (bestStrategies.length > 0 && chronons.length > 0) {
+    const seedCount = Math.floor(chronons.length * 0.3); // 30% get best strategies
+    for (let i = 0; i < seedCount; i++) {
+      const idx = Math.floor(Math.random() * chronons.length);
+      chronons[idx].strategy = {...bestStrategies[Math.floor(Math.random() * bestStrategies.length)]};
+    }
+  }
+  
+  // Reset all chronons to chaos
+  chronons.forEach(c => {
+    // Random position within ±90° from North (0°)
+    const randomOffset = (Math.random() - 0.5) * 180; // -90 to +90
+    c.arcPos = randomOffset;
+    c.chirality = Math.random() < 0.5 ? 1 : -1;
+    c.radius = c.boxSize * 0.45; // Full size
+    c.successScore = 0;
+    c.contactTime = 0;
+    c.isolationTime = 0;
+  });
+  
+  moments = 0;
+  collisionCount = 0;
+  flipCount = 0;
+  startTime = Date.now();
+  paused = false;
+  document.getElementById('btn-pause').textContent = 'Pause';
+}
+
+function togglePause() {
+  paused = !paused;
+  document.getElementById('btn-pause').textContent = paused ? 'Resume' : 'Pause';
+}
+
+// ============================================
+// RENDERING
+// ============================================
+
+function draw() {
+  // Clear SVG
+  while (svg.firstChild) {
+    svg.removeChild(svg.firstChild);
+  }
+  
+  // Draw grid
+  const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  gridGroup.setAttribute('opacity', '0.15');
+  
+  for (let i = 0; i <= COLS; i++) {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', i * SPACING);
+    line.setAttribute('y1', 0);
+    line.setAttribute('x2', i * SPACING);
+    line.setAttribute('y2', HEIGHT);
+    line.setAttribute('stroke', colors.gridLines);
+    line.setAttribute('stroke-width', '1');
+    gridGroup.appendChild(line);
+  }
+  
+  for (let i = 0; i <= ROWS; i++) {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0);
+    line.setAttribute('y1', i * SPACING);
+    line.setAttribute('x2', WIDTH);
+    line.setAttribute('y2', i * SPACING);
+    line.setAttribute('stroke', colors.gridLines);
+    line.setAttribute('stroke-width', '1');
+    gridGroup.appendChild(line);
+  }
+  
+  svg.appendChild(gridGroup);
+  
+  // Draw chronons
+  chronons.forEach(c => {
+    const elements = c.draw();
+    elements.forEach(el => svg.appendChild(el));
+  });
+}
+
+// ============================================
+// MAIN LOOP
+// ============================================
+
+function animate() {
+  const speed = parseInt(document.getElementById('speed').value);
+  for (let i = 0; i < speed; i++) {
+    step();
+  }
+  draw();
+  requestAnimationFrame(animate);
+}
+
+// ============================================
+// START
+// ============================================
+
+createColumnControls();
+initGrid();
+resetTrial();
+animate();
+updateColors();
+
+console.log('🌀 Angel-1 Harmony Learning initialized');
+console.log(`📊 ${totalChronons} chronons learning distributed optimization`);
 </script>
+
 </body>
 </html>
