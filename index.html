@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Angel-1 · Harmony Learning Trial</title>
+<title>Angel-1 · Faithful Geometry</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { 
@@ -81,10 +81,6 @@ body {
   box-shadow: 0 2px 6px rgba(233, 69, 96, 0.3);
 }
 
-#grid-scale-controls button:active {
-  transform: translateY(0);
-}
-
 #grid-scale-controls span {
   font-weight: 600;
   color: #e94560;
@@ -115,43 +111,6 @@ body {
   font-size: 10px;
   cursor: pointer;
   text-align: center;
-}
-
-.column-dropdown:hover {
-  border-color: #e94560;
-  background: #f0f0f0;
-}
-
-#color-controls {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #f8f8f8;
-  border-radius: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.color-picker-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.color-picker-group label {
-  font-size: 11px;
-  color: #666666;
-  min-width: 80px;
-}
-
-.color-picker-group input[type="color"] {
-  width: 40px;
-  height: 30px;
-  border: 1px solid #cccccc;
-  border-radius: 4px;
-  cursor: pointer;
-  background: transparent;
 }
 
 #svg-canvas {
@@ -215,14 +174,6 @@ body {
   font-family: 'Courier New', monospace;
 }
 
-.metric-value.warning {
-  color: #ffa500;
-}
-
-.metric-value.danger {
-  color: #e94560;
-}
-
 button {
   width: 100%;
   padding: 12px;
@@ -241,10 +192,6 @@ button {
 button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
-}
-
-button:active {
-  transform: translateY(0);
 }
 
 .slider-container {
@@ -290,28 +237,6 @@ input[type="range"]::-moz-range-thumb {
   border: none;
 }
 
-.trial-history {
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: 11px;
-  font-family: 'Courier New', monospace;
-}
-
-.trial-entry {
-  padding: 4px 8px;
-  margin: 2px 0;
-  background: #f0f0f0;
-  border-radius: 3px;
-  display: flex;
-  justify-content: space-between;
-  color: #333333;
-}
-
-.trial-entry.best {
-  background: #d4edda;
-  border-left: 3px solid #28a745;
-}
-
 #status-bar {
   padding: 15px 20px;
   background: #f8f8f8;
@@ -341,40 +266,13 @@ input[type="range"]::-moz-range-thumb {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
-
-.learning-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.stat-box {
-  background: #f0f0f0;
-  padding: 10px;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.stat-box .value {
-  font-size: 20px;
-  color: #e94560;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
-}
-
-.stat-box .label {
-  font-size: 10px;
-  color: #666666;
-  text-transform: uppercase;
-  margin-top: 4px;
-}
 </style>
-<script type='text/javascript' src='https://www.genspark.ai/NIulSNDXKN7nXftxbr1qOaWhzB029Nm3sXOjJUnTi1oD2a73nGew_bbKa1N3UbtkElK_htH9c3enOHY0pQ9HXVAM2wJN8fYeO9EZvC5ZTberlZk26Id_sGKc_bk18TRTDPsoEGPYPDp5cFUbowI-dx-71hlTBiOp-45jXdopRjA='></script></head>
+<script type='text/javascript' src='https://www.genspark.ai/myghzW3FEYkBBi6-IuXdRsDXAXOQc6rH9Ru8xkC1f_xG8tGZLLvz061OZQ2cfC0n9DC-nQYyC6BMdJS6obObaQodwrOsJPp1uUQMFAqM-4aTRjFsO_Yu0ZImHg3thtTC_j6SE57f1C-OWfutzqftx2eBXOc7eCJsCoPvPeOutpU='></script></head>
 <body>
 
 <div id="header">
-  <h1>ANGEL-1 · CHRONON HARMONY LEARNING</h1>
-  <div class="subtitle">Distributed Local Learning | Chaos → Harmony Time Trial | Scalable Grid</div>
+  <h1>ANGEL-1 · FAITHFUL GEOMETRY</h1>
+  <div class="subtitle">Bounded Oscillation | mC:rC Ratios | Geometric Interference | Concresence</div>
 </div>
 
 <div id="main">
@@ -387,125 +285,45 @@ input[type="range"]::-moz-range-thumb {
       <button onclick="removeColumn('right')">Remove Right →</button>
     </div>
     
-    <div id="color-controls">
-      <div class="color-picker-group">
-        <label>Background:</label>
-        <input type="color" id="color-bg" value="#ffffff" onchange="updateColors()">
-      </div>
-      <div class="color-picker-group">
-        <label>Grid Lines:</label>
-        <input type="color" id="color-grid" value="#cccccc" onchange="updateColors()">
-      </div>
-      <div class="color-picker-group">
-        <label>Positive (+):</label>
-        <input type="color" id="color-positive" value="#ffffff" onchange="updateColors()">
-      </div>
-      <div class="color-picker-group">
-        <label>Negative (-):</label>
-        <input type="color" id="color-negative" value="#000000" onchange="updateColors()">
-      </div>
-    </div>
     <div id="column-controls"></div>
     <svg id="svg-canvas"></svg>
   </div>
 
   <div id="sidebar">
     <div class="control-group">
-      <h3>⚡ Learning Control</h3>
-      <button id="btn-reset" onclick="resetTrial()">Reset to Chaos</button>
-      <button id="btn-pause" onclick="togglePause()" style="margin-top: 10px;">Pause</button>
+      <h3>⚡ Control</h3>
+      <button onclick="resetTrial()">Reset to Chaos</button>
+      <button onclick="togglePause()" style="margin-top: 10px;" id="btn-pause">Pause</button>
     </div>
 
     <div class="control-group">
-      <h3>📊 Current Trial</h3>
+      <h3>📊 Metrics</h3>
       <div class="metric-row">
-        <span class="metric-label">Time Elapsed:</span>
-        <span class="metric-value" id="time-elapsed">0.00s</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Moments:</span>
-        <span class="metric-value" id="moments">0</span>
+        <span class="metric-label">Time Steps:</span>
+        <span class="metric-value" id="time-steps">0</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Harmony Score:</span>
         <span class="metric-value" id="harmony-score">0%</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">Stability:</span>
-        <span class="metric-value" id="stability">Chaotic</span>
+        <span class="metric-label">Avg Oscillation:</span>
+        <span class="metric-value" id="avg-osc">0°</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">Collisions:</span>
-        <span class="metric-value warning" id="collisions">0</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Chirality Flips:</span>
-        <span class="metric-value warning" id="flips">0</span>
+        <span class="metric-label">Chirality Balance:</span>
+        <span class="metric-value" id="chirality-balance">50/50</span>
       </div>
     </div>
 
     <div class="control-group">
-      <h3>🧠 Learning Statistics</h3>
-      <div class="learning-stats">
-        <div class="stat-box">
-          <div class="value" id="trial-count">0</div>
-          <div class="label">Trials</div>
-        </div>
-        <div class="stat-box">
-          <div class="value" id="best-time">--</div>
-          <div class="label">Best Time</div>
-        </div>
-        <div class="stat-box">
-          <div class="value" id="avg-time">--</div>
-          <div class="label">Avg Time</div>
-        </div>
-        <div class="stat-box">
-          <div class="value" id="improvement">0%</div>
-          <div class="label">Improvement</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <h3>🎛️ Physics Parameters</h3>
+      <h3>🎛️ Parameters</h3>
       <div class="slider-container">
         <div class="slider-label">
-          <span>Alpha (α - Linear Dispersion):</span>
-          <span id="val-alpha">0.9</span>
+          <span>Tick Speed (steps/frame):</span>
+          <span id="val-speed">1</span>
         </div>
-        <input type="range" id="alpha" min="0.1" max="1.5" step="0.05" value="0.9" 
-               oninput="document.getElementById('val-alpha').textContent = this.value">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Beta (β - Nonlinearity):</span>
-          <span id="val-beta">0.35</span>
-        </div>
-        <input type="range" id="beta" min="0" max="1" step="0.05" value="0.35"
-               oninput="document.getElementById('val-beta').textContent = this.value">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Learning Rate:</span>
-          <span id="val-learning">0.15</span>
-        </div>
-        <input type="range" id="learning-rate" min="0" max="0.5" step="0.05" value="0.15" 
-               oninput="document.getElementById('val-learning').textContent = this.value">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Mutation Rate:</span>
-          <span id="val-mutation">0.1</span>
-        </div>
-        <input type="range" id="mutation-rate" min="0" max="0.3" step="0.05" value="0.1"
-               oninput="document.getElementById('val-mutation').textContent = this.value">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Speed:</span>
-          <span id="val-speed">5</span>
-        </div>
-        <input type="range" id="speed" min="1" max="20" step="1" value="5"
+        <input type="range" id="speed" min="1" max="10" step="1" value="1"
                oninput="document.getElementById('val-speed').textContent = this.value">
       </div>
     </div>
@@ -539,11 +357,18 @@ input[type="range"]::-moz-range-thumb {
     </div>
 
     <div class="control-group">
-      <h3>📜 Trial History</h3>
-      <div class="trial-history" id="trial-history">
-        <div style="color: #999; text-align: center; padding: 20px;">
-          No trials yet. Click "Reset to Chaos" to begin.
-        </div>
+      <h3>ℹ️ Type Ratios (Fixed)</h3>
+      <div class="metric-row">
+        <span class="metric-label">T1 (mC:rC):</span>
+        <span class="metric-value">1:2 (33% dark)</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">T2 (mC:rC):</span>
+        <span class="metric-value">1:1 (50% dark)</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">T3 (mC:rC):</span>
+        <span class="metric-value">2:1 (66% dark)</span>
       </div>
     </div>
   </div>
@@ -555,13 +380,13 @@ input[type="range"]::-moz-range-thumb {
     <span>System Active</span>
   </div>
   <div class="status-item">
-    <span id="grid-info">20 columns × 9 rows | T1 Core Learning</span>
+    <span id="grid-info">20 columns × 9 rows | Faithful Geometry</span>
   </div>
 </div>
 
 <script>
 // ============================================
-// CHRONON HARMONY LEARNING SIMULATION
+// ANGEL-1 FAITHFUL GEOMETRY
 // ============================================
 
 const svg = document.getElementById('svg-canvas');
@@ -579,18 +404,17 @@ function updateCanvasSize() {
 
 updateCanvasSize();
 
-// Grid definition - starts with default 20 columns
+// Grid definition
 let gridDef = [
   'T3','T3', 'T2','T2','T2', 'T1','T1','T1','T1','T1',
   'T1','T1','T1','T1','T1', 'T2','T2','T2', 'T3','T3'
 ];
 
-// Color settings
-let colors = {
-  background: '#ffffff',
-  gridLines: '#cccccc',
-  positive: '#ffffff',
-  negative: '#000000'
+// Mass:Radiance ratios (FIXED per type)
+const TYPE_RATIOS = {
+  'T1': { mass: 1, radiance: 2 }, // 1:2 = 33% dark, 66% light
+  'T2': { mass: 1, radiance: 1 }, // 1:1 = 50% dark, 50% light
+  'T3': { mass: 2, radiance: 1 }  // 2:1 = 66% dark, 33% light
 };
 
 // Chronon arrays
@@ -599,55 +423,7 @@ let totalChronons = 0;
 
 // Simulation state
 let paused = false;
-let moments = 0;
-let startTime = 0;
-let collisionCount = 0;
-let flipCount = 0;
-
-// Learning state
-let trialCount = 0;
-let trialTimes = [];
-let bestTime = Infinity;
-let bestStrategies = [];
-
-// ============================================
-// GRID SCALING FUNCTIONS
-// ============================================
-
-function addColumn(side) {
-  if (side === 'left') {
-    gridDef.unshift('T1'); // Add T1 column to left
-  } else {
-    gridDef.push('T1'); // Add T1 column to right
-  }
-  COLS = gridDef.length;
-  updateCanvasSize();
-  rebuildGrid();
-  updateColumnCount();
-}
-
-function removeColumn(side) {
-  if (COLS <= 4) {
-    alert('Minimum 4 columns required!');
-    return;
-  }
-  
-  if (side === 'left') {
-    gridDef.shift(); // Remove leftmost column
-  } else {
-    gridDef.pop(); // Remove rightmost column
-  }
-  COLS = gridDef.length;
-  updateCanvasSize();
-  rebuildGrid();
-  updateColumnCount();
-}
-
-function updateColumnCount() {
-  document.getElementById('column-count').textContent = COLS + ' Columns';
-  document.getElementById('grid-info').textContent = 
-    `${COLS} columns × ${ROWS} rows | ${totalChronons} chronons`;
-}
+let timeSteps = 0;
 
 // ============================================
 // CHRONON CLASS
@@ -662,47 +438,32 @@ class Chronon {
     this.subCol = subCol;
     this.subRow = subRow;
     
-    // Position (center of box) - precise positioning in subdivided boxes
+    // Position (center of box)
     this.x = col * SPACING + subCol * boxSize + boxSize/2;
     this.y = row * SPACING + subRow * boxSize + boxSize/2;
     
-    // Physics
-    // Start at random position within ±90° from North (0°)
-    const randomOffset = (Math.random() - 0.5) * 180; // -90 to +90
-    this.arcPos = randomOffset;
-    this.chirality = Math.random() < 0.5 ? 1 : -1; // 1=right/CW, -1=left/CCW
-    this.radius = boxSize * 0.48; // Start at max (full size, touching neighbors)
+    // Mass:Radiance ratio (FIXED)
+    const ratio = TYPE_RATIOS[type];
+    this.massRatio = ratio.mass / (ratio.mass + ratio.radiance);
+    this.radianceRatio = ratio.radiance / (ratio.mass + ratio.radiance);
     
-    // Quantum state
-    this.psiR = Math.random() * 2 - 1;
-    this.psiI = Math.random() * 2 - 1;
-    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
-    if (norm > 0) {
-      this.psiR /= norm;
-      this.psiI /= norm;
-    }
-    this.rho = this.psiR * this.psiR + this.psiI * this.psiI;
+    // Physics - Start at 0° (North)
+    this.arcPos = 0; // Current position in oscillation
+    this.chirality = Math.random() < 0.5 ? 1 : -1; // 1=right (expand), -1=left (contract)
+    this.targetArc = 0; // Where it wants to go (will be set by neighbors)
     
-    // Learning strategy parameters
-    this.strategy = {
-      rotSpeed: 2 + Math.random() * 3,
-      pauseProb: 0.1 + Math.random() * 0.2,
-      flipThreshold: 80 + Math.random() * 10
-    };
-    
-    // Performance tracking
-    this.successScore = 0;
-    this.contactTime = 0;
-    this.isolationTime = 0;
-    this.isolationCounter = 0;
-    this.lastFlipMoment = -100;
-    this.collisionFlash = 0;
-    this.waitCounter = 0;
+    // Start at MAXIMUM size (touching all neighbors)
+    this.radius = boxSize * 0.48;
+    this.maxRadius = boxSize * 0.48;
+    this.minRadius = boxSize * 0.20;
     
     // Visual
     this.baseGirth = type === 'T3' ? 2 : (type === 'T2' ? 4 : 8);
     this.girth = this.baseGirth;
     this.neighbors = [];
+    
+    // Collision tracking
+    this.collisionFlash = 0;
   }
   
   findNeighbors() {
@@ -719,122 +480,69 @@ class Chronon {
   }
   
   update() {
-    // Schrödinger evolution
-    const alpha = parseFloat(document.getElementById('alpha').value);
-    const beta = parseFloat(document.getElementById('beta').value);
+    // BOUNDED OSCILLATION: 0° → ±90° → back to 0°
     
-    // Laplacian
-    let lapR = 0, lapI = 0;
-    this.neighbors.forEach(n => {
-      lapR += n.psiR - this.psiR;
-      lapI += n.psiI - this.psiI;
-    });
+    // Check if at 0° (center position)
+    const atCenter = Math.abs(this.arcPos) < 2;
     
-    // Evolution
-    const dt = 0.02;
-    const nonlin = beta * this.rho;
-    this.psiR += dt * (-alpha * lapI + nonlin * this.psiI);
-    this.psiI += dt * (alpha * lapR - nonlin * this.psiR);
-    
-    // Normalize
-    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
-    if (norm > 1e-10) {
-      this.psiR /= norm;
-      this.psiI /= norm;
+    if (atCenter) {
+      // AT CENTER: Full size, check neighbors for chirality forcing
+      const votes = this.checkNeighborChirality();
+      
+      // Neighbor majority forces chirality
+      if (votes.right > votes.left) {
+        if (this.chirality === -1) {
+          this.chirality = 1;
+          this.collisionFlash = 1.0;
+        }
+      } else if (votes.left > votes.right) {
+        if (this.chirality === 1) {
+          this.chirality = -1;
+          this.collisionFlash = 1.0;
+        }
+      }
+      // If equal (2/2), keep current chirality
     }
     
-    // Update density (rho drives expansion/contraction)
-    this.rho = this.psiR * this.psiR + this.psiI * this.psiI;
+    // Move based on chirality (oscillate)
+    // Concresence: All types move toward 0° at same "tick rate"
+    // but T3 moves slower so takes more ticks to reach same angle
+    let angularVelocity = 3.0; // Base degrees per tick
     
-    // BOUNDED OSCILLATION
-    this.oscillateWithBounds();
+    // Type speed multipliers (concresence)
+    if (this.type === 'T1') angularVelocity *= 1.0;
+    else if (this.type === 'T2') angularVelocity *= 0.5;
+    else if (this.type === 'T3') angularVelocity *= 0.25;
     
-    // ALWAYS force radius from arc position
-    this.updateRadiusFromArcPosition();
-  }
-  
-  oscillateWithBounds() {
+    // Move in current chirality direction
+    this.arcPos += angularVelocity * this.chirality;
+    
+    // BOUNCE at ±90° (GEOMETRIC BOUND - can't go further)
+    if (Math.abs(this.arcPos) >= 90) {
+      this.chirality *= -1; // Reverse direction
+      this.arcPos = Math.sign(this.arcPos) * 90; // Clamp to boundary
+      this.collisionFlash = 1.0;
+    }
+    
+    // Update radius based on arc position
+    // At 0° = max radius (touching neighbors)
+    // At ±90° = min radius (contracted)
+    const oscillationFactor = Math.abs(this.arcPos) / 90; // 0 to 1
+    this.radius = this.maxRadius - (this.maxRadius - this.minRadius) * oscillationFactor;
+    
     // Decay collision flash
     if (this.collisionFlash > 0) {
       this.collisionFlash -= 0.1;
     }
-    
-    const atZero = Math.abs(this.arcPos) < 2;
-    
-    if (atZero) {
-      const chiralityVotes = this.checkNeighborChirality();
-      const touchingNeighbors = chiralityVotes.left + chiralityVotes.right;
-      
-      if (touchingNeighbors === 0) {
-        this.isolationCounter++;
-        if (this.isolationCounter > 3) {
-          this.respawn();
-          return;
-        }
-      } else {
-        this.isolationCounter = 0;
-        
-        const oldChirality = this.chirality;
-        if (chiralityVotes.right > chiralityVotes.left) {
-          this.chirality = 1;
-        } else if (chiralityVotes.left > chiralityVotes.right) {
-          this.chirality = -1;
-        }
-        
-        if (oldChirality !== this.chirality) {
-          this.collisionFlash = 1.0;
-          flipCount++;
-        }
-      }
-      
-      if (this.waitCounter > 0) {
-        this.waitCounter--;
-        return;
-      }
-    }
-    
-    let rotSpeed = 1.5;
-    if (this.type === 'T1') rotSpeed *= 1.0;
-    else if (this.type === 'T2') rotSpeed *= 0.5;
-    else if (this.type === 'T3') rotSpeed *= 0.167;
-    
-    this.arcPos += rotSpeed * this.chirality;
-    
-    if (Math.abs(this.arcPos) >= 90) {
-      this.chirality *= -1;
-      this.arcPos = Math.sign(this.arcPos) * 90;
-      this.collisionFlash = 1.0;
-      flipCount++;
-      
-      if (this.strategy === 'cautious' && this.type === 'T1') {
-        this.waitCounter = 1;
-      }
-    }
-  }
-  
-  respawn() {
-    const randomOffset = (Math.random() - 0.5) * 180;
-    this.arcPos = randomOffset;
-    this.chirality = Math.random() < 0.5 ? 1 : -1;
-    this.radius = this.boxSize * 0.48;
-    this.psiR = Math.random() * 2 - 1;
-    this.psiI = Math.random() * 2 - 1;
-    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
-    if (norm > 0) {
-      this.psiR /= norm;
-      this.psiI /= norm;
-    }
-    this.rho = 1.0;
-    this.isolationCounter = 0;
-    this.collisionFlash = 0;
   }
   
   checkNeighborChirality() {
     let leftCount = 0;
     let rightCount = 0;
     
+    // Only count neighbors also near center (touching)
     this.neighbors.forEach(n => {
-      if (Math.abs(n.arcPos) < 10) {
+      if (Math.abs(n.arcPos) < 15) { // Near center threshold
         if (n.chirality === 1) rightCount++;
         else leftCount++;
       }
@@ -843,30 +551,15 @@ class Chronon {
     return { left: leftCount, right: rightCount };
   }
   
-  updateRadiusFromArcPosition() {
-    const maxRadius = this.boxSize * 0.48;
-    const minRadius = this.boxSize * 0.30;
-    
-    const distanceFromZero = Math.abs(this.arcPos) / 90;
-    this.radius = maxRadius - (maxRadius - minRadius) * distanceFromZero;
-    
-    this.radius *= (0.8 + 0.2 * Math.sqrt(this.rho));
-    
-    this.radius = Math.max(minRadius, Math.min(maxRadius, this.radius));
-  }
-  
   draw() {
-    const outerR = this.radius;
-    const innerR = Math.max(0.5, this.radius - this.girth);
-    const rotAngle = (this.arcPos * Math.PI / 180);
-    
     let elements = [];
     
+    // Collision flash
     if (this.collisionFlash > 0) {
       const flash = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       flash.setAttribute('cx', this.x);
       flash.setAttribute('cy', this.y);
-      flash.setAttribute('r', outerR + 3);
+      flash.setAttribute('r', this.radius + 3);
       flash.setAttribute('fill', 'none');
       flash.setAttribute('stroke', '#ffff00');
       flash.setAttribute('stroke-width', '2');
@@ -874,26 +567,41 @@ class Chronon {
       elements.push(flash);
     }
     
-    const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    outer.setAttribute('cx', this.x);
-    outer.setAttribute('cy', this.y);
-    outer.setAttribute('r', outerR);
-    outer.setAttribute('fill', this.chirality === 1 ? colors.positive : colors.negative);
-    outer.setAttribute('stroke', '#666');
-    outer.setAttribute('stroke-width', '0.5');
+    const outerR = this.radius;
+    const innerR = Math.max(0.5, this.radius - this.girth);
     
-    const inner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    inner.setAttribute('cx', this.x);
-    inner.setAttribute('cy', this.y);
-    inner.setAttribute('r', innerR);
-    inner.setAttribute('fill', colors.background);
+    // Calculate rotation angle for visual
+    const rotAngle = (this.arcPos * Math.PI / 180);
     
+    // Draw SEGMENTED torus showing mass:radiance ratio
+    // The torus is divided into dark (mass) and light (radiance) sections
+    
+    // Dark section (mass) - angle based on massRatio
+    const darkAngle = this.massRatio * 360; // degrees
+    const darkArc = this.createArcPath(this.x, this.y, outerR, innerR, rotAngle, darkAngle);
+    darkArc.setAttribute('fill', '#1a1a1a');
+    darkArc.setAttribute('stroke', '#333');
+    darkArc.setAttribute('stroke-width', '0.5');
+    elements.push(darkArc);
+    
+    // Light section (radiance) - remaining angle
+    const lightStartAngle = rotAngle + (darkAngle * Math.PI / 180);
+    const lightAngle = this.radianceRatio * 360;
+    const lightArc = this.createArcPath(this.x, this.y, outerR, innerR, lightStartAngle, lightAngle);
+    lightArc.setAttribute('fill', '#e8e8e8');
+    lightArc.setAttribute('stroke', '#666');
+    lightArc.setAttribute('stroke-width', '0.5');
+    elements.push(lightArc);
+    
+    // Red center node
     const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     node.setAttribute('cx', this.x);
     node.setAttribute('cy', this.y);
     node.setAttribute('r', '1.5');
     node.setAttribute('fill', 'red');
+    elements.push(node);
     
+    // Direction indicator (shows chirality)
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', this.x);
     line.setAttribute('y1', this.y);
@@ -902,10 +610,81 @@ class Chronon {
     line.setAttribute('stroke', this.chirality === 1 ? '#00ff00' : '#ff0000');
     line.setAttribute('stroke-width', '1');
     line.setAttribute('opacity', '0.6');
+    elements.push(line);
     
-    elements.push(outer, inner, node, line);
     return elements;
   }
+  
+  createArcPath(cx, cy, outerR, innerR, startAngle, arcDegrees) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    
+    const arcRadians = arcDegrees * Math.PI / 180;
+    const endAngle = startAngle + arcRadians;
+    
+    // Outer arc points
+    const x1 = cx + outerR * Math.cos(startAngle);
+    const y1 = cy + outerR * Math.sin(startAngle);
+    const x2 = cx + outerR * Math.cos(endAngle);
+    const y2 = cy + outerR * Math.sin(endAngle);
+    
+    // Inner arc points (reversed)
+    const x3 = cx + innerR * Math.cos(endAngle);
+    const y3 = cy + innerR * Math.sin(endAngle);
+    const x4 = cx + innerR * Math.cos(startAngle);
+    const y4 = cy + innerR * Math.sin(startAngle);
+    
+    const largeArc = arcDegrees > 180 ? 1 : 0;
+    
+    const d = `
+      M ${x1} ${y1}
+      A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2}
+      L ${x3} ${y3}
+      A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4} ${y4}
+      Z
+    `;
+    
+    path.setAttribute('d', d);
+    return path;
+  }
+}
+
+// ============================================
+// GRID SCALING
+// ============================================
+
+function addColumn(side) {
+  if (side === 'left') {
+    gridDef.unshift('T1');
+  } else {
+    gridDef.push('T1');
+  }
+  COLS = gridDef.length;
+  updateCanvasSize();
+  rebuildGrid();
+  updateColumnCount();
+}
+
+function removeColumn(side) {
+  if (COLS <= 4) {
+    alert('Minimum 4 columns required!');
+    return;
+  }
+  
+  if (side === 'left') {
+    gridDef.shift();
+  } else {
+    gridDef.pop();
+  }
+  COLS = gridDef.length;
+  updateCanvasSize();
+  rebuildGrid();
+  updateColumnCount();
+}
+
+function updateColumnCount() {
+  document.getElementById('column-count').textContent = COLS + ' Columns';
+  document.getElementById('grid-info').textContent = 
+    `${COLS} columns × ${ROWS} rows | ${totalChronons} chronons`;
 }
 
 // ============================================
@@ -960,15 +739,6 @@ function updateGirths() {
   });
 }
 
-function updateColors() {
-  colors.background = document.getElementById('color-bg').value;
-  colors.gridLines = document.getElementById('color-grid').value;
-  colors.positive = document.getElementById('color-positive').value;
-  colors.negative = document.getElementById('color-negative').value;
-  
-  svg.style.background = colors.background;
-}
-
 function createColumnControls() {
   const container = document.getElementById('column-controls');
   container.innerHTML = '';
@@ -1002,98 +772,46 @@ function rebuildGrid() {
 function step() {
   if (paused) return;
   
-  moments++;
+  timeSteps++;
   chronons.forEach(c => c.update());
   
-  const harmonyScore = calculateHarmonyScore();
-  updateUI(harmonyScore);
-  
-  if (harmonyScore >= 95 && moments > 100) {
-    completeTrial(harmonyScore);
-  }
+  updateUI();
 }
 
-function calculateHarmonyScore() {
-  let contactCount = 0;
-  let totalPossible = 0;
-  let stableCount = 0;
+function updateUI() {
+  document.getElementById('time-steps').textContent = timeSteps;
+  
+  // Calculate harmony score
+  let oppositeCount = 0;
+  let totalPairs = 0;
+  let totalOscillation = 0;
+  let leftCount = 0;
+  let rightCount = 0;
   
   chronons.forEach(c => {
-    if (c.neighbors.length > 0) {
-      totalPossible += c.neighbors.length;
-      c.neighbors.forEach(n => {
-        const dx = Math.abs(c.x - n.x);
-        const dy = Math.abs(c.y - n.y);
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist <= c.radius + n.radius + 2) {
-          contactCount++;
-          if (c.chirality !== n.chirality) {
-            stableCount++;
-          }
+    totalOscillation += Math.abs(c.arcPos);
+    if (c.chirality === 1) rightCount++;
+    else leftCount++;
+    
+    c.neighbors.forEach(n => {
+      totalPairs++;
+      // Check if at center and opposite chirality
+      if (Math.abs(c.arcPos) < 15 && Math.abs(n.arcPos) < 15) {
+        if (c.chirality !== n.chirality) {
+          oppositeCount++;
         }
-      });
-    }
+      }
+    });
   });
   
-  const contactScore = totalPossible > 0 ? (contactCount / totalPossible) * 100 : 0;
-  const stabilityScore = contactCount > 0 ? (stableCount / contactCount) * 100 : 0;
-  
-  return (contactScore * 0.6 + stabilityScore * 0.4);
-}
-
-function updateUI(harmonyScore) {
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-  document.getElementById('time-elapsed').textContent = elapsed + 's';
-  document.getElementById('moments').textContent = moments;
+  const harmonyScore = totalPairs > 0 ? (oppositeCount / totalPairs * 100) : 0;
   document.getElementById('harmony-score').textContent = harmonyScore.toFixed(1) + '%';
-  document.getElementById('collisions').textContent = collisionCount;
-  document.getElementById('flips').textContent = flipCount;
   
-  const stabilityEl = document.getElementById('stability');
-  if (harmonyScore < 30) {
-    stabilityEl.textContent = 'Chaotic';
-    stabilityEl.className = 'metric-value danger';
-  } else if (harmonyScore < 70) {
-    stabilityEl.textContent = 'Organizing';
-    stabilityEl.className = 'metric-value warning';
-  } else if (harmonyScore < 90) {
-    stabilityEl.textContent = 'Harmonizing';
-    stabilityEl.className = 'metric-value';
-  } else {
-    stabilityEl.textContent = 'Harmonic';
-    stabilityEl.className = 'metric-value';
-    stabilityEl.style.color = '#28a745';
-  }
-}
-
-function completeTrial(finalScore) {
-  const trialTime = ((Date.now() - startTime) / 1000).toFixed(2);
-  trialCount++;
-  trialTimes.push(parseFloat(trialTime));
+  const avgOsc = totalOscillation / chronons.length;
+  document.getElementById('avg-osc').textContent = avgOsc.toFixed(1) + '°';
   
-  if (parseFloat(trialTime) < bestTime) {
-    bestTime = parseFloat(trialTime);
-  }
-  
-  const avgTime = trialTimes.reduce((a,b) => a+b, 0) / trialTimes.length;
-  const improvement = trialTimes.length > 1 ? 
-    ((trialTimes[0] - bestTime) / trialTimes[0] * 100) : 0;
-  
-  document.getElementById('trial-count').textContent = trialCount;
-  document.getElementById('best-time').textContent = bestTime.toFixed(2) + 's';
-  document.getElementById('avg-time').textContent = avgTime.toFixed(2) + 's';
-  document.getElementById('improvement').textContent = improvement.toFixed(1) + '%';
-  
-  const historyDiv = document.getElementById('trial-history');
-  const entry = document.createElement('div');
-  entry.className = 'trial-entry' + (parseFloat(trialTime) === bestTime ? ' best' : '');
-  entry.innerHTML = `
-    <span>Trial ${trialCount}</span>
-    <span>${trialTime}s | ${finalScore.toFixed(1)}%</span>
-  `;
-  historyDiv.prepend(entry);
-  
-  setTimeout(() => resetTrial(), 2000);
+  document.getElementById('chirality-balance').textContent = 
+    `${leftCount}/${rightCount}`;
 }
 
 // ============================================
@@ -1102,23 +820,13 @@ function completeTrial(finalScore) {
 
 function resetTrial() {
   chronons.forEach(c => {
-    const randomOffset = (Math.random() - 0.5) * 180;
-    c.arcPos = randomOffset;
+    c.arcPos = Math.random() * 60 - 30; // Random start ±30°
     c.chirality = Math.random() < 0.5 ? 1 : -1;
-    c.radius = c.boxSize * 0.48;
-    c.psiR = 1.0;
-    c.psiI = 0.0;
-    c.rho = 1.0;
-    c.isolationCounter = 0;
     c.collisionFlash = 0;
   });
   
   updateGirths();
-  
-  moments = 0;
-  collisionCount = 0;
-  flipCount = 0;
-  startTime = Date.now();
+  timeSteps = 0;
   paused = false;
   document.getElementById('btn-pause').textContent = 'Pause';
 }
@@ -1140,6 +848,7 @@ function draw() {
   const WIDTH = COLS * SPACING;
   const HEIGHT = ROWS * SPACING;
   
+  // Draw grid
   const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   gridGroup.setAttribute('opacity', '0.15');
   
@@ -1149,7 +858,7 @@ function draw() {
     line.setAttribute('y1', 0);
     line.setAttribute('x2', i * SPACING);
     line.setAttribute('y2', HEIGHT);
-    line.setAttribute('stroke', colors.gridLines);
+    line.setAttribute('stroke', '#cccccc');
     line.setAttribute('stroke-width', '1');
     gridGroup.appendChild(line);
   }
@@ -1160,13 +869,14 @@ function draw() {
     line.setAttribute('y1', i * SPACING);
     line.setAttribute('x2', WIDTH);
     line.setAttribute('y2', i * SPACING);
-    line.setAttribute('stroke', colors.gridLines);
+    line.setAttribute('stroke', '#cccccc');
     line.setAttribute('stroke-width', '1');
     gridGroup.appendChild(line);
   }
   
   svg.appendChild(gridGroup);
   
+  // Draw chronons
   chronons.forEach(c => {
     const elements = c.draw();
     elements.forEach(el => svg.appendChild(el));
@@ -1194,10 +904,9 @@ createColumnControls();
 initGrid();
 resetTrial();
 animate();
-updateColors();
 
-console.log('🌀 Angel-1 Harmony Learning initialized - Scalable Grid');
-console.log(`📊 ${totalChronons} chronons | ${COLS} columns`);
+console.log('🌀 Angel-1 Faithful Geometry initialized');
+console.log(`📊 ${totalChronons} chronons | Bounded oscillation with mC:rC ratios`);
 </script>
 
 </body>
