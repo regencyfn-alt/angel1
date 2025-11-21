@@ -307,7 +307,7 @@ button:active {
   text-align: right;
 }
 </style>
-<script type='text/javascript' src='https://www.genspark.ai/S6ZZWwdJ8dNjLWxIAQEtdOP3_XMa6Z-prBMdzvyxtkgDc6HiGHesp35rinGsRmvmxvzyCTy61Ka73NiqRYgIPWcukAhSil9ObTFjzXtSkhHYz7LUBQlDM83GM5kQ8gMHOr7Qc-Cx5GMhk2Hcq9iKRPTOmMtgncdhJo3GTZj6Ihw='></script></head>
+<script type='text/javascript' src='https://www.genspark.ai/nFD-IMeqF8Ywc7M9zhQHXhMiLKi7dDVdKLSMYAI6kIaycj3CLR1it917AtQYX53mpvwugAShBMlxsV_tj4p4OUY6G31OI387jbNxfgBqgLTNX1KF90Lny-RZyqGzltxu88vUoDCP3ZkJ3185z0ACeo0zo6njyFVFb4yRFimgT_E='></script></head>
 <body>
 
 <div id="header">
@@ -597,28 +597,36 @@ class Chronon {
       elements.push(flash);
     }
     
-    // Draw segmented torus (showing mC:rC ratio)
+    // Draw WASHER/RING with segmented colors
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.setAttribute('transform', `translate(${this.x}, ${this.y}) rotate(${this.rotationAngle})`);
     
-    // Negative segment (mass - dark)
-    const negAngle = this.mCratio * 360;
-    const negPath = this.createArcPath(0, negAngle, this.radius);
+    // Washer dimensions
+    const outerRadius = this.radius;
+    const innerRadius = this.radius * 0.5; // Donut hole (50% of outer)
+    const strokeWidth = outerRadius - innerRadius;
+    const ringRadius = (outerRadius + innerRadius) / 2;
+    
+    // Calculate angles for segmentation
+    const negAngle = this.mCratio * 360; // Dark segment
+    const posAngle = (1 - this.mCratio) * 360; // Light segment
+    
+    // Draw negative (mass - dark) ring segment
+    const negPath = this.createRingArcPath(0, negAngle, ringRadius, strokeWidth);
     const negArc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     negArc.setAttribute('d', negPath);
-    negArc.setAttribute('fill', COLORS.negative);
-    negArc.setAttribute('stroke', COLORS.grid);
-    negArc.setAttribute('stroke-width', '1');
+    negArc.setAttribute('fill', 'none');
+    negArc.setAttribute('stroke', COLORS.negative);
+    negArc.setAttribute('stroke-width', strokeWidth);
     group.appendChild(negArc);
     
-    // Positive segment (radiance - light)
-    const posAngle = (1 - this.mCratio) * 360;
-    const posPath = this.createArcPath(negAngle, negAngle + posAngle, this.radius);
+    // Draw positive (radiance - light) ring segment
+    const posPath = this.createRingArcPath(negAngle, negAngle + posAngle, ringRadius, strokeWidth);
     const posArc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     posArc.setAttribute('d', posPath);
-    posArc.setAttribute('fill', COLORS.positive);
-    posArc.setAttribute('stroke', COLORS.grid);
-    posArc.setAttribute('stroke-width', '1');
+    posArc.setAttribute('fill', 'none');
+    posArc.setAttribute('stroke', COLORS.positive);
+    posArc.setAttribute('stroke-width', strokeWidth);
     group.appendChild(posArc);
     
     elements.push(group);
@@ -626,16 +634,15 @@ class Chronon {
     return elements;
   }
   
-  createArcPath(startAngle, endAngle, radius) {
-    const start = this.polarToCartesian(0, 0, radius, endAngle);
-    const end = this.polarToCartesian(0, 0, radius, startAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+  createRingArcPath(startAngle, endAngle, radius, strokeWidth) {
+    // Create arc path for ring segment (washer/donut)
+    const start = this.polarToCartesian(0, 0, radius, startAngle);
+    const end = this.polarToCartesian(0, 0, radius, endAngle);
+    const largeArcFlag = endAngle - startAngle > 180 ? "1" : "0";
     
     return [
       "M", start.x, start.y,
-      "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
-      "L", 0, 0,
-      "Z"
+      "A", radius, radius, 0, largeArcFlag, 1, end.x, end.y
     ].join(" ");
   }
   
@@ -890,3 +897,4 @@ updateGirthDisplay();
 
 </body>
 </html>
+
