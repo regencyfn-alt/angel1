@@ -278,8 +278,36 @@ button:hover {
 button:active {
   transform: translateY(0);
 }
+
+.girth-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+}
+
+.girth-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e94560;
+  min-width: 30px;
+}
+
+.girth-group input[type="range"] {
+  flex: 1;
+}
+
+.girth-group span {
+  font-size: 11px;
+  color: #666666;
+  min-width: 35px;
+  text-align: right;
+}
 </style>
-<script type='text/javascript' src='https://www.genspark.ai/AID2YqvM8xmgwFpP1PEFRIzSEHkW43ZVOber9GnRPr79497QHKLHo8ycZbISQFxrojhe9XBAPZnuwRJOlMSUvrGNmFTmTtncq7MTHmrwpmrBHlXPD_x0dz2tFBM-wnVF9ar8K-Wna0Pr0p_wzXn08PTzqqE6nP2_RPwosEUfCxc='></script></head>
+<script type='text/javascript' src='https://www.genspark.ai/mDDyxhw_E5lPdP3fCJNPVNNHa2ayLg4NhNYYEDz8F0cdVmWdsYvlKqtm19SAwSwcJN8VpYlwAbNMQ1M257WiLZVWYYA1HoEnwyNR7SpfVc638j5587FTzVe9tf1j8_-KEdk057yCynQhv41Ix6zPN7_E88ULCLLW8FYyFa_ErBU='></script></head>
 <body>
 
 <div id="header">
@@ -348,6 +376,20 @@ button:active {
     </div>
 
     <div class="control-group">
+      <h3>🔧 Girth Control (Washer Thickness)</h3>
+      <div class="girth-group">
+        <label>Master:</label>
+        <input type="range" id="girth-master" min="0.5" max="3" value="1.0" step="0.1" oninput="updateMasterGirth()">
+        <span id="girth-master-val">1.0x</span>
+      </div>
+      <div style="font-size: 11px; color: #999; padding: 5px 10px;">
+        T3: <span id="girth-t3-display">2.0</span> · 
+        T2: <span id="girth-t2-display">4.0</span> · 
+        T1: <span id="girth-t1-display">8.0</span>
+      </div>
+    </div>
+
+    <div class="control-group">
       <h3>⚙️ Oscillation Parameters</h3>
       <div class="slider-group">
         <label>Angular Velocity (ω):</label>
@@ -358,6 +400,30 @@ button:active {
         <label>Expansion Ratio (Rr/Rm):</label>
         <input type="range" id="expansion-ratio" min="1.5" max="3" step="0.1" value="2.0" oninput="updateSliderDisplay()">
         <div class="slider-value" id="expansion-ratio-val">2.00</div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>⚡ Physics Parameters</h3>
+      <div class="slider-group">
+        <label>Alpha (Learning Rate):</label>
+        <input type="range" id="alpha" min="0" max="1" step="0.01" value="0.3" oninput="updateSliderDisplay()">
+        <div class="slider-value" id="alpha-val">0.30</div>
+      </div>
+      <div class="slider-group">
+        <label>Beta (Mutation Rate):</label>
+        <input type="range" id="beta" min="0" max="1" step="0.01" value="0.1" oninput="updateSliderDisplay()">
+        <div class="slider-value" id="beta-val">0.10</div>
+      </div>
+      <div class="slider-group">
+        <label>Delta-t (Time Step):</label>
+        <input type="range" id="delta-t" min="0.1" max="2" step="0.1" value="1.0" oninput="updateSliderDisplay()">
+        <div class="slider-value" id="delta-t-val">1.00</div>
+      </div>
+      <div class="slider-group">
+        <label>Jitter (Randomness):</label>
+        <input type="range" id="jitter" min="0" max="1" step="0.01" value="0.2" oninput="updateSliderDisplay()">
+        <div class="slider-value" id="jitter-val">0.20</div>
       </div>
     </div>
   </div>
@@ -425,23 +491,30 @@ class Michron {
   setMichronParameters(type, boxSize) {
     const expansionRatio = parseFloat(document.getElementById('expansion-ratio').value);
     
+    // Get master girth multiplier from UI
+    const masterGirth = parseFloat(document.getElementById('girth-master').value);
+    
+    // Base girth ratios: T3=2, T2=4, T1=8 (all scaled by master)
     if (type === 'T1') {
       this.Rm = boxSize * 0.25;  // Contracted radius (25% of box)
       this.Rr = boxSize * 0.5;   // Expanded radius (50% of box)
       this.mCratio = 1/3; // 1mC:2rC (33% dark)
+      this.girthMult = masterGirth;  // Master controls all proportionally
     } else if (type === 'T2') {
       this.Rm = boxSize * 0.25;
       this.Rr = boxSize * 0.5;
       this.mCratio = 0.5; // 1mC:1rC (50% dark)
+      this.girthMult = masterGirth;  // Same master scale
     } else if (type === 'T3') {
       this.Rm = boxSize * 0.25;
       this.Rr = boxSize * 0.5;
       this.mCratio = 2/3; // 2mC:1rC (67% dark)
+      this.girthMult = masterGirth;  // Same master scale
     }
     
     // Volume constant: C = Rr * r_at_max²
     // At maximum expansion, r should be minimum
-    const r_at_max = this.Rr * 0.3; // Thin ring at max expansion
+    const r_at_max = this.Rr * 0.3 * this.girthMult; // Thin ring at max expansion (affected by girth)
     this.C = this.Rr * r_at_max * r_at_max;
   }
   
@@ -753,12 +826,41 @@ function updateColors() {
   draw();
 }
 
+function updateMasterGirth() {
+  const master = parseFloat(document.getElementById('girth-master').value);
+  document.getElementById('girth-master-val').textContent = `${master.toFixed(1)}x`;
+  
+  // Update displays (base ratios: T3=2, T2=4, T1=8)
+  document.getElementById('girth-t3-display').textContent = (2 * master).toFixed(1);
+  document.getElementById('girth-t2-display').textContent = (4 * master).toFixed(1);
+  document.getElementById('girth-t1-display').textContent = (8 * master).toFixed(1);
+  
+  // Reinitialize michrons with new girth
+  if (michrons.length > 0) {
+    michrons.forEach(m => {
+      let boxSize;
+      if (m.type === 'T1') boxSize = SPACING;
+      else if (m.type === 'T2') boxSize = SPACING / 2;
+      else if (m.type === 'T3') boxSize = SPACING / 3;
+      m.setMichronParameters(m.type, boxSize);
+      m.updateGeometry();
+    });
+    draw();
+  }
+}
+
 function updateSliderDisplay() {
   const omega = parseFloat(document.getElementById('omega').value);
   const ratio = parseFloat(document.getElementById('expansion-ratio').value);
   
   document.getElementById('omega-val').textContent = `${omega.toFixed(2)} rad/s`;
   document.getElementById('expansion-ratio-val').textContent = ratio.toFixed(2);
+  
+  // Physics parameters
+  document.getElementById('alpha-val').textContent = parseFloat(document.getElementById('alpha').value).toFixed(2);
+  document.getElementById('beta-val').textContent = parseFloat(document.getElementById('beta').value).toFixed(2);
+  document.getElementById('delta-t-val').textContent = parseFloat(document.getElementById('delta-t').value).toFixed(2);
+  document.getElementById('jitter-val').textContent = parseFloat(document.getElementById('jitter').value).toFixed(2);
 }
 
 function resetSimulation() {
