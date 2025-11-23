@@ -1,593 +1,609 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANGEL-1 · Wave Flow System</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-const ToroidPlayground = () => {
-  const canvasRef = useRef(null);
-  const [isPaused, setIsPaused] = useState(true);
-  const [gridSize, setGridSize] = useState({ cols: 4, rows: 2 });
-  const [cellSize, setCellSize] = useState(80);
-  const [toroids, setToroids] = useState([]);
-  const [timeScale, setTimeScale] = useState(1.0); // Speed multiplier
-  const [metrics, setMetrics] = useState({
-    contacts: 0,
-    frozen: 0,
-    active: 0
-  });
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0b0f14;
+  color: #e8ecef;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #9ca3af;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
+  border: 1px solid #22303d;
+  border-radius: 6px;
+  color: #e8ecef;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #2d4a70 0%, #22303d 100%);
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+}
+
+button.primary {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border-color: #60a5fa;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: #1a1f2e;
+  border: 1px solid #22303d;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.metric-label {
+  color: #9ca3af;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  color: #10b981;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.params {
+  background: #1a1f2e;
+  border: 1px solid #22303d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.params h3 {
+  color: #e8ecef;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.param-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.param-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.param-item label {
+  color: #d1d5db;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.param-value {
+  color: #60a5fa;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #0b0f14;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+  cursor: pointer;
+  border: none;
+}
+
+.canvas-container {
+  background: #1a1f2e;
+  border: 2px solid #22303d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+canvas {
+  display: block;
+  border: 1px solid #22303d;
+  border-radius: 4px;
+}
+
+.info {
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.info h3 {
+  color: #60a5fa;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.info ul {
+  list-style: none;
+  padding: 0;
+}
+
+.info li {
+  color: #d1d5db;
+  font-size: 13px;
+  line-height: 1.8;
+  padding-left: 20px;
+  position: relative;
+}
+
+.info li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #60a5fa;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>ANGEL-1 · Wave Flow System</h1>
+  <div class="subtitle">Organic Flow · No Death States · T1/T2 Torsion Mechanics · Dark Energy = 68% Extended Zone</div>
+
+  <div class="controls">
+    <button id="pauseBtn" class="primary">Pause</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">Time Steps</div>
+      <div class="metric-value" id="timeSteps">0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Avg Energy</div>
+      <div class="metric-value" id="avgEnergy">0.0000</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Grid Size</div>
+      <div class="metric-value" id="gridSize">8×6</div>
+    </div>
+  </div>
+
+  <div class="params">
+    <h3>Wave Parameters</h3>
+    <div class="param-grid">
+      <div class="param-item">
+        <label>
+          <span>Speed</span>
+          <span class="param-value" id="speedVal">1.0x</span>
+        </label>
+        <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1.0">
+      </div>
+      <div class="param-item">
+        <label>
+          <span>α (Dispersion)</span>
+          <span class="param-value" id="alphaVal">0.90</span>
+        </label>
+        <input type="range" id="alpha" min="0.1" max="1.5" step="0.01" value="0.9">
+      </div>
+      <div class="param-item">
+        <label>
+          <span>β (Nonlinearity)</span>
+          <span class="param-value" id="betaVal">0.35</span>
+        </label>
+        <input type="range" id="beta" min="0" max="1" step="0.01" value="0.35">
+      </div>
+      <div class="param-item">
+        <label>
+          <span>Jitter (Chaos)</span>
+          <span class="param-value" id="jitterVal">0.20</span>
+        </label>
+        <input type="range" id="jitter" min="0" max="1" step="0.01" value="0.2">
+      </div>
+      <div class="param-item">
+        <label>
+          <span>Grid Columns</span>
+          <span class="param-value" id="colsVal">8</span>
+        </label>
+        <input type="range" id="cols" min="4" max="16" step="1" value="8">
+      </div>
+      <div class="param-item">
+        <label>
+          <span>Grid Rows</span>
+          <span class="param-value" id="rowsVal">6</span>
+        </label>
+        <input type="range" id="rows" min="3" max="12" step="1" value="6">
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-container">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <div class="info">
+    <h3>Wave Flow Mechanics & Dark Energy Connection</h3>
+    <ul>
+      <li><strong>Continuous evolution:</strong> Complex wave function (ψ = ψᴿ + iψᴵ) - no death states</li>
+      <li><strong>Laplacian coupling:</strong> Each cell coupled to neighbors via wave diffusion</li>
+      <li><strong>T1 oscillation:</strong> 135° total (45° left + 90° right) - 33% mass, 67% radiance</li>
+      <li><strong>T2 oscillation:</strong> 67.5° total (22.5° left + 45° right) - 50% mass, 50% radiance</li>
+      <li><strong>Safe zones:</strong> 42.6% of oscillation range = bound mass component</li>
+      <li><strong>Extended zones:</strong> 57.4% of oscillation range = free radiance</li>
+      <li><strong>Dark Energy = 68%:</strong> The radiance-dominated extended oscillation zones</li>
+      <li><strong>Phase-driven rotation:</strong> φ = atan2(ψᴵ, ψᴿ) determines washer orientation</li>
+      <li><strong>Organic flow:</strong> Energy sweeps across grid like breathing fabric of spacetime</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// Configuration
+let COLS = 8;
+let ROWS = 6;
+const CELL_SIZE = 60;
+let isPaused = false;
+
+// Wave parameters
+let alpha = 0.9;
+let beta = 0.35;
+let dt = 0.02;
+let jitter = 0.2;
+let speed = 1.0;
+
+// State
+let psiR = [];
+let psiI = [];
+let rho = [];
+let rhoE = [];
+let phi = [];
+let grid = [];
+let t = 0;
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// Initialize
+function init() {
+  const n = COLS * ROWS;
   
-  const animationRef = useRef(null);
-  const lastTimeRef = useRef(Date.now());
+  // Random initial wave function
+  psiR = Array(n).fill(0).map(() => Math.random() * 2 - 1);
+  psiI = Array(n).fill(0).map(() => Math.random() * 2 - 1);
+  rho = Array(n).fill(0);
+  rhoE = Array(n).fill(0);
+  phi = Array(n).fill(0);
+  
+  // Normalize
+  normalize();
+  
+  // Build grid
+  grid = [];
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      grid.push({
+        x: (col - COLS / 2 + 0.5) * CELL_SIZE,
+        y: (row - ROWS / 2 + 0.5) * CELL_SIZE,
+        col,
+        row
+      });
+    }
+  }
+  
+  t = 0;
+  
+  // Update canvas size
+  const width = COLS * CELL_SIZE;
+  const height = ROWS * CELL_SIZE;
+  canvas.width = width;
+  canvas.height = height;
+  
+  document.getElementById('gridSize').textContent = `${COLS}×${ROWS}`;
+}
 
-  // Toroid class
-  class Toroid {
-    constructor(col, row, cellSize) {
-      this.col = col;
-      this.row = row;
-      this.x = col * cellSize + cellSize / 2;
-      this.y = row * cellSize + cellSize / 2;
-      this.cellSize = cellSize;
-      
-      // Core properties - TRUE 50/50 random
-      this.chirality = Math.random() > 0.5 ? 1 : -1; // 1 = right/CW, -1 = left/CCW
-      this.rotation = Math.random() * 720; // Random starting rotation (0-720 for 4π)
-      this.radius = cellSize * 0.35; // Base radius
-      this.expansionFactor = 1.0; // 1.0 = neutral, <1 = contracted, >1 = expanded
-      this.maxExpansion = 1.25; // Can expand 25%
-      this.minExpansion = 0.85; // Can contract 15%
-      
-      // Speed (rotations per second)
-      this.baseSpeed = 360; // 360 degrees per second = 1 full rotation/sec
-      this.speed = this.baseSpeed;
-      
-      // Survival timer - must make contact or die
-      this.timeAlive = 0;
-      this.maxTime = 3.0; // 3 seconds to make first contact
-      this.timeSinceLastKiss = 0; // Track time since last neighbor interaction
-      this.frozen = false;
-      this.hasFlipped = false;
-      this.hasEverKissed = false; // Track if ever made contact
-      
-      // Strategy state
-      this.strategyPhase = 0; // 0 = initial, 1 = executing flip
-      this.strategyTarget = this.chirality === 1 ? 180 : 90; // Right=180deg, Left=90deg (double for 4π)
-      
-      // Contact feedback
-      this.justKissed = false;
-      this.kissType = null; // 'bump' or 'amplify'
-      this.kissCooldown = 0;
-      
-      // Intelligence/reward tracking
-      this.successfulCycles = 0;
-      this.totalKisses = 0;
-      this.intelligence = 0.5; // 0-1, starts neutral
-    }
+function normalize() {
+  let sum = 0;
+  for (let i = 0; i < psiR.length; i++) {
+    sum += psiR[i] * psiR[i] + psiI[i] * psiI[i];
+  }
+  const norm = Math.sqrt(sum) || 1e-12;
+  for (let i = 0; i < psiR.length; i++) {
+    psiR[i] /= norm;
+    psiI[i] /= norm;
+  }
+}
+
+function getNeighbors(i) {
+  const neighbors = [];
+  const col = i % COLS;
+  const row = Math.floor(i / COLS);
+  
+  if (col > 0) neighbors.push(i - 1);
+  if (col < COLS - 1) neighbors.push(i + 1);
+  if (row > 0) neighbors.push(i - COLS);
+  if (row < ROWS - 1) neighbors.push(i + COLS);
+  
+  return neighbors;
+}
+
+function laplacian(arr, i) {
+  const neighbors = getNeighbors(i);
+  let sum = 0;
+  for (const n of neighbors) {
+    sum += arr[n];
+  }
+  return sum - neighbors.length * arr[i];
+}
+
+function step() {
+  const n = psiR.length;
+  
+  // Calculate density and phase
+  for (let i = 0; i < n; i++) {
+    rho[i] = psiR[i] * psiR[i] + psiI[i] * psiI[i];
+    rhoE[i] = 0.95 * rhoE[i] + 0.05 * rho[i];
+    phi[i] = Math.atan2(psiI[i], psiR[i]);
+  }
+  
+  // Evolve wave function
+  const newPsiR = [];
+  const newPsiI = [];
+  
+  for (let i = 0; i < n; i++) {
+    const Lr = laplacian(psiR, i);
+    const Li = laplacian(psiI, i);
+    const r = rho[i];
     
-    update(deltaTime, neighbors) {
-      if (this.frozen) return;
-      
-      this.timeAlive += deltaTime;
-      this.timeSinceLastKiss += deltaTime;
-      
-      // Decay kiss feedback
-      if (this.kissCooldown > 0) {
-        this.kissCooldown -= deltaTime;
-        if (this.kissCooldown <= 0) {
-          this.justKissed = false;
-          this.kissType = null;
+    const Ar = alpha * Lr - beta * r * psiR[i];
+    const Ai = alpha * Li - beta * r * psiI[i];
+    
+    newPsiR[i] = psiR[i] + dt * (-Ai) + (Math.random() * 2 - 1) * jitter * 0.02;
+    newPsiI[i] = psiI[i] + dt * Ar + (Math.random() * 2 - 1) * jitter * 0.02;
+  }
+  
+  psiR = newPsiR;
+  psiI = newPsiI;
+  normalize();
+  
+  t++;
+}
+
+function drawWasher(x, y, radius, phase) {
+  // Apply T1 rotation limits (135° total: 45° left + 90° right)
+  let degrees = ((phase * 180 / Math.PI) % 360 + 360) % 360;
+  let constrainedPhase = phase;
+  
+  if (degrees > 90 && degrees < 180) {
+    constrainedPhase = 90 * Math.PI / 180;
+  } else if (degrees > 180 && degrees < 315) {
+    constrainedPhase = -45 * Math.PI / 180;
+  }
+  
+  const thickness = 8;
+  
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(constrainedPhase);
+  
+  // Black half (left)
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, Math.PI / 2, 3 * Math.PI / 2);
+  ctx.arc(0, 0, Math.max(1, radius - thickness), 3 * Math.PI / 2, Math.PI / 2, true);
+  ctx.closePath();
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fill();
+  
+  // White half (right)
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, -Math.PI / 2, Math.PI / 2);
+  ctx.arc(0, 0, Math.max(1, radius - thickness), Math.PI / 2, -Math.PI / 2, true);
+  ctx.closePath();
+  ctx.fillStyle = '#e8e8e8';
+  ctx.fill();
+  
+  // Outline
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(233, 69, 96, 0.6)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  
+  ctx.restore();
+}
+
+function draw() {
+  const width = canvas.width;
+  const height = canvas.height;
+  
+  // Clear
+  ctx.fillStyle = '#0b0f14';
+  ctx.fillRect(0, 0, width, height);
+  
+  // Draw grid
+  ctx.strokeStyle = '#22303d';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= COLS; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * CELL_SIZE, 0);
+    ctx.lineTo(i * CELL_SIZE, height);
+    ctx.stroke();
+  }
+  for (let i = 0; i <= ROWS; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, i * CELL_SIZE);
+    ctx.lineTo(width, i * CELL_SIZE);
+    ctx.stroke();
+  }
+  
+  // Draw connections
+  const maxRho = Math.max(1e-12, ...rhoE);
+  for (let i = 0; i < grid.length; i++) {
+    const neighbors = getNeighbors(i);
+    for (const n of neighbors) {
+      if (i < n) {
+        const grad = Math.abs(rhoE[n] - rhoE[i]);
+        if (grad < 0.6 / grid.length) {
+          ctx.beginPath();
+          ctx.moveTo(grid[i].x + width / 2, grid[i].y + height / 2);
+          ctx.lineTo(grid[n].x + width / 2, grid[n].y + height / 2);
+          ctx.strokeStyle = 'rgba(96, 165, 250, 0.25)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
         }
-      }
-      
-      // Update rotation based on chirality and speed (4π cycle = 720°)
-      const rotationDelta = this.speed * deltaTime * this.chirality;
-      this.rotation = (this.rotation + rotationDelta) % 720;
-      if (this.rotation < 0) this.rotation += 720;
-      
-      // Update expansion based on chirality
-      if (this.chirality === 1) {
-        // Right rotation: expand and speed up
-        this.expansionFactor = Math.min(this.maxExpansion, this.expansionFactor + deltaTime * 0.5);
-        this.speed = this.baseSpeed * (1 + (this.expansionFactor - 1) * 1.5);
-      } else {
-        // Left rotation: contract and slow down
-        this.expansionFactor = Math.max(this.minExpansion, this.expansionFactor - deltaTime * 0.3);
-        this.speed = this.baseSpeed * this.expansionFactor;
-      }
-      
-      // INTELLIGENT NEIGHBOR SCANNING
-      const activeNeighbors = neighbors.filter(n => !n.frozen);
-      const neighborStates = this.scanNeighbors(activeNeighbors);
-      
-      // Check for edge contact
-      const currentRadius = this.radius * this.expansionFactor;
-      const halfCell = this.cellSize / 2;
-      const distToEdgeRight = halfCell - (this.x - (this.col * this.cellSize + halfCell));
-      const distToEdgeLeft = halfCell + (this.x - (this.col * this.cellSize + halfCell));
-      const distToEdgeTop = halfCell + (this.y - (this.row * this.cellSize + halfCell));
-      const distToEdgeBottom = halfCell - (this.y - (this.row * this.cellSize + halfCell));
-      
-      const touchingEdge = 
-        currentRadius >= distToEdgeRight * 0.9 ||
-        currentRadius >= distToEdgeLeft * 0.9 ||
-        currentRadius >= distToEdgeTop * 0.9 ||
-        currentRadius >= distToEdgeBottom * 0.9;
-      
-      // Check for neighbor contacts when touching edge
-      if (touchingEdge && activeNeighbors.length > 0 && this.kissCooldown <= 0) {
-        this.checkKissContacts(activeNeighbors);
-      }
-      
-      // INTELLIGENT STRATEGY: Use neighbor info to decide when to flip
-      if (!this.hasFlipped && activeNeighbors.length > 0) {
-        // Calculate optimal flip point based on neighbor positions and chirality
-        const optimalFlipPoint = this.calculateOptimalFlip(neighborStates);
-        const targetDiff = Math.abs(((this.rotation - optimalFlipPoint + 360) % 720) - 360);
-        
-        if (targetDiff < 15) {
-          this.flipChirality();
-          this.hasFlipped = true;
-        }
-      } else {
-        // Check if we've completed the 4π cycle (back to start ±45°)
-        const startDiff = Math.min(this.rotation, 720 - this.rotation);
-        if (startDiff < 45 && this.hasFlipped) {
-          // Success! Reset timer and flip flag
-          if (this.hasEverKissed) {
-            this.timeSinceLastKiss = 0; // Reset connection timer
-            this.successfulCycles++;
-            this.intelligence = Math.min(1.0, this.intelligence + 0.1);
-          }
-          this.hasFlipped = false;
-        }
-      }
-      
-      // CRITICAL: Connection-based survival
-      // If you have no active neighbors, you die quickly
-      if (activeNeighbors.length === 0) {
-        if (this.timeAlive > 1.0) { // Isolated toroids die after 1 second
-          this.frozen = true;
-          return;
-        }
-      }
-      
-      // If you've never kissed and time is up, you die
-      if (!this.hasEverKissed && this.timeAlive >= this.maxTime) {
-        this.frozen = true;
-        return;
-      }
-      
-      // If you haven't kissed in too long (lost connection), you die
-      if (this.hasEverKissed && this.timeSinceLastKiss > this.maxTime * 1.5) {
-        this.frozen = true;
-        return;
-      }
-    }
-    
-    scanNeighbors(neighbors) {
-      // Scan neighbors to understand the field
-      const states = {
-        sameChirality: 0,
-        oppositeChirality: 0,
-        expanding: 0,
-        contracting: 0,
-        nearEdge: 0,
-        avgRotation: 0
-      };
-      
-      neighbors.forEach(n => {
-        if (n.frozen) return;
-        
-        if (n.chirality === this.chirality) states.sameChirality++;
-        else states.oppositeChirality++;
-        
-        if (n.expansionFactor > 1.1) states.expanding++;
-        if (n.expansionFactor < 0.95) states.contracting++;
-        
-        states.avgRotation += n.rotation;
-      });
-      
-      if (neighbors.length > 0) {
-        states.avgRotation /= neighbors.length;
-      }
-      
-      return states;
-    }
-    
-    calculateOptimalFlip(neighborStates) {
-      // INTELLIGENT DECISION MAKING
-      // If surrounded by opposite chirality neighbors who are expanding,
-      // flip early to catch their amplification
-      if (neighborStates.oppositeChirality > neighborStates.sameChirality && 
-          neighborStates.expanding > 1) {
-        // Aggressive strategy: flip earlier for amplification
-        return this.chirality === 1 ? 120 : 60;
-      }
-      
-      // If surrounded by same chirality neighbors who are expanding,
-      // flip late to avoid bumps
-      if (neighborStates.sameChirality > neighborStates.oppositeChirality && 
-          neighborStates.expanding > 1) {
-        // Conservative strategy: flip later to avoid collision
-        return this.chirality === 1 ? 240 : 120;
-      }
-      
-      // Default safe strategy
-      return this.chirality === 1 ? 180 : 90;
-    }
-    
-    checkKissContacts(neighbors) {
-      neighbors.forEach(neighbor => {
-        if (neighbor.frozen || neighbor.kissCooldown > 0) return;
-        
-        const dx = this.x - neighbor.x;
-        const dy = this.y - neighbor.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const combinedRadius = (this.radius * this.expansionFactor) + (neighbor.radius * neighbor.expansionFactor);
-        
-        // More generous contact threshold
-        if (distance < combinedRadius * 1.1) { // 10% overlap tolerance
-          
-          // Check if same or opposite chirality
-          const sameChirality = this.chirality === neighbor.chirality;
-          
-          if (sameChirality) {
-            // Same chirality = opposite edge directions = BUMP
-            this.handleBump();
-            neighbor.handleBump();
-            this.kissType = 'bump';
-            neighbor.kissType = 'bump';
-          } else {
-            // Opposite chirality = same edge directions = AMPLIFY
-            this.handleAmplify();
-            neighbor.handleAmplify();
-            this.kissType = 'amplify';
-            neighbor.kissType = 'amplify';
-          }
-          
-          this.justKissed = true;
-          neighbor.justKissed = true;
-          this.hasEverKissed = true; // Mark as connected
-          neighbor.hasEverKissed = true;
-          this.timeSinceLastKiss = 0; // Reset connection timer
-          neighbor.timeSinceLastKiss = 0;
-          this.kissCooldown = 0.3; // 300ms cooldown
-          neighbor.kissCooldown = 0.3;
-        }
-      });
-    }
-    
-    getEdgeVelocity(angle) {
-      // Returns direction of edge movement at given angle
-      // For CW (chirality=1), edge moves in direction of rotation
-      // For CCW (chirality=-1), edge moves opposite
-      return this.chirality;
-    }
-    
-    handleBump() {
-      // Shrink and reverse direction
-      this.expansionFactor = Math.max(this.minExpansion, this.expansionFactor - 0.05);
-      this.flipChirality();
-      this.totalKisses++;
-      this.intelligence = Math.max(0.0, this.intelligence - 0.05); // Penalty for bump
-    }
-    
-    handleAmplify() {
-      // Speed boost and continue
-      this.rotation += 30 * this.chirality; // Extra kick
-      this.speed *= 1.2;
-      this.totalKisses++;
-      this.intelligence = Math.min(1.0, this.intelligence + 0.1); // Reward for amplification!
-    }
-    
-    flipChirality() {
-      this.chirality *= -1;
-      this.strategyTarget = this.chirality === 1 ? 90 : 45;
-    }
-    
-    draw(ctx) {
-      const currentRadius = this.radius * this.expansionFactor;
-      const thickness = 8;
-      
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate((this.rotation * Math.PI) / 360); // Divide by 360 since rotation is 0-720
-      
-      // Flash effect for kiss contact
-      if (this.justKissed) {
-        ctx.beginPath();
-        ctx.arc(0, 0, currentRadius + 5, 0, Math.PI * 2);
-        ctx.strokeStyle = this.kissType === 'bump' ? '#ff6b6b' : '#51cf66';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-      }
-      
-      // Intelligence glow (brighter = smarter)
-      if (this.intelligence > 0.6) {
-        ctx.beginPath();
-        ctx.arc(0, 0, currentRadius + 3, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 215, 0, ${this.intelligence * 0.5})`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-      
-      // Draw outer ring
-      ctx.beginPath();
-      ctx.arc(0, 0, currentRadius, 0, Math.PI * 2);
-      
-      // Color based on state
-      let ringColor;
-      if (this.frozen) {
-        ringColor = '#999';
-      } else if (!this.hasEverKissed && this.timeAlive > 2.0) {
-        ringColor = '#ff4444'; // Dying - never connected
-      } else {
-        ringColor = this.chirality === 1 ? '#e94560' : '#4a90e2';
-      }
-      
-      ctx.strokeStyle = ringColor;
-      ctx.lineWidth = thickness;
-      ctx.stroke();
-      
-      // Draw charge segments (simplified)
-      ctx.beginPath();
-      ctx.arc(0, 0, currentRadius, 0, Math.PI);
-      ctx.strokeStyle = this.frozen ? '#ccc' : '#333';
-      ctx.lineWidth = thickness;
-      ctx.stroke();
-      
-      // Direction indicator
-      ctx.beginPath();
-      ctx.moveTo(currentRadius - 5, 0);
-      ctx.lineTo(currentRadius + 5, 0);
-      ctx.strokeStyle = this.chirality === 1 ? '#e94560' : '#4a90e2';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      
-      ctx.restore();
-      
-      // Draw timer bar
-      if (!this.frozen) {
-        const timerWidth = this.cellSize * 0.6;
-        const timerHeight = 4;
-        const timerX = this.col * this.cellSize + (this.cellSize - timerWidth) / 2;
-        const timerY = (this.row + 1) * this.cellSize - 10;
-        
-        ctx.fillStyle = '#ddd';
-        ctx.fillRect(timerX, timerY, timerWidth, timerHeight);
-        
-        const timeRatio = this.timeAlive / (this.maxTime * 1.5);
-        ctx.fillStyle = timeRatio > 0.66 ? '#e94560' : '#4a90e2';
-        ctx.fillRect(timerX, timerY, timerWidth * timeRatio, timerHeight);
-      }
-      
-      // Show successful cycles as small dots
-      if (this.successfulCycles > 0) {
-        const dotX = this.col * this.cellSize + 5;
-        const dotY = this.row * this.cellSize + 5;
-        ctx.fillStyle = '#ffd700';
-        ctx.beginPath();
-        ctx.arc(dotX, dotY, Math.min(this.successfulCycles * 2, 8), 0, Math.PI * 2);
-        ctx.fill();
       }
     }
   }
-
-  // Initialize grid
-  const initializeGrid = () => {
-    const newToroids = [];
-    for (let row = 0; row < gridSize.rows; row++) {
-      for (let col = 0; col < gridSize.cols; col++) {
-        newToroids.push(new Toroid(col, row, cellSize));
-      }
-    }
-    setToroids(newToroids);
-    lastTimeRef.current = Date.now();
-  };
-
-  // Animation loop
-  const animate = () => {
-    const now = Date.now();
-    const deltaTime = ((now - lastTimeRef.current) / 1000) * timeScale; // Apply time scale
-    lastTimeRef.current = now;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    const width = gridSize.cols * cellSize;
-    const height = gridSize.rows * cellSize;
+  
+  // Draw washers
+  const MIN_RADIUS = 8;
+  const MAX_RADIUS = CELL_SIZE / 2 - 2;
+  
+  for (let i = 0; i < grid.length; i++) {
+    const p = grid[i];
+    const rsrc = rhoE[i];
+    const radius = MIN_RADIUS + (MAX_RADIUS - MIN_RADIUS) * (rsrc / maxRho);
     
-    canvas.width = width;
-    canvas.height = height;
+    drawWasher(
+      p.x + width / 2,
+      p.y + height / 2,
+      radius,
+      phi[i]
+    );
+  }
+  
+  // Update metrics
+  const avgEnergy = rhoE.reduce((a, b) => a + b, 0) / rhoE.length;
+  document.getElementById('timeSteps').textContent = t;
+  document.getElementById('avgEnergy').textContent = avgEnergy.toFixed(4);
+}
 
-    // Clear canvas
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, width, height);
-
-    // Draw grid
-    ctx.strokeStyle = '#ddd';
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= gridSize.cols; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * cellSize, 0);
-      ctx.lineTo(i * cellSize, height);
-      ctx.stroke();
+function animate() {
+  if (!isPaused) {
+    for (let s = 0; s < Math.ceil(speed * 5); s++) {
+      step();
     }
-    for (let i = 0; i <= gridSize.rows; i++) {
-      ctx.beginPath();
-      ctx.moveTo(0, i * cellSize);
-      ctx.lineTo(width, i * cellSize);
-      ctx.stroke();
-    }
+  }
+  draw();
+  requestAnimationFrame(animate);
+}
 
-    // Update and draw toroids
-    const updatedToroids = toroids.map(toroid => {
-      const neighbors = toroids.filter(t => {
-        if (t === toroid) return false;
-        const colDiff = Math.abs(t.col - toroid.col);
-        const rowDiff = Math.abs(t.row - toroid.row);
-        return colDiff <= 1 && rowDiff <= 1;
-      });
-      
-      toroid.update(deltaTime, neighbors);
-      toroid.draw(ctx);
-      return toroid;
-    });
-
-    setToroids(updatedToroids);
-
-    // Update metrics
-    const frozen = updatedToroids.filter(t => t.frozen).length;
-    const active = updatedToroids.length - frozen;
-    const contacts = updatedToroids.filter(t => t.justKissed).length / 2;
-    const avgIntelligence = active > 0 
-      ? updatedToroids.filter(t => !t.frozen).reduce((sum, t) => sum + t.intelligence, 0) / active 
-      : 0;
-    const totalCycles = updatedToroids.reduce((sum, t) => sum + t.successfulCycles, 0);
-    
-    setMetrics({ 
-      contacts: Math.floor(contacts), 
-      frozen, 
-      active,
-      intelligence: avgIntelligence,
-      cycles: totalCycles
-    });
-
-    if (!isPaused) {
-      animationRef.current = requestAnimationFrame(animate);
-    }
-  };
-
-  useEffect(() => {
-    initializeGrid();
-  }, [gridSize, cellSize]);
-
-  useEffect(() => {
-    if (!isPaused) {
-      lastTimeRef.current = Date.now();
-      animationRef.current = requestAnimationFrame(animate);
-    }
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [isPaused, toroids]);
-
-  return (
-    <div className="w-full h-full flex flex-col items-center gap-4 p-6 bg-gray-50">
-      <div className="w-full max-w-4xl">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Toroid Mechanics Playground</h1>
-        <p className="text-sm text-gray-600 mb-4">
-          Red = Right/CW (expand/speedup) · Blue = Left/CCW (contract/slowdown)
-        </p>
-
-        <div className="flex gap-4 mb-4">
-          <button
-            onClick={() => setIsPaused(!isPaused)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            {isPaused ? <Play size={20} /> : <Pause size={20} />}
-            {isPaused ? 'Release' : 'Pause'}
-          </button>
-          
-          <button
-            onClick={initializeGrid}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-          >
-            <RotateCcw size={20} />
-            Reset
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-white p-4 rounded shadow">
-            <div className="text-sm text-gray-600">Active</div>
-            <div className="text-2xl font-bold text-blue-600">{metrics.active}</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <div className="text-sm text-gray-600">Frozen</div>
-            <div className="text-2xl font-bold text-red-600">{metrics.frozen}</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <div className="text-sm text-gray-600">Kiss Events</div>
-            <div className="text-2xl font-bold text-green-600">{metrics.contacts}</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <div className="text-sm text-gray-600">Intelligence</div>
-            <div className="text-2xl font-bold text-yellow-600">{(metrics.intelligence * 100).toFixed(0)}%</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow col-span-2">
-            <div className="text-sm text-gray-600">Successful 4π Cycles</div>
-            <div className="text-2xl font-bold text-purple-600">{metrics.cycles || 0}</div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded shadow mb-4">
-          <div className="mb-2">
-            <label className="text-sm font-semibold text-gray-700">Columns: {gridSize.cols}</label>
-            <input
-              type="range"
-              min="2"
-              max="8"
-              value={gridSize.cols}
-              onChange={(e) => setGridSize({ ...gridSize, cols: parseInt(e.target.value) })}
-              className="w-full"
-            />
-          </div>
-          <div className="mb-2">
-            <label className="text-sm font-semibold text-gray-700">Rows: {gridSize.rows}</label>
-            <input
-              type="range"
-              min="2"
-              max="6"
-              value={gridSize.rows}
-              onChange={(e) => setGridSize({ ...gridSize, rows: parseInt(e.target.value) })}
-              className="w-full"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-gray-700">
-              Speed: {timeScale.toFixed(1)}x
-            </label>
-            <input
-              type="range"
-              min="0.1"
-              max="3"
-              step="0.1"
-              value={timeScale}
-              onChange={(e) => setTimeScale(parseFloat(e.target.value))}
-              className="w-full"
-            />
-            <div className="text-xs text-gray-500 mt-1">
-              0.1x (slow motion) → 3x (fast forward)
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded shadow">
-          <canvas
-            ref={canvasRef}
-            className="border-2 border-gray-300 rounded"
-          />
-        </div>
-
-        <div className="mt-4 bg-blue-50 p-4 rounded text-sm">
-          <h3 className="font-bold mb-2">4π Spinor Mechanics:</h3>
-          <ul className="space-y-1 text-gray-700">
-            <li>• <strong>🔴 CRITICAL: Connection = Survival</strong> - Isolated toroids die in 1 second</li>
-            <li>• <strong>Full cycle = 720°</strong> (two complete rotations to return to quantum state)</li>
-            <li>• <strong>Right (Red):</strong> Expands, speeds up, intelligent flip at 120-240°</li>
-            <li>• <strong>Left (Blue):</strong> Contracts, slows down, intelligent flip at 60-120°</li>
-            <li>• <strong>Same chirality kiss:</strong> Bump → shrink & reverse (red flash, -5% IQ)</li>
-            <li>• <strong>Opposite chirality kiss:</strong> Amplify → boost (green flash, +10% IQ)</li>
-            <li>• <strong>Intelligence:</strong> Toroids scan neighbors and adapt strategy</li>
-            <li>• <strong>Gold glow:</strong> High intelligence (>60%)</li>
-            <li>• <strong>Gold dots:</strong> Successful 4π cycles completed</li>
-            <li>• <strong>Bright red:</strong> Dying (never made contact)</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
+// UI Controls
+document.getElementById('pauseBtn').onclick = () => {
+  isPaused = !isPaused;
+  document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
 };
 
-export default ToroidPlayground;
+document.getElementById('resetBtn').onclick = () => {
+  init();
+};
+
+document.getElementById('speed').oninput = (e) => {
+  speed = parseFloat(e.target.value);
+  document.getElementById('speedVal').textContent = speed.toFixed(1) + 'x';
+};
+
+document.getElementById('alpha').oninput = (e) => {
+  alpha = parseFloat(e.target.value);
+  document.getElementById('alphaVal').textContent = alpha.toFixed(2);
+};
+
+document.getElementById('beta').oninput = (e) => {
+  beta = parseFloat(e.target.value);
+  document.getElementById('betaVal').textContent = beta.toFixed(2);
+};
+
+document.getElementById('jitter').oninput = (e) => {
+  jitter = parseFloat(e.target.value);
+  document.getElementById('jitterVal').textContent = jitter.toFixed(2);
+};
+
+document.getElementById('cols').oninput = (e) => {
+  COLS = parseInt(e.target.value);
+  document.getElementById('colsVal').textContent = COLS;
+  init();
+};
+
+document.getElementById('rows').oninput = (e) => {
+  ROWS = parseInt(e.target.value);
+  document.getElementById('rowsVal').textContent = ROWS;
+  init();
+};
+
+// Start
+init();
+animate();
+</script>
+
+</body>
+</html>
