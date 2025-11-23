@@ -1,1204 +1,670 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>Angel-1 · Harmony Learning Trial</title>
+<meta charset="utf-8" />
+<meta http-equiv="x-ua-compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Angel-1 Chronon Simulator · 8×8 Expandable</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { 
-  font-family: 'Segoe UI', system-ui, sans-serif; 
-  background: #ffffff; 
-  color: #333333;
-  overflow-x: hidden;
-}
-
-#header {
-  padding: 20px;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-  border-bottom: 2px solid #cccccc;
-}
-
-#header h1 {
-  font-size: 28px;
-  font-weight: 300;
-  letter-spacing: 3px;
-  color: #e94560;
-  margin-bottom: 10px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-#header .subtitle {
-  font-size: 14px;
-  color: #666666;
-  letter-spacing: 1px;
-}
-
-#main {
-  display: flex;
-  gap: 20px;
-  padding: 20px;
-  min-height: calc(100vh - 200px);
-  width: 100%;
-}
-
-#canvas-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #ffffff;
-  padding: 20px;
-  position: relative;
-  min-width: 0;
-}
-
-#grid-scale-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #f8f8f8;
-  border-radius: 6px;
-  align-items: center;
-  border: 2px solid #e94560;
-}
-
-#grid-scale-controls button {
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #e94560 0%, #d63552 100%);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-#grid-scale-controls button:hover {
-  background: linear-gradient(135deg, #d63552 0%, #c72544 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(233, 69, 96, 0.3);
-}
-
-#grid-scale-controls button:active {
-  transform: translateY(0);
-}
-
-#grid-scale-controls span {
-  font-weight: 600;
-  color: #e94560;
-  font-size: 16px;
-  min-width: 80px;
-  text-align: center;
-}
-
-#column-controls {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #f8f8f8;
-  border-radius: 6px;
-  flex-wrap: wrap;
-  width: 100%;
-  justify-content: center;
-}
-
-.column-dropdown {
-  width: 38px;
-  padding: 4px 2px;
-  background: #ffffff;
-  color: #333333;
-  border: 1px solid #cccccc;
-  border-radius: 3px;
-  font-size: 10px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.column-dropdown:hover {
-  border-color: #e94560;
-  background: #f0f0f0;
-}
-
-#color-controls {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #f8f8f8;
-  border-radius: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.color-picker-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.color-picker-group label {
-  font-size: 11px;
-  color: #666666;
-  min-width: 80px;
-}
-
-.color-picker-group input[type="color"] {
-  width: 40px;
-  height: 30px;
-  border: 1px solid #cccccc;
-  border-radius: 4px;
-  cursor: pointer;
-  background: transparent;
-}
-
-#svg-canvas {
-  background: white;
-  border: 1px solid #dddddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  width: 100%;
-  height: auto;
-}
-
-#sidebar {
-  width: 340px;
-  min-width: 340px;
-  flex-shrink: 0;
-  background: #f8f8f8;
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.control-group {
-  background: #ffffff;
-  padding: 15px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-}
-
-.control-group h3 {
-  font-size: 14px;
-  color: #e94560;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.metric-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 13px;
-}
-
-.metric-row:last-child {
-  border-bottom: none;
-}
-
-.metric-label {
-  color: #666666;
-}
-
-.metric-value {
-  color: #e94560;
-  font-weight: 600;
-  font-family: 'Courier New', monospace;
-}
-
-.metric-value.warning {
-  color: #ffa500;
-}
-
-.metric-value.danger {
-  color: #e94560;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #e94560 0%, #d63552 100%);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-.slider-container {
-  margin: 10px 0;
-}
-
-.slider-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #666666;
-  margin-bottom: 5px;
-}
-
-.slider-label span:last-child {
-  color: #e94560;
-  font-weight: 600;
-}
-
-input[type="range"] {
-  width: 100%;
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 3px;
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #e94560;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #e94560;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-.trial-history {
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: 11px;
-  font-family: 'Courier New', monospace;
-}
-
-.trial-entry {
-  padding: 4px 8px;
-  margin: 2px 0;
-  background: #f0f0f0;
-  border-radius: 3px;
-  display: flex;
-  justify-content: space-between;
-  color: #333333;
-}
-
-.trial-entry.best {
-  background: #d4edda;
-  border-left: 3px solid #28a745;
-}
-
-#status-bar {
-  padding: 15px 20px;
-  background: #f8f8f8;
-  border-top: 2px solid #e0e0e0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.status-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: #666666;
-}
-
-.status-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #28a745;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.learning-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.stat-box {
-  background: #f0f0f0;
-  padding: 10px;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.stat-box .value {
-  font-size: 20px;
-  color: #e94560;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
-}
-
-.stat-box .label {
-  font-size: 10px;
-  color: #666666;
-  text-transform: uppercase;
-  margin-top: 4px;
-}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0b0f14;
+    color: #e8ecef;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  header {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
+    border-bottom: 2px solid #22303d;
+    padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  
+  .subtitle {
+    font-size: 13px;
+    color: #9ca3af;
+    font-weight: 400;
+  }
+  
+  main {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  
+  footer {
+    background: #0f1620;
+    border-top: 2px solid #22303d;
+    padding: 16px 24px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+  }
+  
+  .controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .control-group.highlight {
+    background: rgba(96, 165, 250, 0.1);
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+  }
+  
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: #d1d5db;
+  }
+  
+  .control-value {
+    font-size: 12px;
+    color: #60a5fa;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+  }
+  
+  input[type=range] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #1a1f2e;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  input[type=range]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
+    border: 1px solid #22303d;
+    border-radius: 6px;
+    color: #e8ecef;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  
+  button:hover {
+    background: linear-gradient(135deg, #2d4a70 0%, #22303d 100%);
+    border-color: #60a5fa;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(96, 165, 250, 0.2);
+  }
+  
+  button:active {
+    transform: translateY(0);
+  }
+  
+  button.primary {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    border-color: #60a5fa;
+  }
+  
+  button.primary:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  }
+  
+  .stats {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(15, 22, 32, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid #22303d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .stats-value {
+    color: #10b981;
+    font-weight: 600;
+  }
+  
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 22px;
+    }
+    .controls-grid {
+      grid-template-columns: 1fr;
+    }
+    .stats {
+      font-size: 10px;
+      padding: 8px 12px;
+    }
+  }
 </style>
-<script type='text/javascript' src='https://www.genspark.ai/TD_bNM3BeAnXHtmkD5EbT2oUAX5gYQfekSPjMFJN7frmwJAgOuZkjlE8NUEM5eBXDhYUfqn_Of4yYsQ4la9EHlsv5R0NRDIgL0hP-Qtl-89puc5uDVInC8RhZSn4jzfPQ79HIym6DpkR4zSKziaKOBlijW7zmK8gNki9GH8UARU='></script></head>
+</head>
 <body>
 
-<div id="header">
-  <h1>ANGEL-1 · CHRONON HARMONY LEARNING</h1>
-  <div class="subtitle">Distributed Local Learning | Chaos → Harmony Time Trial | Scalable Grid</div>
-</div>
+<header>
+  <h1>Angel-1 Chronon Simulator · Expandable Grid</h1>
+  <div class="subtitle">Dynamic Grid Expansion · Volume-Conserving Washers · Chirality & Frequency</div>
+</header>
 
-<div id="main">
-  <div id="canvas-container">
-    <div id="grid-scale-controls">
-      <button onclick="removeColumn('left')">← Remove Left</button>
-      <button onclick="addColumn('left')">+ Add Left</button>
-      <span id="column-count">20 Columns</span>
-      <button onclick="addColumn('right')">Add Right +</button>
-      <button onclick="removeColumn('right')">Remove Right →</button>
+<main>
+  <svg id="v" viewBox="-260 -260 520 520"></svg>
+  <div class="stats" id="stats">
+    <div>Time Steps: <span class="stats-value" id="stat-t">0</span></div>
+    <div>Grid: <span class="stats-value" id="stat-grid">8×8</span> (<span class="stats-value" id="stat-n">64</span> chronons)</div>
+    <div>Zoom: <span class="stats-value" id="stat-zoom">1.00</span>×</div>
+    <div>Topology: <span class="stats-value">Washer (Annular)</span></div>
+  </div>
+</main>
+
+<footer>
+  <div class="button-group">
+    <button id="p" class="primary">Pause</button>
+    <button id="r">Reset</button>
+    <button id="fd">Force Draw</button>
+    <button id="save">Save PNG</button>
+  </div>
+  
+  <div class="controls-grid">
+    <!-- VIEW CONTROLS (HIGHLIGHTED) -->
+    <div class="control-group highlight">
+      <div class="control-label">
+        <span>🔍 Zoom Level</span>
+        <span class="control-value" id="val-zoom">1.00</span>
+      </div>
+      <input id="zoom" type="range" min="0.5" max="3" step="0.1" value="1">
     </div>
     
-    <div id="color-controls">
-      <div class="color-picker-group">
-        <label>Background:</label>
-        <input type="color" id="color-bg" value="#ffffff" onchange="updateColors()">
+    <div class="control-group highlight">
+      <div class="control-label">
+        <span>↔️ Grid Width (Columns)</span>
+        <span class="control-value" id="val-cols">8</span>
       </div>
-      <div class="color-picker-group">
-        <label>Grid Lines:</label>
-        <input type="color" id="color-grid" value="#cccccc" onchange="updateColors()">
-      </div>
-      <div class="color-picker-group">
-        <label>Positive (+):</label>
-        <input type="color" id="color-positive" value="#ffffff" onchange="updateColors()">
-      </div>
-      <div class="color-picker-group">
-        <label>Negative (-):</label>
-        <input type="color" id="color-negative" value="#000000" onchange="updateColors()">
-      </div>
+      <input id="cols" type="range" min="4" max="24" step="1" value="8">
     </div>
-    <div id="column-controls"></div>
-    <svg id="svg-canvas"></svg>
-  </div>
-
-  <div id="sidebar">
-    <div class="control-group">
-      <h3>⚡ Learning Control</h3>
-      <button id="btn-reset" onclick="resetTrial()">Reset to Chaos</button>
-      <button id="btn-pause" onclick="togglePause()" style="margin-top: 10px;">Pause</button>
+    
+    <div class="control-group highlight">
+      <div class="control-label">
+        <span>↕️ Grid Height (Rows)</span>
+        <span class="control-value" id="val-rows">8</span>
+      </div>
+      <input id="rows" type="range" min="4" max="24" step="1" value="8">
     </div>
-
+    
+    <!-- PHYSICS CONTROLS -->
     <div class="control-group">
-      <h3>📊 Current Trial</h3>
-      <div class="metric-row">
-        <span class="metric-label">Time Elapsed:</span>
-        <span class="metric-value" id="time-elapsed">0.00s</span>
+      <div class="control-label">
+        <span>α (Linear Dispersion)</span>
+        <span class="control-value" id="val-a">0.90</span>
       </div>
-      <div class="metric-row">
-        <span class="metric-label">Moments:</span>
-        <span class="metric-value" id="moments">0</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Harmony Score:</span>
-        <span class="metric-value" id="harmony-score">0%</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Stability:</span>
-        <span class="metric-value" id="stability">Chaotic</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Collisions:</span>
-        <span class="metric-value warning" id="collisions">0</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Chirality Flips:</span>
-        <span class="metric-value warning" id="flips">0</span>
-      </div>
+      <input id="a" type="range" min="0.1" max="1.5" step="0.01" value="0.9">
     </div>
-
+    
     <div class="control-group">
-      <h3>🧠 Learning Statistics</h3>
-      <div class="learning-stats">
-        <div class="stat-box">
-          <div class="value" id="trial-count">0</div>
-          <div class="label">Trials</div>
-        </div>
-        <div class="stat-box">
-          <div class="value" id="best-time">--</div>
-          <div class="label">Best Time</div>
-        </div>
-        <div class="stat-box">
-          <div class="value" id="avg-time">--</div>
-          <div class="label">Avg Time</div>
-        </div>
-        <div class="stat-box">
-          <div class="value" id="improvement">0%</div>
-          <div class="label">Improvement</div>
-        </div>
+      <div class="control-label">
+        <span>β (Nonlinearity)</span>
+        <span class="control-value" id="val-b">0.35</span>
       </div>
+      <input id="b" type="range" min="0" max="1" step="0.01" value="0.35">
     </div>
-
+    
     <div class="control-group">
-      <h3>🎛️ Physics Parameters</h3>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Alpha (α - Linear Dispersion):</span>
-          <span id="val-alpha">0.9</span>
-        </div>
-        <input type="range" id="alpha" min="0.1" max="1.5" step="0.05" value="0.9" 
-               oninput="document.getElementById('val-alpha').textContent = this.value">
+      <div class="control-label">
+        <span>Δt (Time Step)</span>
+        <span class="control-value" id="val-d">0.02</span>
       </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Beta (β - Nonlinearity):</span>
-          <span id="val-beta">0.35</span>
-        </div>
-        <input type="range" id="beta" min="0" max="1" step="0.05" value="0.35"
-               oninput="document.getElementById('val-beta').textContent = this.value">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Learning Rate:</span>
-          <span id="val-learning">0.15</span>
-        </div>
-        <input type="range" id="learning-rate" min="0" max="0.5" step="0.05" value="0.15" 
-               oninput="document.getElementById('val-learning').textContent = this.value">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Mutation Rate:</span>
-          <span id="val-mutation">0.1</span>
-        </div>
-        <input type="range" id="mutation-rate" min="0" max="0.3" step="0.05" value="0.1"
-               oninput="document.getElementById('val-mutation').textContent = this.value">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>Speed:</span>
-          <span id="val-speed">5</span>
-        </div>
-        <input type="range" id="speed" min="1" max="20" step="1" value="5"
-               oninput="document.getElementById('val-speed').textContent = this.value">
-      </div>
+      <input id="d" type="range" min="0.01" max="0.2" step="0.01" value="0.02">
     </div>
-
+    
     <div class="control-group">
-      <h3>⚙️ Girth Controls</h3>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>T1 Girth:</span>
-          <span id="val-girth-t1">8</span>
-        </div>
-        <input type="range" id="girth-t1" min="2" max="20" step="1" value="8" 
-               oninput="document.getElementById('val-girth-t1').textContent = this.value; updateGirths()">
+      <div class="control-label">
+        <span>Jitter (Noise)</span>
+        <span class="control-value" id="val-j">0.00</span>
       </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>T2 Girth:</span>
-          <span id="val-girth-t2">4</span>
-        </div>
-        <input type="range" id="girth-t2" min="1" max="10" step="0.5" value="4"
-               oninput="document.getElementById('val-girth-t2').textContent = this.value; updateGirths()">
-      </div>
-      <div class="slider-container">
-        <div class="slider-label">
-          <span>T3 Girth:</span>
-          <span id="val-girth-t3">2</span>
-        </div>
-        <input type="range" id="girth-t3" min="0.5" max="5" step="0.5" value="2"
-               oninput="document.getElementById('val-girth-t3').textContent = this.value; updateGirths()">
-      </div>
+      <input id="j" type="range" min="0" max="0.05" step="0.001" value="0.00">
     </div>
-
+    
     <div class="control-group">
-      <h3>📜 Trial History</h3>
-      <div class="trial-history" id="trial-history">
-        <div style="color: #999; text-align: center; padding: 20px;">
-          No trials yet. Click "Reset to Chaos" to begin.
-        </div>
+      <div class="control-label">
+        <span>Speed (Steps/Frame)</span>
+        <span class="control-value" id="val-s">4</span>
       </div>
+      <input id="s" type="range" min="1" max="20" step="1" value="4">
     </div>
   </div>
-</div>
-
-<div id="status-bar">
-  <div class="status-item">
-    <div class="status-indicator"></div>
-    <span>System Active</span>
-  </div>
-  <div class="status-item">
-    <span id="grid-info">20 columns × 9 rows | T1 Core Learning</span>
-  </div>
-</div>
+</footer>
 
 <script>
-// ============================================
-// CHRONON HARMONY LEARNING SIMULATION
-// ============================================
+// Dynamic grid configuration
+let GRID_COLS = 8;
+let GRID_ROWS = 8;
+const SPACING = 60;
+let zoomLevel = 1.0;
 
-const svg = document.getElementById('svg-canvas');
-let COLS = 20;
-const ROWS = 9;
-const SPACING = 40;
+const S={n:GRID_COLS*GRID_ROWS, k:1, alpha:0.9, beta:0.35, dt:0.02, jitter:0.00, speed:4};
+let psiR=[], psiI=[], rho=[], grid=[], t=0, play=true;
+let rhoE=[], phi=[], torque=[];
+const v=document.getElementById('v');
 
-function updateCanvasSize() {
-  const WIDTH = COLS * SPACING;
-  const HEIGHT = ROWS * SPACING;
-  svg.setAttribute('width', WIDTH);
-  svg.setAttribute('height', HEIGHT);
-  svg.setAttribute('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
+function idx(row, col) {
+  return row * GRID_COLS + col;
 }
 
-updateCanvasSize();
-
-// Grid definition - starts with default 20 columns
-let gridDef = [
-  'T3','T3', 'T2','T2','T2', 'T1','T1','T1','T1','T1',
-  'T1','T1','T1','T1','T1', 'T2','T2','T2', 'T3','T3'
-];
-
-// Color settings
-let colors = {
-  background: '#ffffff',
-  gridLines: '#cccccc',
-  positive: '#ffffff',
-  negative: '#000000'
-};
-
-// Chronon arrays
-let chronons = [];
-let totalChronons = 0;
-
-// Simulation state
-let paused = false;
-let moments = 0;
-let startTime = 0;
-let collisionCount = 0;
-let flipCount = 0;
-
-// Learning state
-let trialCount = 0;
-let trialTimes = [];
-let bestTime = Infinity;
-let bestStrategies = [];
-
-// ============================================
-// GRID SCALING FUNCTIONS
-// ============================================
-
-function addColumn(side) {
-  if (side === 'left') {
-    gridDef.unshift('T1'); // Add T1 column to left
-  } else {
-    gridDef.push('T1'); // Add T1 column to right
-  }
-  COLS = gridDef.length;
-  updateCanvasSize();
-  rebuildGrid();
-  updateColumnCount();
+function getNeighbors(i) {
+  const row = Math.floor(i / GRID_COLS);
+  const col = i % GRID_COLS;
+  const neighbors = [];
+  if (col > 0) neighbors.push(idx(row, col - 1));
+  if (col < GRID_COLS - 1) neighbors.push(idx(row, col + 1));
+  if (row > 0) neighbors.push(idx(row - 1, col));
+  if (row < GRID_ROWS - 1) neighbors.push(idx(row + 1, col));
+  return neighbors;
 }
 
-function removeColumn(side) {
-  if (COLS <= 4) {
-    alert('Minimum 4 columns required!');
-    return;
-  }
-  
-  if (side === 'left') {
-    gridDef.shift(); // Remove leftmost column
-  } else {
-    gridDef.pop(); // Remove rightmost column
-  }
-  COLS = gridDef.length;
-  updateCanvasSize();
-  rebuildGrid();
-  updateColumnCount();
+function updateViewBox() {
+  const baseSize = 260;
+  const size = baseSize / zoomLevel;
+  v.setAttribute('viewBox', `${-size} ${-size} ${size*2} ${size*2}`);
+  document.getElementById('stat-zoom').textContent = zoomLevel.toFixed(2);
 }
 
-function updateColumnCount() {
-  document.getElementById('column-count').textContent = COLS + ' Columns';
-  document.getElementById('grid-info').textContent = 
-    `${COLS} columns × ${ROWS} rows | ${totalChronons} chronons`;
-}
-
-// ============================================
-// CHRONON CLASS
-// ============================================
-
-class Chronon {
-  constructor(col, row, type, boxSize, subCol = 0, subRow = 0) {
-    this.col = col;
-    this.row = row;
-    this.type = type;
-    this.boxSize = boxSize;
-    this.subCol = subCol;
-    this.subRow = subRow;
-    
-    // Position (center of box) - precise positioning in subdivided boxes
-    this.x = col * SPACING + subCol * boxSize + boxSize/2;
-    this.y = row * SPACING + subRow * boxSize + boxSize/2;
-    
-    // Physics
-    // Start at random position within ±90° from North (0°)
-    const randomOffset = (Math.random() - 0.5) * 180; // -90 to +90
-    this.arcPos = randomOffset;
-    this.chirality = Math.random() < 0.5 ? 1 : -1; // 1=right/CW, -1=left/CCW
-    this.radius = boxSize * 0.48; // Start at max (full size, touching neighbors)
-    
-    // Quantum state
-    this.psiR = Math.random() * 2 - 1;
-    this.psiI = Math.random() * 2 - 1;
-    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
-    if (norm > 0) {
-      this.psiR /= norm;
-      this.psiI /= norm;
-    }
-    this.rho = this.psiR * this.psiR + this.psiI * this.psiI;
-    
-    // Learning strategy parameters
-    this.strategy = {
-      rotSpeed: 2 + Math.random() * 3,
-      pauseProb: 0.1 + Math.random() * 0.2,
-      flipThreshold: 80 + Math.random() * 10
+function ui(){
+  const map={a:'alpha',b:'beta',d:'dt',j:'jitter',s:'speed'};
+  ['a','b','d','j','s'].forEach(id=>{
+    const input = document.getElementById(id);
+    const valDisplay = document.getElementById('val-' + id);
+    input.oninput=e=>{ 
+      S[map[id]]=parseFloat(e.target.value);
+      valDisplay.textContent = e.target.value;
     };
-    
-    // Performance tracking
-    this.successScore = 0;
-    this.contactTime = 0;
-    this.isolationTime = 0;
-    this.isolationCounter = 0;
-    this.lastFlipMoment = -100;
-    this.collisionFlash = 0;
-    this.waitCounter = 0;
-    
-    // Visual
-    this.baseGirth = type === 'T3' ? 2 : (type === 'T2' ? 4 : 8);
-    this.girth = this.baseGirth;
-    this.neighbors = [];
-  }
-  
-  findNeighbors() {
-    this.neighbors = chronons.filter(c => {
-      if (c === this) return false;
-      if (c.type !== this.type) return false;
-      
-      const dx = Math.abs(c.x - this.x);
-      const dy = Math.abs(c.y - this.y);
-      const neighborDist = this.boxSize * 1.5;
-      
-      return dx <= neighborDist && dy <= neighborDist && (dx + dy) > 0;
-    });
-  }
-  
-  update() {
-    // Schrödinger evolution
-    const alpha = parseFloat(document.getElementById('alpha').value);
-    const beta = parseFloat(document.getElementById('beta').value);
-    
-    // Laplacian
-    let lapR = 0, lapI = 0;
-    this.neighbors.forEach(n => {
-      lapR += n.psiR - this.psiR;
-      lapI += n.psiI - this.psiI;
-    });
-    
-    // Evolution
-    const dt = 0.02;
-    const nonlin = beta * this.rho;
-    this.psiR += dt * (-alpha * lapI + nonlin * this.psiI);
-    this.psiI += dt * (alpha * lapR - nonlin * this.psiR);
-    
-    // Normalize
-    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
-    if (norm > 1e-10) {
-      this.psiR /= norm;
-      this.psiI /= norm;
-    }
-    
-    // Update density (rho drives expansion/contraction)
-    this.rho = this.psiR * this.psiR + this.psiI * this.psiI;
-    
-    // BOUNDED OSCILLATION
-    this.oscillateWithBounds();
-    
-    // ALWAYS force radius from arc position
-    this.updateRadiusFromArcPosition();
-  }
-  
-  oscillateWithBounds() {
-    // Decay collision flash
-    if (this.collisionFlash > 0) {
-      this.collisionFlash -= 0.1;
-    }
-    
-    const atZero = Math.abs(this.arcPos) < 2;
-    
-    if (atZero) {
-      const chiralityVotes = this.checkNeighborChirality();
-      const touchingNeighbors = chiralityVotes.left + chiralityVotes.right;
-      
-      if (touchingNeighbors === 0) {
-        this.isolationCounter++;
-        if (this.isolationCounter > 3) {
-          this.respawn();
-          return;
-        }
-      } else {
-        this.isolationCounter = 0;
-        
-        const oldChirality = this.chirality;
-        if (chiralityVotes.right > chiralityVotes.left) {
-          this.chirality = 1;
-        } else if (chiralityVotes.left > chiralityVotes.right) {
-          this.chirality = -1;
-        }
-        
-        if (oldChirality !== this.chirality) {
-          this.collisionFlash = 1.0;
-          flipCount++;
-        }
-      }
-      
-      if (this.waitCounter > 0) {
-        this.waitCounter--;
-        return;
-      }
-    }
-    
-    let rotSpeed = 1.5;
-    if (this.type === 'T1') rotSpeed *= 1.0;
-    else if (this.type === 'T2') rotSpeed *= 0.5;
-    else if (this.type === 'T3') rotSpeed *= 0.167;
-    
-    this.arcPos += rotSpeed * this.chirality;
-    
-    if (Math.abs(this.arcPos) >= 90) {
-      this.chirality *= -1;
-      this.arcPos = Math.sign(this.arcPos) * 90;
-      this.collisionFlash = 1.0;
-      flipCount++;
-      
-      if (this.strategy === 'cautious' && this.type === 'T1') {
-        this.waitCounter = 1;
-      }
-    }
-  }
-  
-  respawn() {
-    const randomOffset = (Math.random() - 0.5) * 180;
-    this.arcPos = randomOffset;
-    this.chirality = Math.random() < 0.5 ? 1 : -1;
-    this.radius = this.boxSize * 0.48;
-    this.psiR = Math.random() * 2 - 1;
-    this.psiI = Math.random() * 2 - 1;
-    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
-    if (norm > 0) {
-      this.psiR /= norm;
-      this.psiI /= norm;
-    }
-    this.rho = 1.0;
-    this.isolationCounter = 0;
-    this.collisionFlash = 0;
-  }
-  
-  checkNeighborChirality() {
-    let leftCount = 0;
-    let rightCount = 0;
-    
-    this.neighbors.forEach(n => {
-      if (Math.abs(n.arcPos) < 10) {
-        if (n.chirality === 1) rightCount++;
-        else leftCount++;
-      }
-    });
-    
-    return { left: leftCount, right: rightCount };
-  }
-  
-  updateRadiusFromArcPosition() {
-    const maxRadius = this.boxSize * 0.48;
-    const minRadius = this.boxSize * 0.30;
-    
-    const distanceFromZero = Math.abs(this.arcPos) / 90;
-    this.radius = maxRadius - (maxRadius - minRadius) * distanceFromZero;
-    
-    this.radius *= (0.8 + 0.2 * Math.sqrt(this.rho));
-    
-    this.radius = Math.max(minRadius, Math.min(maxRadius, this.radius));
-  }
-  
-  draw() {
-    const outerR = this.radius;
-    const innerR = Math.max(0.5, this.radius - this.girth);
-    const rotAngle = (this.arcPos * Math.PI / 180);
-    
-    let elements = [];
-    
-    if (this.collisionFlash > 0) {
-      const flash = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      flash.setAttribute('cx', this.x);
-      flash.setAttribute('cy', this.y);
-      flash.setAttribute('r', outerR + 3);
-      flash.setAttribute('fill', 'none');
-      flash.setAttribute('stroke', '#ffff00');
-      flash.setAttribute('stroke-width', '2');
-      flash.setAttribute('opacity', this.collisionFlash * 0.8);
-      elements.push(flash);
-    }
-    
-    const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    outer.setAttribute('cx', this.x);
-    outer.setAttribute('cy', this.y);
-    outer.setAttribute('r', outerR);
-    outer.setAttribute('fill', this.chirality === 1 ? colors.positive : colors.negative);
-    outer.setAttribute('stroke', '#666');
-    outer.setAttribute('stroke-width', '0.5');
-    
-    const inner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    inner.setAttribute('cx', this.x);
-    inner.setAttribute('cy', this.y);
-    inner.setAttribute('r', innerR);
-    inner.setAttribute('fill', colors.background);
-    
-    const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    node.setAttribute('cx', this.x);
-    node.setAttribute('cy', this.y);
-    node.setAttribute('r', '1.5');
-    node.setAttribute('fill', 'red');
-    
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', this.x);
-    line.setAttribute('y1', this.y);
-    line.setAttribute('x2', this.x + outerR * Math.cos(rotAngle));
-    line.setAttribute('y2', this.y + outerR * Math.sin(rotAngle));
-    line.setAttribute('stroke', this.chirality === 1 ? '#00ff00' : '#ff0000');
-    line.setAttribute('stroke-width', '1');
-    line.setAttribute('opacity', '0.6');
-    
-    elements.push(outer, inner, node, line);
-    return elements;
-  }
-}
-
-// ============================================
-// INITIALIZATION
-// ============================================
-
-function initGrid() {
-  chronons = [];
-  
-  for (let c = 0; c < COLS; c++) {
-    const type = gridDef[c];
-    let boxSize, subsPerCol;
-    
-    if (type === 'T1') {
-      boxSize = SPACING;
-      subsPerCol = 1;
-    } else if (type === 'T2') {
-      boxSize = SPACING / 2;
-      subsPerCol = 2;
-    } else {
-      boxSize = SPACING / 3;
-      subsPerCol = 3;
-    }
-    
-    for (let r = 0; r < ROWS; r++) {
-      for (let subR = 0; subR < subsPerCol; subR++) {
-        for (let subC = 0; subC < subsPerCol; subC++) {
-          const chronon = new Chronon(c, r, type, boxSize, subC, subR);
-          chronons.push(chronon);
-        }
-      }
-    }
-  }
-  
-  chronons.forEach(c => c.findNeighbors());
-  updateGirths();
-  
-  totalChronons = chronons.length;
-  updateColumnCount();
-  console.log(`Initialized ${totalChronons} chronons`);
-}
-
-function updateGirths() {
-  const t1Girth = parseFloat(document.getElementById('girth-t1').value);
-  const t2Girth = parseFloat(document.getElementById('girth-t2').value);
-  const t3Girth = parseFloat(document.getElementById('girth-t3').value);
-  
-  chronons.forEach(c => {
-    if (c.type === 'T1') c.girth = t1Girth;
-    else if (c.type === 'T2') c.girth = t2Girth;
-    else if (c.type === 'T3') c.girth = t3Girth;
   });
+  
+  // Zoom control
+  document.getElementById('zoom').oninput = e => {
+    zoomLevel = parseFloat(e.target.value);
+    document.getElementById('val-zoom').textContent = zoomLevel.toFixed(2);
+    updateViewBox();
+  };
+  
+  // Grid expansion controls
+  document.getElementById('cols').oninput = e => {
+    const newCols = parseInt(e.target.value);
+    document.getElementById('val-cols').textContent = newCols;
+    resizeGrid(newCols, GRID_ROWS);
+  };
+  
+  document.getElementById('rows').oninput = e => {
+    const newRows = parseInt(e.target.value);
+    document.getElementById('val-rows').textContent = newRows;
+    resizeGrid(GRID_COLS, newRows);
+  };
+  
+  const pb=document.getElementById('p'); 
+  const setBtn=()=>pb.textContent=play?'Pause':'Play';
+  pb.onclick=()=>{ play=!play; setBtn(); };
+  document.getElementById('r').onclick=()=>{ reset(); for(let i=0;i<12;i++) step(); draw(true); };
+  document.getElementById('fd').onclick=()=>draw(false);
+  setBtn();
 }
 
-function updateColors() {
-  colors.background = document.getElementById('color-bg').value;
-  colors.gridLines = document.getElementById('color-grid').value;
-  colors.positive = document.getElementById('color-positive').value;
-  colors.negative = document.getElementById('color-negative').value;
+function resizeGrid(newCols, newRows) {
+  if (newCols === GRID_COLS && newRows === GRID_ROWS) return;
   
-  svg.style.background = colors.background;
-}
-
-function createColumnControls() {
-  const container = document.getElementById('column-controls');
-  container.innerHTML = '';
+  const oldCols = GRID_COLS;
+  const oldRows = GRID_ROWS;
+  const oldN = S.n;
   
-  for (let i = 0; i < COLS; i++) {
-    const select = document.createElement('select');
-    select.className = 'column-dropdown';
-    select.innerHTML = `
-      <option value="T1" ${gridDef[i] === 'T1' ? 'selected' : ''}>T1</option>
-      <option value="T2" ${gridDef[i] === 'T2' ? 'selected' : ''}>T2</option>
-      <option value="T3" ${gridDef[i] === 'T3' ? 'selected' : ''}>T3</option>
-    `;
-    select.onchange = function() {
-      gridDef[i] = this.value;
-      rebuildGrid();
-    };
-    container.appendChild(select);
+  GRID_COLS = newCols;
+  GRID_ROWS = newRows;
+  S.n = GRID_COLS * GRID_ROWS;
+  
+  // Create new arrays
+  const newPsiR = [...Array(S.n)].map(() => Math.random()*2-1);
+  const newPsiI = [...Array(S.n)].map(() => Math.random()*2-1);
+  const newRho = Array(S.n).fill(0);
+  const newRhoE = Array(S.n).fill(0);
+  const newPhi = Array(S.n).fill(0);
+  const newTorque = Array(S.n).fill(0);
+  
+  // Copy existing data where grids overlap
+  for(let row = 0; row < Math.min(oldRows, newRows); row++) {
+    for(let col = 0; col < Math.min(oldCols, newCols); col++) {
+      const oldIdx = row * oldCols + col;
+      const newIdx = row * newCols + col;
+      if (oldIdx < oldN && newIdx < S.n) {
+        newPsiR[newIdx] = psiR[oldIdx];
+        newPsiI[newIdx] = psiI[oldIdx];
+        newRho[newIdx] = rho[oldIdx];
+        newRhoE[newIdx] = rhoE[oldIdx];
+        newPhi[newIdx] = phi[oldIdx];
+        newTorque[newIdx] = torque[oldIdx];
+      }
+    }
   }
-}
-
-function rebuildGrid() {
-  initGrid();
-  resetTrial();
-  createColumnControls();
-}
-
-// ============================================
-// SIMULATION
-// ============================================
-
-function step() {
-  if (paused) return;
   
-  moments++;
-  chronons.forEach(c => c.update());
+  psiR = newPsiR;
+  psiI = newPsiI;
+  rho = newRho;
+  rhoE = newRhoE;
+  phi = newPhi;
+  torque = newTorque;
   
-  const harmonyScore = calculateHarmonyScore();
-  updateUI(harmonyScore);
+  norm();
   
-  if (harmonyScore >= 95 && moments > 100) {
-    completeTrial(harmonyScore);
-  }
-}
-
-function calculateHarmonyScore() {
-  let contactCount = 0;
-  let totalPossible = 0;
-  let stableCount = 0;
-  
-  chronons.forEach(c => {
-    if (c.neighbors.length > 0) {
-      totalPossible += c.neighbors.length;
-      c.neighbors.forEach(n => {
-        const dx = Math.abs(c.x - n.x);
-        const dy = Math.abs(c.y - n.y);
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist <= c.radius + n.radius + 2) {
-          contactCount++;
-          if (c.chirality !== n.chirality) {
-            stableCount++;
-          }
-        }
+  // Rebuild grid positions
+  grid = [];
+  for(let row=0; row<GRID_ROWS; row++){
+    for(let col=0; col<GRID_COLS; col++){
+      grid.push({
+        x: (col - GRID_COLS/2 + 0.5) * SPACING,
+        y: (row - GRID_ROWS/2 + 0.5) * SPACING
       });
     }
-  });
+  }
   
-  const contactScore = totalPossible > 0 ? (contactCount / totalPossible) * 100 : 0;
-  const stabilityScore = contactCount > 0 ? (stableCount / contactCount) * 100 : 0;
+  // Update stats display
+  document.getElementById('stat-grid').textContent = `${GRID_COLS}×${GRID_ROWS}`;
+  document.getElementById('stat-n').textContent = S.n;
   
-  return (contactScore * 0.6 + stabilityScore * 0.4);
+  draw(true);
 }
 
-function updateUI(harmonyScore) {
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-  document.getElementById('time-elapsed').textContent = elapsed + 's';
-  document.getElementById('moments').textContent = moments;
-  document.getElementById('harmony-score').textContent = harmonyScore.toFixed(1) + '%';
-  document.getElementById('collisions').textContent = collisionCount;
-  document.getElementById('flips').textContent = flipCount;
+function reset(){
+  psiR=[...Array(S.n)].map(()=>Math.random()*2-1);
+  psiI=[...Array(S.n)].map(()=>Math.random()*2-1);
+  norm();
+  rho = Array(S.n).fill(0);
+  rhoE= Array(S.n).fill(0);
+  phi   = Array(S.n).fill(0);
+  torque= Array(S.n).fill(0);
   
-  const stabilityEl = document.getElementById('stability');
-  if (harmonyScore < 30) {
-    stabilityEl.textContent = 'Chaotic';
-    stabilityEl.className = 'metric-value danger';
-  } else if (harmonyScore < 70) {
-    stabilityEl.textContent = 'Organizing';
-    stabilityEl.className = 'metric-value warning';
-  } else if (harmonyScore < 90) {
-    stabilityEl.textContent = 'Harmonizing';
-    stabilityEl.className = 'metric-value';
-  } else {
-    stabilityEl.textContent = 'Harmonic';
-    stabilityEl.className = 'metric-value';
-    stabilityEl.style.color = '#28a745';
+  grid = [];
+  for(let row=0; row<GRID_ROWS; row++){
+    for(let col=0; col<GRID_COLS; col++){
+      grid.push({
+        x: (col - GRID_COLS/2 + 0.5) * SPACING,
+        y: (row - GRID_ROWS/2 + 0.5) * SPACING
+      });
+    }
+  }
+  t=0;
+  document.getElementById('stat-t').textContent = t;
+}
+
+function norm(){ 
+  let s=0; 
+  for(let i=0; i<S.n; i++) s += psiR[i]*psiR[i] + psiI[i]*psiI[i];
+  s = Math.sqrt(s) || 1e-12; 
+  for(let i=0; i<S.n; i++){ psiR[i]/=s; psiI[i]/=s; } 
+}
+
+function L(a, i){ 
+  const neighbors = getNeighbors(i);
+  let sum = 0;
+  for(const n of neighbors) sum += a[n];
+  return sum - neighbors.length * a[i];
+}
+
+function step(){
+  for(let i=0; i<S.n; i++){
+    rho[i] = psiR[i]*psiR[i] + psiI[i]*psiI[i];
+    rhoE[i] = 0.95*rhoE[i] + 0.05*rho[i];
+    phi[i] = Math.atan2(psiI[i], psiR[i]);
+  }
+  
+  const nr = new Array(S.n), ni = new Array(S.n);
+  for(let i=0; i<S.n; i++){
+    const Lr = L(psiR, i), Li = L(psiI, i), r = rho[i];
+    const Ar = S.alpha*Lr - S.beta*r*psiR[i];
+    const Ai = S.alpha*Li - S.beta*r*psiI[i];
+    nr[i] = psiR[i] + S.dt*(-Ai) + (Math.random()*2-1)*S.jitter*0.02;
+    ni[i] = psiI[i] + S.dt*( Ar) + (Math.random()*2-1)*S.jitter*0.02;
+  }
+  psiR = nr; psiI = ni; norm(); t++;
+
+  for(let i=0; i<S.n; i++){
+    const neighbors = getNeighbors(i);
+    let maxDphi = 0;
+    for(const n of neighbors){
+      const dphi = ((phi[n] - phi[i] + 9.4248) % 6.2832) - 3.1416;
+      maxDphi = Math.max(maxDphi, Math.abs(dphi));
+    }
+    torque[i] = maxDphi;
   }
 }
 
-function completeTrial(finalScore) {
-  const trialTime = ((Date.now() - startTime) / 1000).toFixed(2);
-  trialCount++;
-  trialTimes.push(parseFloat(trialTime));
+function drawWasher(g, cx, cy, majorRadius, rotationAngle) {
+  const baseGirth = 12;
+  const girth = baseGirth / Math.max(0.3, majorRadius / 8);
   
-  if (parseFloat(trialTime) < bestTime) {
-    bestTime = parseFloat(trialTime);
-  }
+  const outerR = majorRadius;
+  const innerR = Math.max(1, majorRadius - girth);
   
-  const avgTime = trialTimes.reduce((a,b) => a+b, 0) / trialTimes.length;
-  const improvement = trialTimes.length > 1 ? 
-    ((trialTimes[0] - bestTime) / trialTimes[0] * 100) : 0;
-  
-  document.getElementById('trial-count').textContent = trialCount;
-  document.getElementById('best-time').textContent = bestTime.toFixed(2) + 's';
-  document.getElementById('avg-time').textContent = avgTime.toFixed(2) + 's';
-  document.getElementById('improvement').textContent = improvement.toFixed(1) + '%';
-  
-  const historyDiv = document.getElementById('trial-history');
-  const entry = document.createElement('div');
-  entry.className = 'trial-entry' + (parseFloat(trialTime) === bestTime ? ' best' : '');
-  entry.innerHTML = `
-    <span>Trial ${trialCount}</span>
-    <span>${trialTime}s | ${finalScore.toFixed(1)}%</span>
+  // Left half (black)
+  const leftPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const leftD = `
+    M ${cx} ${cy - outerR}
+    A ${outerR} ${outerR} 0 0 0 ${cx} ${cy + outerR}
+    L ${cx} ${cy + innerR}
+    A ${innerR} ${innerR} 0 0 1 ${cx} ${cy - innerR}
+    Z
   `;
-  historyDiv.prepend(entry);
+  leftPath.setAttribute('d', leftD);
+  leftPath.setAttribute('fill', '#1a1a1a');
+  leftPath.setAttribute('opacity', '0.9');
+  leftPath.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
+  g.appendChild(leftPath);
   
-  setTimeout(() => resetTrial(), 2000);
+  // Right half (white)
+  const rightPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const rightD = `
+    M ${cx} ${cy - outerR}
+    A ${outerR} ${outerR} 0 0 1 ${cx} ${cy + outerR}
+    L ${cx} ${cy + innerR}
+    A ${innerR} ${innerR} 0 0 0 ${cx} ${cy - innerR}
+    Z
+  `;
+  rightPath.setAttribute('d', rightD);
+  rightPath.setAttribute('fill', '#e8e8e8');
+  rightPath.setAttribute('opacity', '0.9');
+  rightPath.setAttribute('transform', `rotate(${rotationAngle * 180 / Math.PI}, ${cx}, ${cy})`);
+  g.appendChild(rightPath);
+  
+  // Outline
+  const outline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  outline.setAttribute('cx', cx);
+  outline.setAttribute('cy', cy);
+  outline.setAttribute('r', outerR);
+  outline.setAttribute('fill', 'none');
+  outline.setAttribute('stroke', '#60a5fa');
+  outline.setAttribute('stroke-width', '0.5');
+  outline.setAttribute('opacity', '0.4');
+  g.appendChild(outline);
+  
+  if (innerR > 1) {
+    const innerOutline = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    innerOutline.setAttribute('cx', cx);
+    innerOutline.setAttribute('cy', cy);
+    innerOutline.setAttribute('r', innerR);
+    innerOutline.setAttribute('fill', 'none');
+    innerOutline.setAttribute('stroke', '#60a5fa');
+    innerOutline.setAttribute('stroke-width', '0.5');
+    innerOutline.setAttribute('opacity', '0.4');
+    g.appendChild(innerOutline);
+  }
 }
 
-// ============================================
-// CONTROLS
-// ============================================
+function draw(init=false){
+  if(init){ 
+    v.innerHTML=''; 
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g'); 
+    g.id='g'; 
+    v.appendChild(g); 
+  }
+  const g = document.getElementById('g'); 
+  g.innerHTML='';
+  const max = Math.max(1e-12, ...rhoE);
 
-function resetTrial() {
-  chronons.forEach(c => {
-    const randomOffset = (Math.random() - 0.5) * 180;
-    c.arcPos = randomOffset;
-    c.chirality = Math.random() < 0.5 ? 1 : -1;
-    c.radius = c.boxSize * 0.48;
-    c.psiR = 1.0;
-    c.psiI = 0.0;
-    c.rho = 1.0;
-    c.isolationCounter = 0;
-    c.collisionFlash = 0;
-  });
-  
-  updateGirths();
-  
-  moments = 0;
-  collisionCount = 0;
-  flipCount = 0;
-  startTime = Date.now();
-  paused = false;
-  document.getElementById('btn-pause').textContent = 'Pause';
-}
-
-function togglePause() {
-  paused = !paused;
-  document.getElementById('btn-pause').textContent = paused ? 'Resume' : 'Pause';
-}
-
-// ============================================
-// RENDERING
-// ============================================
-
-function draw() {
-  while (svg.firstChild) {
-    svg.removeChild(svg.firstChild);
+  // Draw connections
+  for(let i=0; i<S.n; i++){
+    const neighbors = getNeighbors(i);
+    for(const n of neighbors){
+      if(i < n){
+        const grad = Math.abs(rhoE[n] - rhoE[i]);
+        if(grad < 0.6/S.n){
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1', grid[i].x);
+          line.setAttribute('y1', grid[i].y);
+          line.setAttribute('x2', grid[n].x);
+          line.setAttribute('y2', grid[n].y);
+          line.setAttribute('stroke','#60a5fa'); 
+          line.setAttribute('stroke-width','1'); 
+          line.setAttribute('opacity','.25');
+          g.appendChild(line);
+        }
+      }
+    }
   }
   
-  const WIDTH = COLS * SPACING;
-  const HEIGHT = ROWS * SPACING;
+  // Draw chronon washers
+  const MAX_RADIUS = Math.floor(SPACING / 2) - 2;
+  const MIN_RADIUS = 8;
   
-  const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  gridGroup.setAttribute('opacity', '0.15');
-  
-  for (let i = 0; i <= COLS; i++) {
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', i * SPACING);
-    line.setAttribute('y1', 0);
-    line.setAttribute('x2', i * SPACING);
-    line.setAttribute('y2', HEIGHT);
-    line.setAttribute('stroke', colors.gridLines);
-    line.setAttribute('stroke-width', '1');
-    gridGroup.appendChild(line);
+  for(let i=0; i<S.n; i++){
+    const p = grid[i];
+    const rsrc = rhoE[i];
+    const majorRadius = MIN_RADIUS + (MAX_RADIUS - MIN_RADIUS)*(rsrc/max);
+    
+    const radiusRatio = majorRadius / 8;
+    const rotationSpeed = radiusRatio;
+    const rotationAngle = phi[i] * rotationSpeed;
+    
+    drawWasher(g, p.x, p.y, majorRadius, rotationAngle);
+    
+    // High curvature markers
+    const neighbors = getNeighbors(i);
+    let curv = 0;
+    if(neighbors.length >= 2){
+      const avgNeighbor = neighbors.reduce((sum, n) => sum + rhoE[n], 0) / neighbors.length;
+      curv = Math.abs(avgNeighbor - rhoE[i]);
+    }
+    if(curv > 2.5*max/S.n) {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx', p.x);
+      dot.setAttribute('cy', p.y);
+      dot.setAttribute('r', '1.5');
+      dot.setAttribute('fill', '#f87171');
+      g.appendChild(dot);
+    }
   }
   
-  for (let i = 0; i <= ROWS; i++) {
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', 0);
-    line.setAttribute('y1', i * SPACING);
-    line.setAttribute('x2', WIDTH);
-    line.setAttribute('y2', i * SPACING);
-    line.setAttribute('stroke', colors.gridLines);
-    line.setAttribute('stroke-width', '1');
-    gridGroup.appendChild(line);
+  // Update stats
+  if(t % 10 === 0) {
+    document.getElementById('stat-t').textContent = t;
   }
-  
-  svg.appendChild(gridGroup);
-  
-  chronons.forEach(c => {
-    const elements = c.draw();
-    elements.forEach(el => svg.appendChild(el));
-  });
 }
 
-// ============================================
-// MAIN LOOP
-// ============================================
+ui(); 
+reset(); 
+updateViewBox();
+for(let i=0; i<12; i++) step(); 
+draw(true);
 
-function animate() {
-  const speed = parseInt(document.getElementById('speed').value);
-  for (let i = 0; i < speed; i++) {
-    step();
-  }
-  draw();
-  requestAnimationFrame(animate);
-}
+(function loop(){ 
+  if(play){ 
+    for(let s=0; s<S.speed; s++) step(); 
+  } 
+  draw(false); 
+  requestAnimationFrame(loop); 
+})();
 
-// ============================================
-// START
-// ============================================
-
-createColumnControls();
-initGrid();
-resetTrial();
-animate();
-updateColors();
-
-console.log('🌀 Angel-1 Harmony Learning initialized - Scalable Grid');
-console.log(`📊 ${totalChronons} chronons | ${COLS} columns`);
+document.getElementById('save').onclick=()=>{
+  const svg = document.getElementById('v');
+  const xml = new XMLSerializer().serializeToString(svg);
+  const img = new Image();
+  const url = URL.createObjectURL(new Blob([xml], {type:'image/svg+xml'}));
+  img.onload=()=>{
+    const c = document.createElement('canvas'); 
+    c.width = 2000; 
+    c.height = 2000;
+    const ctx = c.getContext('2d'); 
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    const a = document.createElement('a'); 
+    a.download = 'angel1_expandable_chronons.png'; 
+    a.href = c.toDataURL(); 
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+};
 </script>
-
 </body>
 </html>
