@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Angel-1 · Michron Physics (4π Spinor Model)</title>
+<title>Angel-1 · Harmony Learning Trial</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { 
@@ -81,72 +81,16 @@ body {
   box-shadow: 0 2px 6px rgba(233, 69, 96, 0.3);
 }
 
+#grid-scale-controls button:active {
+  transform: translateY(0);
+}
+
 #grid-scale-controls span {
   font-weight: 600;
   color: #e94560;
   font-size: 16px;
   min-width: 80px;
   text-align: center;
-}
-
-#zoom-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #f8f8f8;
-  border-radius: 6px;
-  align-items: center;
-  border: 2px solid #4a90e2;
-}
-
-#zoom-controls label {
-  font-weight: 600;
-  color: #4a90e2;
-  font-size: 14px;
-}
-
-#zoom-controls input[type="range"] {
-  flex: 1;
-  min-width: 150px;
-}
-
-#zoom-controls span {
-  font-weight: 600;
-  color: #4a90e2;
-  font-size: 14px;
-  min-width: 50px;
-}
-
-#color-controls {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  padding: 12px;
-  background: #f8f8f8;
-  border-radius: 6px;
-  flex-wrap: wrap;
-  border: 2px solid #9b59b6;
-}
-
-.color-picker-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.color-picker-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #9b59b6;
-}
-
-.color-picker-group input[type="color"] {
-  width: 50px;
-  height: 30px;
-  border: 2px solid #9b59b6;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 #column-controls {
@@ -161,46 +105,84 @@ body {
   justify-content: center;
 }
 
-.col-dropdown {
-  padding: 4px 6px;
-  font-size: 11px;
+.column-dropdown {
+  width: 38px;
+  padding: 4px 2px;
+  background: #ffffff;
+  color: #333333;
   border: 1px solid #cccccc;
   border-radius: 3px;
-  background: white;
+  font-size: 10px;
   cursor: pointer;
-  transition: all 0.2s;
+  text-align: center;
 }
 
-.col-dropdown:hover {
+.column-dropdown:hover {
   border-color: #e94560;
-  background: #fff5f7;
+  background: #f0f0f0;
+}
+
+#color-controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f8f8f8;
+  border-radius: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.color-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-picker-group label {
+  font-size: 11px;
+  color: #666666;
+  min-width: 80px;
+}
+
+.color-picker-group input[type="color"] {
+  width: 40px;
+  height: 30px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
 }
 
 #svg-canvas {
-  border: 2px solid #cccccc;
-  border-radius: 8px;
   background: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  height: auto;
 }
 
 #sidebar {
-  width: 320px;
+  width: 340px;
+  min-width: 340px;
+  flex-shrink: 0;
   background: #f8f8f8;
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  max-height: calc(100vh - 140px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 100px);
   overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .control-group {
-  margin-bottom: 25px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.control-group:last-child {
-  border-bottom: none;
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
 }
 
 .control-group h3 {
@@ -214,44 +196,31 @@ body {
 .metric-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-  padding: 6px 10px;
-  background: white;
-  border-radius: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
   font-size: 13px;
+}
+
+.metric-row:last-child {
+  border-bottom: none;
 }
 
 .metric-label {
   color: #666666;
-  font-weight: 500;
 }
 
 .metric-value {
   color: #e94560;
-  font-weight: 700;
-}
-
-.slider-group {
-  margin-bottom: 15px;
-}
-
-.slider-group label {
-  display: block;
-  font-size: 12px;
-  color: #666666;
-  margin-bottom: 5px;
   font-weight: 600;
+  font-family: 'Courier New', monospace;
 }
 
-.slider-group input[type="range"] {
-  width: 100%;
-  margin-bottom: 5px;
+.metric-value.warning {
+  color: #ffa500;
 }
 
-.slider-group .slider-value {
-  font-size: 11px;
-  color: #999999;
-  text-align: right;
+.metric-value.danger {
+  color: #e94560;
 }
 
 button {
@@ -266,67 +235,156 @@ button {
   font-weight: 600;
   letter-spacing: 1px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(233, 69, 96, 0.2);
+  text-transform: uppercase;
 }
 
 button:hover {
-  background: linear-gradient(135deg, #d63552 0%, #c72544 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
 }
 
 button:active {
   transform: translateY(0);
 }
 
-.girth-group {
+.slider-container {
+  margin: 10px 0;
+}
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666666;
+  margin-bottom: 5px;
+}
+
+.slider-label span:last-child {
+  color: #e94560;
+  font-weight: 600;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #e94560;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #e94560;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.trial-history {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+}
+
+.trial-entry {
+  padding: 4px 8px;
+  margin: 2px 0;
+  background: #f0f0f0;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  color: #333333;
+}
+
+.trial-entry.best {
+  background: #d4edda;
+  border-left: 3px solid #28a745;
+}
+
+#status-bar {
+  padding: 15px 20px;
+  background: #f8f8f8;
+  border-top: 2px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  padding: 8px;
-  background: white;
-  border-radius: 4px;
-}
-
-.girth-group label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #e94560;
-  min-width: 30px;
-}
-
-.girth-group input[type="range"] {
-  flex: 1;
-}
-
-.girth-group span {
-  font-size: 11px;
+  gap: 10px;
+  font-size: 13px;
   color: #666666;
-  min-width: 35px;
-  text-align: right;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #28a745;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.learning-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-box {
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.stat-box .value {
+  font-size: 20px;
+  color: #e94560;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.stat-box .label {
+  font-size: 10px;
+  color: #666666;
+  text-transform: uppercase;
+  margin-top: 4px;
 }
 </style>
-<script type='text/javascript' src='https://www.genspark.ai/mDDyxhw_E5lPdP3fCJNPVNNHa2ayLg4NhNYYEDz8F0cdVmWdsYvlKqtm19SAwSwcJN8VpYlwAbNMQ1M257WiLZVWYYA1HoEnwyNR7SpfVc638j5587FTzVe9tf1j8_-KEdk057yCynQhv41Ix6zPN7_E88ULCLLW8FYyFa_ErBU='></script></head>
+<script type='text/javascript' src='https://www.genspark.ai/TD_bNM3BeAnXHtmkD5EbT2oUAX5gYQfekSPjMFJN7frmwJAgOuZkjlE8NUEM5eBXDhYUfqn_Of4yYsQ4la9EHlsv5R0NRDIgL0hP-Qtl-89puc5uDVInC8RhZSn4jzfPQ79HIym6DpkR4zSKziaKOBlijW7zmK8gNki9GH8UARU='></script></head>
 <body>
 
 <div id="header">
-  <h1>ANGEL-1 · MICHRON PHYSICS</h1>
-  <div class="subtitle">4π Spinor Model · Volume-Conserving Toroid Oscillation</div>
+  <h1>ANGEL-1 · CHRONON HARMONY LEARNING</h1>
+  <div class="subtitle">Distributed Local Learning | Chaos → Harmony Time Trial | Scalable Grid</div>
 </div>
 
 <div id="main">
   <div id="canvas-container">
     <div id="grid-scale-controls">
-      <button onclick="removeColumn()">← Remove Column</button>
-      <span id="col-count-display">Columns: 20</span>
-      <button onclick="addColumn()">Add Column →</button>
-    </div>
-    
-    <div id="zoom-controls">
-      <label>Zoom:</label>
-      <input type="range" id="zoom-slider" min="20" max="80" value="40" step="5" oninput="updateZoom()">
-      <span id="zoom-value">40px</span>
+      <button onclick="removeColumn('left')">← Remove Left</button>
+      <button onclick="addColumn('left')">+ Add Left</button>
+      <span id="column-count">20 Columns</span>
+      <button onclick="addColumn('right')">Add Right +</button>
+      <button onclick="removeColumn('right')">Remove Right →</button>
     </div>
     
     <div id="color-controls">
@@ -347,538 +405,800 @@ button:active {
         <input type="color" id="color-negative" value="#000000" onchange="updateColors()">
       </div>
     </div>
-    
     <div id="column-controls"></div>
     <svg id="svg-canvas"></svg>
   </div>
 
   <div id="sidebar">
     <div class="control-group">
-      <h3>⚡ Control</h3>
-      <button id="btn-reset" onclick="resetSimulation()">Reset to Anti-Phase</button>
+      <h3>⚡ Learning Control</h3>
+      <button id="btn-reset" onclick="resetTrial()">Reset to Chaos</button>
       <button id="btn-pause" onclick="togglePause()" style="margin-top: 10px;">Pause</button>
     </div>
 
     <div class="control-group">
-      <h3>📊 Michron Metrics</h3>
+      <h3>📊 Current Trial</h3>
       <div class="metric-row">
-        <span class="metric-label">Phase Coherence:</span>
-        <span class="metric-value" id="phase-coherence">0%</span>
+        <span class="metric-label">Time Elapsed:</span>
+        <span class="metric-value" id="time-elapsed">0.00s</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">Avg Expansion:</span>
-        <span class="metric-value" id="avg-expansion">0%</span>
+        <span class="metric-label">Moments:</span>
+        <span class="metric-value" id="moments">0</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">Interaction Energy:</span>
-        <span class="metric-value" id="interaction-energy">0</span>
+        <span class="metric-label">Harmony Score:</span>
+        <span class="metric-value" id="harmony-score">0%</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Stability:</span>
+        <span class="metric-value" id="stability">Chaotic</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Collisions:</span>
+        <span class="metric-value warning" id="collisions">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Chirality Flips:</span>
+        <span class="metric-value warning" id="flips">0</span>
       </div>
     </div>
 
     <div class="control-group">
-      <h3>🔧 Girth Control (Washer Thickness)</h3>
-      <div class="girth-group">
-        <label>Master:</label>
-        <input type="range" id="girth-master" min="0.5" max="3" value="1.0" step="0.1" oninput="updateMasterGirth()">
-        <span id="girth-master-val">1.0x</span>
-      </div>
-      <div style="font-size: 11px; color: #999; padding: 5px 10px;">
-        T3: <span id="girth-t3-display">2.0</span> · 
-        T2: <span id="girth-t2-display">4.0</span> · 
-        T1: <span id="girth-t1-display">8.0</span>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <h3>⚙️ Oscillation Parameters</h3>
-      <div class="slider-group">
-        <label>Angular Velocity (ω):</label>
-        <input type="range" id="omega" min="0.1" max="5" step="0.1" value="1.0" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="omega-val">1.00 rad/s</div>
-      </div>
-      <div class="slider-group">
-        <label>Expansion Ratio (Rr/Rm):</label>
-        <input type="range" id="expansion-ratio" min="1.5" max="3" step="0.1" value="2.0" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="expansion-ratio-val">2.00</div>
+      <h3>🧠 Learning Statistics</h3>
+      <div class="learning-stats">
+        <div class="stat-box">
+          <div class="value" id="trial-count">0</div>
+          <div class="label">Trials</div>
+        </div>
+        <div class="stat-box">
+          <div class="value" id="best-time">--</div>
+          <div class="label">Best Time</div>
+        </div>
+        <div class="stat-box">
+          <div class="value" id="avg-time">--</div>
+          <div class="label">Avg Time</div>
+        </div>
+        <div class="stat-box">
+          <div class="value" id="improvement">0%</div>
+          <div class="label">Improvement</div>
+        </div>
       </div>
     </div>
 
     <div class="control-group">
-      <h3>⚡ Physics Parameters</h3>
-      <div class="slider-group">
-        <label>Alpha (Learning Rate):</label>
-        <input type="range" id="alpha" min="0" max="1" step="0.01" value="0.3" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="alpha-val">0.30</div>
+      <h3>🎛️ Physics Parameters</h3>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Alpha (α - Linear Dispersion):</span>
+          <span id="val-alpha">0.9</span>
+        </div>
+        <input type="range" id="alpha" min="0.1" max="1.5" step="0.05" value="0.9" 
+               oninput="document.getElementById('val-alpha').textContent = this.value">
       </div>
-      <div class="slider-group">
-        <label>Beta (Mutation Rate):</label>
-        <input type="range" id="beta" min="0" max="1" step="0.01" value="0.1" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="beta-val">0.10</div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Beta (β - Nonlinearity):</span>
+          <span id="val-beta">0.35</span>
+        </div>
+        <input type="range" id="beta" min="0" max="1" step="0.05" value="0.35"
+               oninput="document.getElementById('val-beta').textContent = this.value">
       </div>
-      <div class="slider-group">
-        <label>Delta-t (Time Step):</label>
-        <input type="range" id="delta-t" min="0.1" max="2" step="0.1" value="1.0" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="delta-t-val">1.00</div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Learning Rate:</span>
+          <span id="val-learning">0.15</span>
+        </div>
+        <input type="range" id="learning-rate" min="0" max="0.5" step="0.05" value="0.15" 
+               oninput="document.getElementById('val-learning').textContent = this.value">
       </div>
-      <div class="slider-group">
-        <label>Jitter (Randomness):</label>
-        <input type="range" id="jitter" min="0" max="1" step="0.01" value="0.2" oninput="updateSliderDisplay()">
-        <div class="slider-value" id="jitter-val">0.20</div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Mutation Rate:</span>
+          <span id="val-mutation">0.1</span>
+        </div>
+        <input type="range" id="mutation-rate" min="0" max="0.3" step="0.05" value="0.1"
+               oninput="document.getElementById('val-mutation').textContent = this.value">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>Speed:</span>
+          <span id="val-speed">5</span>
+        </div>
+        <input type="range" id="speed" min="1" max="20" step="1" value="5"
+               oninput="document.getElementById('val-speed').textContent = this.value">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>⚙️ Girth Controls</h3>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>T1 Girth:</span>
+          <span id="val-girth-t1">8</span>
+        </div>
+        <input type="range" id="girth-t1" min="2" max="20" step="1" value="8" 
+               oninput="document.getElementById('val-girth-t1').textContent = this.value; updateGirths()">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>T2 Girth:</span>
+          <span id="val-girth-t2">4</span>
+        </div>
+        <input type="range" id="girth-t2" min="1" max="10" step="0.5" value="4"
+               oninput="document.getElementById('val-girth-t2').textContent = this.value; updateGirths()">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>T3 Girth:</span>
+          <span id="val-girth-t3">2</span>
+        </div>
+        <input type="range" id="girth-t3" min="0.5" max="5" step="0.5" value="2"
+               oninput="document.getElementById('val-girth-t3').textContent = this.value; updateGirths()">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>📜 Trial History</h3>
+      <div class="trial-history" id="trial-history">
+        <div style="color: #999; text-align: center; padding: 20px;">
+          No trials yet. Click "Reset to Chaos" to begin.
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+<div id="status-bar">
+  <div class="status-item">
+    <div class="status-indicator"></div>
+    <span>System Active</span>
+  </div>
+  <div class="status-item">
+    <span id="grid-info">20 columns × 9 rows | T1 Core Learning</span>
+  </div>
+</div>
+
 <script>
-// === CONFIGURATION ===
+// ============================================
+// CHRONON HARMONY LEARNING SIMULATION
+// ============================================
+
+const svg = document.getElementById('svg-canvas');
 let COLS = 20;
 const ROWS = 9;
-let SPACING = 40;
+const SPACING = 40;
 
-// === COLOR STATE ===
-let COLORS = {
-  bg: '#ffffff',
-  grid: '#cccccc',
+function updateCanvasSize() {
+  const WIDTH = COLS * SPACING;
+  const HEIGHT = ROWS * SPACING;
+  svg.setAttribute('width', WIDTH);
+  svg.setAttribute('height', HEIGHT);
+  svg.setAttribute('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
+}
+
+updateCanvasSize();
+
+// Grid definition - starts with default 20 columns
+let gridDef = [
+  'T3','T3', 'T2','T2','T2', 'T1','T1','T1','T1','T1',
+  'T1','T1','T1','T1','T1', 'T2','T2','T2', 'T3','T3'
+];
+
+// Color settings
+let colors = {
+  background: '#ffffff',
+  gridLines: '#cccccc',
   positive: '#ffffff',
   negative: '#000000'
 };
 
-// === GLOBAL STATE ===
-let michrons = [];
-let isPaused = false;
-let columnTypes = Array(COLS).fill('T1');
-let lastFrameTime = performance.now();
+// Chronon arrays
+let chronons = [];
+let totalChronons = 0;
 
-// === MICHRON CLASS (4π Spinor Physics) ===
-class Michron {
-  constructor(col, row, subCol, subRow, type) {
+// Simulation state
+let paused = false;
+let moments = 0;
+let startTime = 0;
+let collisionCount = 0;
+let flipCount = 0;
+
+// Learning state
+let trialCount = 0;
+let trialTimes = [];
+let bestTime = Infinity;
+let bestStrategies = [];
+
+// ============================================
+// GRID SCALING FUNCTIONS
+// ============================================
+
+function addColumn(side) {
+  if (side === 'left') {
+    gridDef.unshift('T1'); // Add T1 column to left
+  } else {
+    gridDef.push('T1'); // Add T1 column to right
+  }
+  COLS = gridDef.length;
+  updateCanvasSize();
+  rebuildGrid();
+  updateColumnCount();
+}
+
+function removeColumn(side) {
+  if (COLS <= 4) {
+    alert('Minimum 4 columns required!');
+    return;
+  }
+  
+  if (side === 'left') {
+    gridDef.shift(); // Remove leftmost column
+  } else {
+    gridDef.pop(); // Remove rightmost column
+  }
+  COLS = gridDef.length;
+  updateCanvasSize();
+  rebuildGrid();
+  updateColumnCount();
+}
+
+function updateColumnCount() {
+  document.getElementById('column-count').textContent = COLS + ' Columns';
+  document.getElementById('grid-info').textContent = 
+    `${COLS} columns × ${ROWS} rows | ${totalChronons} chronons`;
+}
+
+// ============================================
+// CHRONON CLASS
+// ============================================
+
+class Chronon {
+  constructor(col, row, type, boxSize, subCol = 0, subRow = 0) {
     this.col = col;
     this.row = row;
+    this.type = type;
+    this.boxSize = boxSize;
     this.subCol = subCol;
     this.subRow = subRow;
-    this.type = type;
     
-    // Calculate position in grid
-    let boxSize;
-    if (type === 'T1') boxSize = SPACING;
-    else if (type === 'T2') boxSize = SPACING / 2;
-    else if (type === 'T3') boxSize = SPACING / 3;
-    
+    // Position (center of box) - precise positioning in subdivided boxes
     this.x = col * SPACING + subCol * boxSize + boxSize/2;
     this.y = row * SPACING + subRow * boxSize + boxSize/2;
     
-    // Michron parameters (based on type)
-    this.setMichronParameters(type, boxSize);
+    // Physics
+    // Start at random position within ±90° from North (0°)
+    const randomOffset = (Math.random() - 0.5) * 180; // -90 to +90
+    this.arcPos = randomOffset;
+    this.chirality = Math.random() < 0.5 ? 1 : -1; // 1=right/CW, -1=left/CCW
+    this.radius = boxSize * 0.48; // Start at max (full size, touching neighbors)
     
-    // Phase angle θ ∈ [0, 4π]
-    // Initialize with anti-phase checkerboard
-    const isOdd = (col + row + subCol + subRow) % 2;
-    this.theta = isOdd ? 0 : Math.PI; // Anti-phase initialization
+    // Quantum state
+    this.psiR = Math.random() * 2 - 1;
+    this.psiI = Math.random() * 2 - 1;
+    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
+    if (norm > 0) {
+      this.psiR /= norm;
+      this.psiI /= norm;
+    }
+    this.rho = this.psiR * this.psiR + this.psiI * this.psiI;
     
-    // Chirality (direction of oscillation)
-    this.chirality = isOdd ? 1 : -1;
+    // Learning strategy parameters
+    this.strategy = {
+      rotSpeed: 2 + Math.random() * 3,
+      pauseProb: 0.1 + Math.random() * 0.2,
+      flipThreshold: 80 + Math.random() * 10
+    };
     
-    // Visual rotation (for segmented display)
-    this.visualRotation = 0;
+    // Performance tracking
+    this.successScore = 0;
+    this.contactTime = 0;
+    this.isolationTime = 0;
+    this.isolationCounter = 0;
+    this.lastFlipMoment = -100;
+    this.collisionFlash = 0;
+    this.waitCounter = 0;
     
-    // Neighbors (will be linked later)
+    // Visual
+    this.baseGirth = type === 'T3' ? 2 : (type === 'T2' ? 4 : 8);
+    this.girth = this.baseGirth;
     this.neighbors = [];
-    
-    // Calculate initial R and r
-    this.updateGeometry();
   }
   
-  setMichronParameters(type, boxSize) {
-    const expansionRatio = parseFloat(document.getElementById('expansion-ratio').value);
-    
-    // Get master girth multiplier from UI
-    const masterGirth = parseFloat(document.getElementById('girth-master').value);
-    
-    // Base girth ratios: T3=2, T2=4, T1=8 (all scaled by master)
-    if (type === 'T1') {
-      this.Rm = boxSize * 0.25;  // Contracted radius (25% of box)
-      this.Rr = boxSize * 0.5;   // Expanded radius (50% of box)
-      this.mCratio = 1/3; // 1mC:2rC (33% dark)
-      this.girthMult = masterGirth;  // Master controls all proportionally
-    } else if (type === 'T2') {
-      this.Rm = boxSize * 0.25;
-      this.Rr = boxSize * 0.5;
-      this.mCratio = 0.5; // 1mC:1rC (50% dark)
-      this.girthMult = masterGirth;  // Same master scale
-    } else if (type === 'T3') {
-      this.Rm = boxSize * 0.25;
-      this.Rr = boxSize * 0.5;
-      this.mCratio = 2/3; // 2mC:1rC (67% dark)
-      this.girthMult = masterGirth;  // Same master scale
-    }
-    
-    // Volume constant: C = Rr * r_at_max²
-    // At maximum expansion, r should be minimum
-    const r_at_max = this.Rr * 0.3 * this.girthMult; // Thin ring at max expansion (affected by girth)
-    this.C = this.Rr * r_at_max * r_at_max;
-  }
-  
-  updateGeometry() {
-    // R(θ) = Rm + (Rr - Rm) * sin²(θ/4)
-    const sinTerm = Math.sin(this.theta / 4);
-    this.R = this.Rm + (this.Rr - this.Rm) * sinTerm * sinTerm;
-    
-    // r(θ) = sqrt(C / R(θ))  [Volume conservation]
-    this.r = Math.sqrt(this.C / this.R);
-    
-    // Wavelength: λ = 1/sqrt(R - r)
-    const diff = this.R - this.r;
-    if (diff > 0) {
-      this.lambda = 1 / Math.sqrt(diff);
-    } else {
-      this.lambda = Infinity;
-    }
-    
-    // Visual rotation speed (faster when contracted)
-    this.twistRate = 1 / Math.sqrt(this.R / this.Rm);
-  }
-  
-  update(deltaTime) {
-    // Angular velocity from UI
-    const omega = parseFloat(document.getElementById('omega').value);
-    
-    // Phase evolution: θ(t) = ωt
-    // Chirality determines direction
-    this.theta += omega * deltaTime * this.chirality;
-    
-    // Wrap θ to [0, 4π] (spinor periodicity)
-    while (this.theta >= 4 * Math.PI) this.theta -= 4 * Math.PI;
-    while (this.theta < 0) this.theta += 4 * Math.PI;
-    
-    // Update geometry from phase
-    this.updateGeometry();
-    
-    // Visual rotation (represents helical twist)
-    this.visualRotation += this.twistRate * omega * deltaTime * 50;
-    
-    // Check for anti-phase forcing with neighbors
-    this.checkAntiPhaseInteraction();
-  }
-  
-  checkAntiPhaseInteraction() {
-    // Neighbors should be anti-phase: θ_i = θ_j + π
-    this.neighbors.forEach(n => {
-      const phaseDiff = Math.abs(this.theta - n.theta);
-      const antiPhaseDiff = Math.abs(phaseDiff - Math.PI);
+  findNeighbors() {
+    this.neighbors = chronons.filter(c => {
+      if (c === this) return false;
+      if (c.type !== this.type) return false;
       
-      // If too close in phase (should be anti-phase), apply force
-      if (antiPhaseDiff > Math.PI / 4) {
-        // Weak repulsion to restore anti-phase
-        const correction = 0.01 * Math.sign(Math.PI - phaseDiff);
-        this.theta += correction;
-      }
+      const dx = Math.abs(c.x - this.x);
+      const dy = Math.abs(c.y - this.y);
+      const neighborDist = this.boxSize * 1.5;
+      
+      return dx <= neighborDist && dy <= neighborDist && (dx + dy) > 0;
     });
   }
   
-  getInteractionStrength(neighbor) {
-    // Iij ∝ r_i*r_j - R_i*R_j
-    return this.r * neighbor.r - this.R * neighbor.R;
+  update() {
+    // Schrödinger evolution
+    const alpha = parseFloat(document.getElementById('alpha').value);
+    const beta = parseFloat(document.getElementById('beta').value);
+    
+    // Laplacian
+    let lapR = 0, lapI = 0;
+    this.neighbors.forEach(n => {
+      lapR += n.psiR - this.psiR;
+      lapI += n.psiI - this.psiI;
+    });
+    
+    // Evolution
+    const dt = 0.02;
+    const nonlin = beta * this.rho;
+    this.psiR += dt * (-alpha * lapI + nonlin * this.psiI);
+    this.psiI += dt * (alpha * lapR - nonlin * this.psiR);
+    
+    // Normalize
+    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
+    if (norm > 1e-10) {
+      this.psiR /= norm;
+      this.psiI /= norm;
+    }
+    
+    // Update density (rho drives expansion/contraction)
+    this.rho = this.psiR * this.psiR + this.psiI * this.psiI;
+    
+    // BOUNDED OSCILLATION
+    this.oscillateWithBounds();
+    
+    // ALWAYS force radius from arc position
+    this.updateRadiusFromArcPosition();
   }
   
-  isInContact(neighbor) {
-    // Geometric contact: distance < R_i + R_j
-    const dx = this.x - neighbor.x;
-    const dy = this.y - neighbor.y;
-    const distance = Math.sqrt(dx*dx + dy*dy);
-    return distance < (this.R + neighbor.R) * 1.1; // 10% overlap tolerance
+  oscillateWithBounds() {
+    // Decay collision flash
+    if (this.collisionFlash > 0) {
+      this.collisionFlash -= 0.1;
+    }
+    
+    const atZero = Math.abs(this.arcPos) < 2;
+    
+    if (atZero) {
+      const chiralityVotes = this.checkNeighborChirality();
+      const touchingNeighbors = chiralityVotes.left + chiralityVotes.right;
+      
+      if (touchingNeighbors === 0) {
+        this.isolationCounter++;
+        if (this.isolationCounter > 3) {
+          this.respawn();
+          return;
+        }
+      } else {
+        this.isolationCounter = 0;
+        
+        const oldChirality = this.chirality;
+        if (chiralityVotes.right > chiralityVotes.left) {
+          this.chirality = 1;
+        } else if (chiralityVotes.left > chiralityVotes.right) {
+          this.chirality = -1;
+        }
+        
+        if (oldChirality !== this.chirality) {
+          this.collisionFlash = 1.0;
+          flipCount++;
+        }
+      }
+      
+      if (this.waitCounter > 0) {
+        this.waitCounter--;
+        return;
+      }
+    }
+    
+    let rotSpeed = 1.5;
+    if (this.type === 'T1') rotSpeed *= 1.0;
+    else if (this.type === 'T2') rotSpeed *= 0.5;
+    else if (this.type === 'T3') rotSpeed *= 0.167;
+    
+    this.arcPos += rotSpeed * this.chirality;
+    
+    if (Math.abs(this.arcPos) >= 90) {
+      this.chirality *= -1;
+      this.arcPos = Math.sign(this.arcPos) * 90;
+      this.collisionFlash = 1.0;
+      flipCount++;
+      
+      if (this.strategy === 'cautious' && this.type === 'T1') {
+        this.waitCounter = 1;
+      }
+    }
+  }
+  
+  respawn() {
+    const randomOffset = (Math.random() - 0.5) * 180;
+    this.arcPos = randomOffset;
+    this.chirality = Math.random() < 0.5 ? 1 : -1;
+    this.radius = this.boxSize * 0.48;
+    this.psiR = Math.random() * 2 - 1;
+    this.psiI = Math.random() * 2 - 1;
+    const norm = Math.sqrt(this.psiR * this.psiR + this.psiI * this.psiI);
+    if (norm > 0) {
+      this.psiR /= norm;
+      this.psiI /= norm;
+    }
+    this.rho = 1.0;
+    this.isolationCounter = 0;
+    this.collisionFlash = 0;
+  }
+  
+  checkNeighborChirality() {
+    let leftCount = 0;
+    let rightCount = 0;
+    
+    this.neighbors.forEach(n => {
+      if (Math.abs(n.arcPos) < 10) {
+        if (n.chirality === 1) rightCount++;
+        else leftCount++;
+      }
+    });
+    
+    return { left: leftCount, right: rightCount };
+  }
+  
+  updateRadiusFromArcPosition() {
+    const maxRadius = this.boxSize * 0.48;
+    const minRadius = this.boxSize * 0.30;
+    
+    const distanceFromZero = Math.abs(this.arcPos) / 90;
+    this.radius = maxRadius - (maxRadius - minRadius) * distanceFromZero;
+    
+    this.radius *= (0.8 + 0.2 * Math.sqrt(this.rho));
+    
+    this.radius = Math.max(minRadius, Math.min(maxRadius, this.radius));
   }
   
   draw() {
+    const outerR = this.radius;
+    const innerR = Math.max(0.5, this.radius - this.girth);
+    const rotAngle = (this.arcPos * Math.PI / 180);
+    
     let elements = [];
     
-    // Draw toroid ring with segmented mC:rC colors
-    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    group.setAttribute('transform', `translate(${this.x}, ${this.y}) rotate(${this.visualRotation})`);
+    if (this.collisionFlash > 0) {
+      const flash = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      flash.setAttribute('cx', this.x);
+      flash.setAttribute('cy', this.y);
+      flash.setAttribute('r', outerR + 3);
+      flash.setAttribute('fill', 'none');
+      flash.setAttribute('stroke', '#ffff00');
+      flash.setAttribute('stroke-width', '2');
+      flash.setAttribute('opacity', this.collisionFlash * 0.8);
+      elements.push(flash);
+    }
     
-    // Ring dimensions
-    const outerRadius = this.R;
-    const strokeWidth = this.r * 2; // Girth (minor diameter)
+    const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    outer.setAttribute('cx', this.x);
+    outer.setAttribute('cy', this.y);
+    outer.setAttribute('r', outerR);
+    outer.setAttribute('fill', this.chirality === 1 ? colors.positive : colors.negative);
+    outer.setAttribute('stroke', '#666');
+    outer.setAttribute('stroke-width', '0.5');
     
-    // Calculate segment angles
-    const negAngle = this.mCratio * 360; // Dark segment
-    const posAngle = (1 - this.mCratio) * 360; // Light segment
+    const inner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    inner.setAttribute('cx', this.x);
+    inner.setAttribute('cy', this.y);
+    inner.setAttribute('r', innerR);
+    inner.setAttribute('fill', colors.background);
     
-    // Draw negative (mass - dark) segment
-    const negArc = this.createRingSegment(0, negAngle, outerRadius, strokeWidth, COLORS.negative);
-    group.appendChild(negArc);
+    const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    node.setAttribute('cx', this.x);
+    node.setAttribute('cy', this.y);
+    node.setAttribute('r', '1.5');
+    node.setAttribute('fill', 'red');
     
-    // Draw positive (radiance - light) segment
-    const posArc = this.createRingSegment(negAngle, negAngle + posAngle, outerRadius, strokeWidth, COLORS.positive);
-    group.appendChild(posArc);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', this.x);
+    line.setAttribute('y1', this.y);
+    line.setAttribute('x2', this.x + outerR * Math.cos(rotAngle));
+    line.setAttribute('y2', this.y + outerR * Math.sin(rotAngle));
+    line.setAttribute('stroke', this.chirality === 1 ? '#00ff00' : '#ff0000');
+    line.setAttribute('stroke-width', '1');
+    line.setAttribute('opacity', '0.6');
     
-    elements.push(group);
-    
+    elements.push(outer, inner, node, line);
     return elements;
-  }
-  
-  createRingSegment(startAngle, endAngle, radius, strokeWidth, color) {
-    const start = this.polarToCartesian(0, 0, radius, startAngle);
-    const end = this.polarToCartesian(0, 0, radius, endAngle);
-    const largeArcFlag = endAngle - startAngle > 180 ? "1" : "0";
-    
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const d = [
-      "M", start.x, start.y,
-      "A", radius, radius, 0, largeArcFlag, 1, end.x, end.y
-    ].join(" ");
-    
-    path.setAttribute('d', d);
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke', color);
-    path.setAttribute('stroke-width', strokeWidth);
-    path.setAttribute('stroke-linecap', 'round');
-    
-    return path;
-  }
-  
-  polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-    return {
-      x: centerX + (radius * Math.cos(angleInRadians)),
-      y: centerY + (radius * Math.sin(angleInRadians))
-    };
   }
 }
 
-// === INITIALIZATION ===
-function init() {
-  michrons = [];
+// ============================================
+// INITIALIZATION
+// ============================================
+
+function initGrid() {
+  chronons = [];
   
-  for (let col = 0; col < COLS; col++) {
-    const type = columnTypes[col];
+  for (let c = 0; c < COLS; c++) {
+    const type = gridDef[c];
+    let boxSize, subsPerCol;
     
-    for (let row = 0; row < ROWS; row++) {
-      if (type === 'T1') {
-        michrons.push(new Michron(col, row, 0, 0, 'T1'));
-      } else if (type === 'T2') {
-        for (let sc = 0; sc < 2; sc++) {
-          for (let sr = 0; sr < 2; sr++) {
-            michrons.push(new Michron(col, row, sc, sr, 'T2'));
-          }
-        }
-      } else if (type === 'T3') {
-        for (let sc = 0; sc < 3; sc++) {
-          for (let sr = 0; sr < 3; sr++) {
-            michrons.push(new Michron(col, row, sc, sr, 'T3'));
-          }
+    if (type === 'T1') {
+      boxSize = SPACING;
+      subsPerCol = 1;
+    } else if (type === 'T2') {
+      boxSize = SPACING / 2;
+      subsPerCol = 2;
+    } else {
+      boxSize = SPACING / 3;
+      subsPerCol = 3;
+    }
+    
+    for (let r = 0; r < ROWS; r++) {
+      for (let subR = 0; subR < subsPerCol; subR++) {
+        for (let subC = 0; subC < subsPerCol; subC++) {
+          const chronon = new Chronon(c, r, type, boxSize, subC, subR);
+          chronons.push(chronon);
         }
       }
     }
   }
   
-  // Link neighbors
-  michrons.forEach(m => {
-    m.neighbors = michrons.filter(n => {
-      if (n === m) return false;
-      const dcol = Math.abs(n.col - m.col);
-      const drow = Math.abs(n.row - m.row);
-      return (dcol <= 1 && drow <= 1);
-    });
+  chronons.forEach(c => c.findNeighbors());
+  updateGirths();
+  
+  totalChronons = chronons.length;
+  updateColumnCount();
+  console.log(`Initialized ${totalChronons} chronons`);
+}
+
+function updateGirths() {
+  const t1Girth = parseFloat(document.getElementById('girth-t1').value);
+  const t2Girth = parseFloat(document.getElementById('girth-t2').value);
+  const t3Girth = parseFloat(document.getElementById('girth-t3').value);
+  
+  chronons.forEach(c => {
+    if (c.type === 'T1') c.girth = t1Girth;
+    else if (c.type === 'T2') c.girth = t2Girth;
+    else if (c.type === 'T3') c.girth = t3Girth;
+  });
+}
+
+function updateColors() {
+  colors.background = document.getElementById('color-bg').value;
+  colors.gridLines = document.getElementById('color-grid').value;
+  colors.positive = document.getElementById('color-positive').value;
+  colors.negative = document.getElementById('color-negative').value;
+  
+  svg.style.background = colors.background;
+}
+
+function createColumnControls() {
+  const container = document.getElementById('column-controls');
+  container.innerHTML = '';
+  
+  for (let i = 0; i < COLS; i++) {
+    const select = document.createElement('select');
+    select.className = 'column-dropdown';
+    select.innerHTML = `
+      <option value="T1" ${gridDef[i] === 'T1' ? 'selected' : ''}>T1</option>
+      <option value="T2" ${gridDef[i] === 'T2' ? 'selected' : ''}>T2</option>
+      <option value="T3" ${gridDef[i] === 'T3' ? 'selected' : ''}>T3</option>
+    `;
+    select.onchange = function() {
+      gridDef[i] = this.value;
+      rebuildGrid();
+    };
+    container.appendChild(select);
+  }
+}
+
+function rebuildGrid() {
+  initGrid();
+  resetTrial();
+  createColumnControls();
+}
+
+// ============================================
+// SIMULATION
+// ============================================
+
+function step() {
+  if (paused) return;
+  
+  moments++;
+  chronons.forEach(c => c.update());
+  
+  const harmonyScore = calculateHarmonyScore();
+  updateUI(harmonyScore);
+  
+  if (harmonyScore >= 95 && moments > 100) {
+    completeTrial(harmonyScore);
+  }
+}
+
+function calculateHarmonyScore() {
+  let contactCount = 0;
+  let totalPossible = 0;
+  let stableCount = 0;
+  
+  chronons.forEach(c => {
+    if (c.neighbors.length > 0) {
+      totalPossible += c.neighbors.length;
+      c.neighbors.forEach(n => {
+        const dx = Math.abs(c.x - n.x);
+        const dy = Math.abs(c.y - n.y);
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist <= c.radius + n.radius + 2) {
+          contactCount++;
+          if (c.chirality !== n.chirality) {
+            stableCount++;
+          }
+        }
+      });
+    }
   });
   
-  renderColumnControls();
-  draw();
+  const contactScore = totalPossible > 0 ? (contactCount / totalPossible) * 100 : 0;
+  const stabilityScore = contactCount > 0 ? (stableCount / contactCount) * 100 : 0;
+  
+  return (contactScore * 0.6 + stabilityScore * 0.4);
 }
 
-// === ANIMATION LOOP ===
-function animate(currentTime) {
-  if (!isPaused) {
-    const deltaTime = (currentTime - lastFrameTime) / 1000; // Convert to seconds
-    lastFrameTime = currentTime;
-    
-    michrons.forEach(m => m.update(deltaTime));
-    draw();
-    updateMetrics();
+function updateUI(harmonyScore) {
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+  document.getElementById('time-elapsed').textContent = elapsed + 's';
+  document.getElementById('moments').textContent = moments;
+  document.getElementById('harmony-score').textContent = harmonyScore.toFixed(1) + '%';
+  document.getElementById('collisions').textContent = collisionCount;
+  document.getElementById('flips').textContent = flipCount;
+  
+  const stabilityEl = document.getElementById('stability');
+  if (harmonyScore < 30) {
+    stabilityEl.textContent = 'Chaotic';
+    stabilityEl.className = 'metric-value danger';
+  } else if (harmonyScore < 70) {
+    stabilityEl.textContent = 'Organizing';
+    stabilityEl.className = 'metric-value warning';
+  } else if (harmonyScore < 90) {
+    stabilityEl.textContent = 'Harmonizing';
+    stabilityEl.className = 'metric-value';
   } else {
-    lastFrameTime = currentTime;
+    stabilityEl.textContent = 'Harmonic';
+    stabilityEl.className = 'metric-value';
+    stabilityEl.style.color = '#28a745';
   }
-  requestAnimationFrame(animate);
 }
 
-// === DRAWING ===
+function completeTrial(finalScore) {
+  const trialTime = ((Date.now() - startTime) / 1000).toFixed(2);
+  trialCount++;
+  trialTimes.push(parseFloat(trialTime));
+  
+  if (parseFloat(trialTime) < bestTime) {
+    bestTime = parseFloat(trialTime);
+  }
+  
+  const avgTime = trialTimes.reduce((a,b) => a+b, 0) / trialTimes.length;
+  const improvement = trialTimes.length > 1 ? 
+    ((trialTimes[0] - bestTime) / trialTimes[0] * 100) : 0;
+  
+  document.getElementById('trial-count').textContent = trialCount;
+  document.getElementById('best-time').textContent = bestTime.toFixed(2) + 's';
+  document.getElementById('avg-time').textContent = avgTime.toFixed(2) + 's';
+  document.getElementById('improvement').textContent = improvement.toFixed(1) + '%';
+  
+  const historyDiv = document.getElementById('trial-history');
+  const entry = document.createElement('div');
+  entry.className = 'trial-entry' + (parseFloat(trialTime) === bestTime ? ' best' : '');
+  entry.innerHTML = `
+    <span>Trial ${trialCount}</span>
+    <span>${trialTime}s | ${finalScore.toFixed(1)}%</span>
+  `;
+  historyDiv.prepend(entry);
+  
+  setTimeout(() => resetTrial(), 2000);
+}
+
+// ============================================
+// CONTROLS
+// ============================================
+
+function resetTrial() {
+  chronons.forEach(c => {
+    const randomOffset = (Math.random() - 0.5) * 180;
+    c.arcPos = randomOffset;
+    c.chirality = Math.random() < 0.5 ? 1 : -1;
+    c.radius = c.boxSize * 0.48;
+    c.psiR = 1.0;
+    c.psiI = 0.0;
+    c.rho = 1.0;
+    c.isolationCounter = 0;
+    c.collisionFlash = 0;
+  });
+  
+  updateGirths();
+  
+  moments = 0;
+  collisionCount = 0;
+  flipCount = 0;
+  startTime = Date.now();
+  paused = false;
+  document.getElementById('btn-pause').textContent = 'Pause';
+}
+
+function togglePause() {
+  paused = !paused;
+  document.getElementById('btn-pause').textContent = paused ? 'Resume' : 'Pause';
+}
+
+// ============================================
+// RENDERING
+// ============================================
+
 function draw() {
-  const svg = document.getElementById('svg-canvas');
+  while (svg.firstChild) {
+    svg.removeChild(svg.firstChild);
+  }
+  
   const WIDTH = COLS * SPACING;
   const HEIGHT = ROWS * SPACING;
   
-  svg.setAttribute('width', WIDTH);
-  svg.setAttribute('height', HEIGHT);
-  svg.innerHTML = '';
-  svg.style.background = COLORS.bg;
+  const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  gridGroup.setAttribute('opacity', '0.15');
   
-  // Draw grid
-  for (let col = 0; col <= COLS; col++) {
+  for (let i = 0; i <= COLS; i++) {
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', col * SPACING);
+    line.setAttribute('x1', i * SPACING);
     line.setAttribute('y1', 0);
-    line.setAttribute('x2', col * SPACING);
+    line.setAttribute('x2', i * SPACING);
     line.setAttribute('y2', HEIGHT);
-    line.setAttribute('stroke', COLORS.grid);
+    line.setAttribute('stroke', colors.gridLines);
     line.setAttribute('stroke-width', '1');
-    svg.appendChild(line);
+    gridGroup.appendChild(line);
   }
   
-  for (let row = 0; row <= ROWS; row++) {
+  for (let i = 0; i <= ROWS; i++) {
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', 0);
-    line.setAttribute('y1', row * SPACING);
+    line.setAttribute('y1', i * SPACING);
     line.setAttribute('x2', WIDTH);
-    line.setAttribute('y2', row * SPACING);
-    line.setAttribute('stroke', COLORS.grid);
+    line.setAttribute('y2', i * SPACING);
+    line.setAttribute('stroke', colors.gridLines);
     line.setAttribute('stroke-width', '1');
-    svg.appendChild(line);
+    gridGroup.appendChild(line);
   }
   
-  // Draw michrons
-  michrons.forEach(m => {
-    const elements = m.draw();
+  svg.appendChild(gridGroup);
+  
+  chronons.forEach(c => {
+    const elements = c.draw();
     elements.forEach(el => svg.appendChild(el));
   });
 }
 
-// === METRICS ===
-function updateMetrics() {
-  let totalExpansion = 0;
-  let phaseCoherence = 0;
-  let totalInteraction = 0;
-  let pairCount = 0;
-  
-  michrons.forEach(m => {
-    // Expansion percentage
-    const expansionPercent = ((m.R - m.Rm) / (m.Rr - m.Rm)) * 100;
-    totalExpansion += expansionPercent;
-    
-    // Phase coherence with neighbors
-    m.neighbors.forEach(n => {
-      const phaseDiff = Math.abs(m.theta - n.theta);
-      const antiPhaseScore = Math.abs(phaseDiff - Math.PI) / Math.PI;
-      phaseCoherence += (1 - antiPhaseScore);
-      
-      const interaction = m.getInteractionStrength(n);
-      totalInteraction += Math.abs(interaction);
-      pairCount++;
-    });
-  });
-  
-  const avgExpansion = (totalExpansion / michrons.length).toFixed(1);
-  const coherencePercent = ((phaseCoherence / pairCount) * 100).toFixed(1);
-  const avgInteraction = (totalInteraction / pairCount).toFixed(2);
-  
-  document.getElementById('avg-expansion').textContent = `${avgExpansion}%`;
-  document.getElementById('phase-coherence').textContent = `${coherencePercent}%`;
-  document.getElementById('interaction-energy').textContent = avgInteraction;
-}
+// ============================================
+// MAIN LOOP
+// ============================================
 
-// === UI CONTROLS ===
-function renderColumnControls() {
-  const container = document.getElementById('column-controls');
-  container.innerHTML = '';
-  
-  for (let col = 0; col < COLS; col++) {
-    const select = document.createElement('select');
-    select.className = 'col-dropdown';
-    select.innerHTML = `
-      <option value="T1" ${columnTypes[col] === 'T1' ? 'selected' : ''}>T1</option>
-      <option value="T2" ${columnTypes[col] === 'T2' ? 'selected' : ''}>T2</option>
-      <option value="T3" ${columnTypes[col] === 'T3' ? 'selected' : ''}>T3</option>
-    `;
-    select.onchange = (e) => {
-      columnTypes[col] = e.target.value;
-      init();
-    };
-    container.appendChild(select);
+function animate() {
+  const speed = parseInt(document.getElementById('speed').value);
+  for (let i = 0; i < speed; i++) {
+    step();
   }
-  
-  document.getElementById('col-count-display').textContent = `Columns: ${COLS}`;
-}
-
-function addColumn() {
-  COLS++;
-  columnTypes.push('T1');
-  init();
-}
-
-function removeColumn() {
-  if (COLS > 4) {
-    COLS--;
-    columnTypes.pop();
-    init();
-  }
-}
-
-function updateZoom() {
-  const slider = document.getElementById('zoom-slider');
-  SPACING = parseInt(slider.value);
-  document.getElementById('zoom-value').textContent = `${SPACING}px`;
-  init();
-}
-
-function updateColors() {
-  COLORS.bg = document.getElementById('color-bg').value;
-  COLORS.grid = document.getElementById('color-grid').value;
-  COLORS.positive = document.getElementById('color-positive').value;
-  COLORS.negative = document.getElementById('color-negative').value;
   draw();
+  requestAnimationFrame(animate);
 }
 
-function updateMasterGirth() {
-  const master = parseFloat(document.getElementById('girth-master').value);
-  document.getElementById('girth-master-val').textContent = `${master.toFixed(1)}x`;
-  
-  // Update displays (base ratios: T3=2, T2=4, T1=8)
-  document.getElementById('girth-t3-display').textContent = (2 * master).toFixed(1);
-  document.getElementById('girth-t2-display').textContent = (4 * master).toFixed(1);
-  document.getElementById('girth-t1-display').textContent = (8 * master).toFixed(1);
-  
-  // Reinitialize michrons with new girth
-  if (michrons.length > 0) {
-    michrons.forEach(m => {
-      let boxSize;
-      if (m.type === 'T1') boxSize = SPACING;
-      else if (m.type === 'T2') boxSize = SPACING / 2;
-      else if (m.type === 'T3') boxSize = SPACING / 3;
-      m.setMichronParameters(m.type, boxSize);
-      m.updateGeometry();
-    });
-    draw();
-  }
-}
+// ============================================
+// START
+// ============================================
 
-function updateSliderDisplay() {
-  const omega = parseFloat(document.getElementById('omega').value);
-  const ratio = parseFloat(document.getElementById('expansion-ratio').value);
-  
-  document.getElementById('omega-val').textContent = `${omega.toFixed(2)} rad/s`;
-  document.getElementById('expansion-ratio-val').textContent = ratio.toFixed(2);
-  
-  // Physics parameters
-  document.getElementById('alpha-val').textContent = parseFloat(document.getElementById('alpha').value).toFixed(2);
-  document.getElementById('beta-val').textContent = parseFloat(document.getElementById('beta').value).toFixed(2);
-  document.getElementById('delta-t-val').textContent = parseFloat(document.getElementById('delta-t').value).toFixed(2);
-  document.getElementById('jitter-val').textContent = parseFloat(document.getElementById('jitter').value).toFixed(2);
-}
+createColumnControls();
+initGrid();
+resetTrial();
+animate();
+updateColors();
 
-function resetSimulation() {
-  init();
-  lastFrameTime = performance.now();
-}
-
-function togglePause() {
-  isPaused = !isPaused;
-  document.getElementById('btn-pause').textContent = isPaused ? 'Resume' : 'Pause';
-}
-
-// === START ===
-init();
-requestAnimationFrame(animate);
-updateSliderDisplay();
+console.log('🌀 Angel-1 Harmony Learning initialized - Scalable Grid');
+console.log(`📊 ${totalChronons} chronons | ${COLS} columns`);
 </script>
 
 </body>
 </html>
-
