@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANGEL-1 · Wave Flow System</title>
+<title>ANGEL-1 · Michron Physics Dashboard</title>
 <style>
 * {
   margin: 0;
@@ -16,121 +16,170 @@ body {
   background: #0b0f14;
   color: #e8ecef;
   min-height: 100vh;
-  padding: 20px;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
+.header {
+  background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
+  border-bottom: 2px solid #22303d;
+  padding: 16px 24px;
 }
 
-h1 {
-  font-size: 32px;
-  font-weight: 700;
+.header h1 {
+  font-size: 24px;
   background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
-.subtitle {
+.header .subtitle {
   color: #9ca3af;
-  font-size: 14px;
-  margin-bottom: 20px;
+  font-size: 12px;
 }
 
-.controls {
+.main {
   display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+.canvas-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
 }
 
-button {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
-  border: 1px solid #22303d;
-  border-radius: 6px;
-  color: #e8ecef;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-button:hover {
-  background: linear-gradient(135deg, #2d4a70 0%, #22303d 100%);
-  border-color: #60a5fa;
-  transform: translateY(-1px);
-}
-
-button.primary {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-  border-color: #60a5fa;
-}
-
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.sidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  margin-bottom: 20px;
 }
 
-.metric-card {
+/* Control Panels */
+.panel {
   background: #1a1f2e;
   border: 1px solid #22303d;
   border-radius: 8px;
   padding: 16px;
 }
 
-.metric-label {
-  color: #9ca3af;
-  font-size: 13px;
-  margin-bottom: 4px;
-}
-
-.metric-value {
-  color: #10b981;
-  font-size: 24px;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
-}
-
-.params {
-  background: #1a1f2e;
-  border: 1px solid #22303d;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.params h3 {
-  color: #e8ecef;
-  font-size: 16px;
-  margin-bottom: 16px;
-}
-
-.param-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-}
-
-.param-item {
+.panel h3 {
+  color: #60a5fa;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
 
-.param-item label {
-  color: #d1d5db;
-  font-size: 13px;
+/* Grid Controls */
+.grid-controls {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.param-value {
+.grid-controls button {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
+  border: 1px solid #22303d;
+  border-radius: 4px;
+  color: #e8ecef;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grid-controls button:hover {
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+}
+
+.grid-controls span {
+  color: #60a5fa;
+  font-weight: 600;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Type Selectors */
+.type-selectors {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.type-selectors select {
+  padding: 4px 6px;
+  font-size: 10px;
+  background: #0b0f14;
+  border: 1px solid #22303d;
+  border-radius: 3px;
+  color: #e8ecef;
+  cursor: pointer;
+}
+
+.type-selectors select:hover {
+  border-color: #60a5fa;
+}
+
+/* Playback Controls */
+.playback {
+  display: flex;
+  gap: 8px;
+}
+
+.playback button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #22303d;
+  border-radius: 6px;
+  color: #e8ecef;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.playback button.primary {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border-color: #60a5fa;
+}
+
+.playback button.secondary {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
+}
+
+.playback button:hover {
+  transform: translateY(-1px);
+}
+
+/* Sliders */
+.slider-group {
+  margin-bottom: 12px;
+}
+
+.slider-group:last-child {
+  margin-bottom: 0;
+}
+
+.slider-group label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #d1d5db;
+  margin-bottom: 4px;
+}
+
+.slider-group .value {
   color: #60a5fa;
   font-family: 'Courier New', monospace;
   font-weight: 600;
@@ -138,8 +187,8 @@ button.primary {
 
 input[type="range"] {
   width: 100%;
-  height: 6px;
-  border-radius: 3px;
+  height: 4px;
+  border-radius: 2px;
   background: #0b0f14;
   outline: none;
   -webkit-appearance: none;
@@ -147,229 +196,410 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
   cursor: pointer;
 }
 
-input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
-  cursor: pointer;
-  border: none;
+/* Color Pickers */
+.color-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
+.color-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-item label {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.color-item input[type="color"] {
+  width: 32px;
+  height: 24px;
+  border: 1px solid #22303d;
+  border-radius: 3px;
+  cursor: pointer;
+  background: none;
+}
+
+/* Metrics */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.metric {
+  background: #0b0f14;
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+}
+
+.metric .label {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-bottom: 2px;
+}
+
+.metric .value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #10b981;
+  font-family: 'Courier New', monospace;
+}
+
+/* Canvas */
 .canvas-container {
   background: #1a1f2e;
   border: 2px solid #22303d;
   border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 16px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 400px;
 }
 
 canvas {
-  display: block;
   border: 1px solid #22303d;
   border-radius: 4px;
 }
 
-.info {
+/* Row selectors on left of canvas */
+.canvas-with-rows {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.row-selectors {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row-selectors select {
+  padding: 2px 4px;
+  font-size: 9px;
+  background: #0b0f14;
+  border: 1px solid #22303d;
+  border-radius: 2px;
+  color: #e8ecef;
+  cursor: pointer;
+  width: 36px;
+}
+
+/* Info Box */
+.info-box {
   background: rgba(96, 165, 250, 0.1);
   border: 1px solid rgba(96, 165, 250, 0.3);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #9ca3af;
 }
 
-.info h3 {
-  color: #60a5fa;
-  font-size: 16px;
-  margin-bottom: 12px;
-}
-
-.info ul {
-  list-style: none;
-  padding: 0;
-}
-
-.info li {
-  color: #d1d5db;
-  font-size: 13px;
-  line-height: 1.8;
-  padding-left: 20px;
-  position: relative;
-}
-
-.info li:before {
-  content: "•";
-  position: absolute;
-  left: 0;
+.info-box strong {
   color: #60a5fa;
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>ANGEL-1 · Wave Flow System</h1>
-  <div class="subtitle">Organic Flow · No Death States · T1/T2 Torsion Mechanics · Dark Energy = 68% Extended Zone</div>
+<div class="header">
+  <h1>ANGEL-1 · MICHRON PHYSICS</h1>
+  <div class="subtitle">4π Spinor Model · Volume-Conserving Toroid Oscillation · T1/T2/T3 Torsion Space</div>
+</div>
 
-  <div class="controls">
-    <button id="pauseBtn" class="primary">Pause</button>
-    <button id="resetBtn">Reset</button>
-  </div>
-
-  <div class="metrics">
-    <div class="metric-card">
-      <div class="metric-label">Time Steps</div>
-      <div class="metric-value" id="timeSteps">0</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Avg Energy</div>
-      <div class="metric-value" id="avgEnergy">0.0000</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Grid Size</div>
-      <div class="metric-value" id="gridSize">8×6</div>
-    </div>
-  </div>
-
-  <div class="params">
-    <h3>Wave Parameters</h3>
-    <div class="param-grid">
-      <div class="param-item">
-        <label>
-          <span>Speed</span>
-          <span class="param-value" id="speedVal">1.0x</span>
-        </label>
-        <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1.0">
+<div class="main">
+  <div class="canvas-section">
+    <!-- Grid Size Controls -->
+    <div class="panel">
+      <div class="grid-controls">
+        <button onclick="removeColumn()">− Col</button>
+        <span id="colCount">Columns: 8</span>
+        <button onclick="addColumn()">+ Col</button>
+        <button onclick="removeRow()">− Row</button>
+        <span id="rowCount">Rows: 6</span>
+        <button onclick="addRow()">+ Row</button>
       </div>
-      <div class="param-item">
+      
+      <!-- Column Type Selectors -->
+      <div class="type-selectors" id="colSelectors"></div>
+    </div>
+
+    <!-- Canvas with Row Selectors -->
+    <div class="canvas-container">
+      <div class="canvas-with-rows">
+        <div class="row-selectors" id="rowSelectors"></div>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <!-- Playback -->
+    <div class="panel">
+      <h3>⚡ Control</h3>
+      <div class="playback">
+        <button id="pauseBtn" class="primary" onclick="togglePause()">Pause</button>
+        <button class="secondary" onclick="reset()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="panel">
+      <h3>📊 Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="label">Time Steps</div>
+          <div class="value" id="metricTime">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Avg Torsion</div>
+          <div class="value" id="metricTorsion">0.00</div>
+        </div>
+        <div class="metric">
+          <div class="label">T1 Cells</div>
+          <div class="value" id="metricT1" style="color:#e94560;">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">T2 Cells</div>
+          <div class="value" id="metricT2" style="color:#60a5fa;">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">T3 Cells</div>
+          <div class="value" id="metricT3" style="color:#10b981;">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Interactions</div>
+          <div class="value" id="metricInteractions">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Speed Control -->
+    <div class="panel">
+      <h3>⏱️ Speed</h3>
+      <div class="slider-group">
+        <label>
+          <span>Simulation Speed</span>
+          <span class="value" id="speedVal">1.0x</span>
+        </label>
+        <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1" oninput="updateSpeed()">
+      </div>
+    </div>
+
+    <!-- Girth Control -->
+    <div class="panel">
+      <h3>🔧 Girth Control</h3>
+      <div class="slider-group">
+        <label>
+          <span>Master Girth</span>
+          <span class="value" id="girthVal">1.0x</span>
+        </label>
+        <input type="range" id="girth" min="0.5" max="2" step="0.1" value="1" oninput="updateGirth()">
+      </div>
+      <div style="font-size:10px; color:#9ca3af; margin-top:8px;">
+        T1: <span id="girthT1">0.25</span> · 
+        T2: <span id="girthT2">0.45</span> · 
+        T3: <span id="girthT3">0.65</span>
+      </div>
+    </div>
+
+    <!-- Torsion Control -->
+    <div class="panel">
+      <h3>🌀 Torsion Thresholds</h3>
+      <div class="slider-group">
+        <label>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="autoTorsion" onchange="toggleAutoTorsion()">
+            Auto T-State Transitions
+          </span>
+        </label>
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>T1↔T2 Threshold</span>
+          <span class="value" id="threshLowVal">0.50</span>
+        </label>
+        <input type="range" id="threshLow" min="0.1" max="0.7" step="0.05" value="0.5" oninput="updateThresholds()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>T2↔T3 Threshold</span>
+          <span class="value" id="threshHighVal">0.70</span>
+        </label>
+        <input type="range" id="threshHigh" min="0.5" max="0.95" step="0.05" value="0.7" oninput="updateThresholds()">
+      </div>
+      <div style="font-size:10px; color:#9ca3af; margin-top:8px;">
+        T1: <span style="color:#e94560;">●</span> Low torsion · 
+        T2: <span style="color:#60a5fa;">●</span> Medium · 
+        T3: <span style="color:#10b981;">●</span> High
+      </div>
+    </div>
+
+    <!-- Wave Parameters -->
+    <div class="panel">
+      <h3>🌊 Wave Parameters</h3>
+      <div class="slider-group">
         <label>
           <span>α (Dispersion)</span>
-          <span class="param-value" id="alphaVal">0.90</span>
+          <span class="value" id="alphaVal">0.90</span>
         </label>
-        <input type="range" id="alpha" min="0.1" max="1.5" step="0.01" value="0.9">
+        <input type="range" id="alpha" min="0.1" max="1.5" step="0.01" value="0.9" oninput="updateAlpha()">
       </div>
-      <div class="param-item">
+      <div class="slider-group">
         <label>
           <span>β (Nonlinearity)</span>
-          <span class="param-value" id="betaVal">0.35</span>
+          <span class="value" id="betaVal">0.35</span>
         </label>
-        <input type="range" id="beta" min="0" max="1" step="0.01" value="0.35">
+        <input type="range" id="beta" min="0" max="1" step="0.01" value="0.35" oninput="updateBeta()">
       </div>
-      <div class="param-item">
+      <div class="slider-group">
         <label>
-          <span>Jitter (Chaos)</span>
-          <span class="param-value" id="jitterVal">0.20</span>
+          <span>Jitter</span>
+          <span class="value" id="jitterVal">0.20</span>
         </label>
-        <input type="range" id="jitter" min="0" max="1" step="0.01" value="0.2">
-      </div>
-      <div class="param-item">
-        <label>
-          <span>Grid Columns</span>
-          <span class="param-value" id="colsVal">8</span>
-        </label>
-        <input type="range" id="cols" min="4" max="16" step="1" value="8">
-      </div>
-      <div class="param-item">
-        <label>
-          <span>Grid Rows</span>
-          <span class="param-value" id="rowsVal">6</span>
-        </label>
-        <input type="range" id="rows" min="3" max="12" step="1" value="6">
+        <input type="range" id="jitter" min="0" max="1" step="0.01" value="0.2" oninput="updateJitter()">
       </div>
     </div>
-  </div>
 
-  <div class="canvas-container">
-    <canvas id="canvas"></canvas>
-  </div>
+    <!-- Colors -->
+    <div class="panel">
+      <h3>🎨 Colors</h3>
+      <div class="color-row">
+        <div class="color-item">
+          <input type="color" id="colorBg" value="#0b0f14" onchange="updateColors()">
+          <label>Background</label>
+        </div>
+        <div class="color-item">
+          <input type="color" id="colorGrid" value="#22303d" onchange="updateColors()">
+          <label>Grid</label>
+        </div>
+      </div>
+      <div class="color-row" style="margin-top:8px;">
+        <div class="color-item">
+          <input type="color" id="colorMass" value="#1a1a1a" onchange="updateColors()">
+          <label>Mass (−)</label>
+        </div>
+        <div class="color-item">
+          <input type="color" id="colorRadiance" value="#e8e8e8" onchange="updateColors()">
+          <label>Radiance (+)</label>
+        </div>
+      </div>
+    </div>
 
-  <div class="info">
-    <h3>Wave Flow Mechanics & Dark Energy Connection</h3>
-    <ul>
-      <li><strong>Continuous evolution:</strong> Complex wave function (ψ = ψᴿ + iψᴵ) - no death states</li>
-      <li><strong>Laplacian coupling:</strong> Each cell coupled to neighbors via wave diffusion</li>
-      <li><strong>T1 oscillation:</strong> 135° total (45° left + 90° right) - 33% mass, 67% radiance</li>
-      <li><strong>T2 oscillation:</strong> 67.5° total (22.5° left + 45° right) - 50% mass, 50% radiance</li>
-      <li><strong>Safe zones:</strong> 42.6% of oscillation range = bound mass component</li>
-      <li><strong>Extended zones:</strong> 57.4% of oscillation range = free radiance</li>
-      <li><strong>Dark Energy = 68%:</strong> The radiance-dominated extended oscillation zones</li>
-      <li><strong>Phase-driven rotation:</strong> φ = atan2(ψᴵ, ψᴿ) determines washer orientation</li>
-      <li><strong>Organic flow:</strong> Energy sweeps across grid like breathing fabric of spacetime</li>
-    </ul>
+    <!-- Info -->
+    <div class="info-box">
+      <strong>Torsion-Load Transitions:</strong><br>
+      T1: Low torsion → pure radiant flow<br>
+      T2: Medium torsion → contained tension (EM)<br>
+      T3: High torsion → crystallized mass<br><br>
+      <strong>T-Class Specs:</strong><br>
+      T1: R=4.0, girth=0.25, mass=33%<br>
+      T2: R=2.0, girth=0.45, mass=50%<br>
+      T3: R=4.0, girth=0.65, mass=90%<br><br>
+      <strong>Eτ=h constraint holds.</strong> Geometry determines stable solution.
+    </div>
   </div>
 </div>
 
 <script>
-// Configuration
+// === CONFIGURATION ===
 let COLS = 8;
 let ROWS = 6;
-const CELL_SIZE = 60;
+const CELL_SIZE = 50;
+const GRID_UNITS = 8; // 8x8 subdivision per cell
+
+// T-Class specifications
+const T_SPECS = {
+  T1: { majorR: 4.0, girth: 0.25, mass: 0.33 },
+  T2: { majorR: 2.0, girth: 0.45, mass: 0.50 },
+  T3: { majorR: 4.0, girth: 0.65, mass: 0.90 }
+};
+
+// Torsion thresholds for T-state transitions
+let TORSION_THRESHOLD_LOW = 0.5;   // T1 <-> T2 boundary (raised so T1 can exist)
+let TORSION_THRESHOLD_HIGH = 0.7;  // T2 <-> T3 boundary
+let autoTorsion = false;  // Disabled by default - use manual row/col dropdowns
+
+// === STATE ===
+let colTypes = Array(COLS).fill('T1');
+let rowTypes = Array(ROWS).fill('T1');
 let isPaused = false;
+let t = 0;
 
-// Wave parameters
-let alpha = 0.9;
-let beta = 0.35;
-let dt = 0.02;
-let jitter = 0.2;
-let speed = 1.0;
-
-// State
+// Wave state
 let psiR = [];
 let psiI = [];
 let rho = [];
 let rhoE = [];
 let phi = [];
-let grid = [];
-let t = 0;
+let torsion = [];      // Local torsion density per cell
+let cellTypes = [];    // Dynamic T-state per cell (can change)
+
+// Parameters
+let speed = 1.0;
+let girthMult = 1.0;
+let alpha = 0.9;
+let beta = 0.35;
+let jitter = 0.2;
+let dt = 0.02;
+
+// Colors
+let colors = {
+  bg: '#0b0f14',
+  grid: '#22303d',
+  mass: '#1a1a1a',
+  radiance: '#e8e8e8'
+};
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// Initialize
+// === INITIALIZATION ===
 function init() {
   const n = COLS * ROWS;
   
-  // Random initial wave function
   psiR = Array(n).fill(0).map(() => Math.random() * 2 - 1);
   psiI = Array(n).fill(0).map(() => Math.random() * 2 - 1);
   rho = Array(n).fill(0);
   rhoE = Array(n).fill(0);
   phi = Array(n).fill(0);
+  torsion = Array(n).fill(0);
   
-  // Normalize
-  normalize();
-  
-  // Build grid
-  grid = [];
+  // Initialize cell types from row/col selectors
+  cellTypes = [];
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
-      grid.push({
-        x: (col - COLS / 2 + 0.5) * CELL_SIZE,
-        y: (row - ROWS / 2 + 0.5) * CELL_SIZE,
-        col,
-        row
-      });
+      if (colTypes[col] !== 'T1') {
+        cellTypes.push(colTypes[col]);
+      } else {
+        cellTypes.push(rowTypes[row]);
+      }
     }
   }
   
+  normalize();
+  
+  canvas.width = COLS * CELL_SIZE;
+  canvas.height = ROWS * CELL_SIZE;
+  
   t = 0;
   
-  // Update canvas size
-  const width = COLS * CELL_SIZE;
-  const height = ROWS * CELL_SIZE;
-  canvas.width = width;
-  canvas.height = height;
-  
-  document.getElementById('gridSize').textContent = `${COLS}×${ROWS}`;
+  buildSelectors();
+  draw();
 }
 
 function normalize() {
@@ -384,6 +614,75 @@ function normalize() {
   }
 }
 
+// === SELECTORS ===
+function buildSelectors() {
+  // Column selectors
+  const colContainer = document.getElementById('colSelectors');
+  colContainer.innerHTML = '';
+  for (let i = 0; i < COLS; i++) {
+    const select = document.createElement('select');
+    select.innerHTML = `
+      <option value="T1" ${colTypes[i] === 'T1' ? 'selected' : ''}>T1</option>
+      <option value="T2" ${colTypes[i] === 'T2' ? 'selected' : ''}>T2</option>
+      <option value="T3" ${colTypes[i] === 'T3' ? 'selected' : ''}>T3</option>
+    `;
+    select.onchange = (e) => { colTypes[i] = e.target.value; };
+    colContainer.appendChild(select);
+  }
+  
+  // Row selectors
+  const rowContainer = document.getElementById('rowSelectors');
+  rowContainer.innerHTML = '';
+  for (let i = 0; i < ROWS; i++) {
+    const select = document.createElement('select');
+    select.style.height = CELL_SIZE + 'px';
+    select.innerHTML = `
+      <option value="T1" ${rowTypes[i] === 'T1' ? 'selected' : ''}>T1</option>
+      <option value="T2" ${rowTypes[i] === 'T2' ? 'selected' : ''}>T2</option>
+      <option value="T3" ${rowTypes[i] === 'T3' ? 'selected' : ''}>T3</option>
+    `;
+    select.onchange = (e) => { rowTypes[i] = e.target.value; };
+    rowContainer.appendChild(select);
+  }
+  
+  document.getElementById('colCount').textContent = `Columns: ${COLS}`;
+  document.getElementById('rowCount').textContent = `Rows: ${ROWS}`;
+}
+
+// === GRID CONTROLS ===
+function addColumn() {
+  if (COLS < 16) {
+    COLS++;
+    colTypes.push('T1');
+    init();
+  }
+}
+
+function removeColumn() {
+  if (COLS > 4) {
+    COLS--;
+    colTypes.pop();
+    init();
+  }
+}
+
+function addRow() {
+  if (ROWS < 12) {
+    ROWS++;
+    rowTypes.push('T1');
+    init();
+  }
+}
+
+function removeRow() {
+  if (ROWS > 3) {
+    ROWS--;
+    rowTypes.pop();
+    init();
+  }
+}
+
+// === WAVE MECHANICS ===
 function getNeighbors(i) {
   const neighbors = [];
   const col = i % COLS;
@@ -400,23 +699,58 @@ function getNeighbors(i) {
 function laplacian(arr, i) {
   const neighbors = getNeighbors(i);
   let sum = 0;
-  for (const n of neighbors) {
-    sum += arr[n];
-  }
+  for (const n of neighbors) sum += arr[n];
   return sum - neighbors.length * arr[i];
 }
 
 function step() {
   const n = psiR.length;
   
-  // Calculate density and phase
   for (let i = 0; i < n; i++) {
     rho[i] = psiR[i] * psiR[i] + psiI[i] * psiI[i];
     rhoE[i] = 0.95 * rhoE[i] + 0.05 * rho[i];
     phi[i] = Math.atan2(psiI[i], psiR[i]);
   }
   
-  // Evolve wave function
+  // Calculate local torsion density (T_μνρ T^μνρ approximation)
+  // Based on phase gradients with neighbors - the "twist stress"
+  for (let i = 0; i < n; i++) {
+    const neighbors = getNeighbors(i);
+    let torsionSum = 0;
+    
+    for (const nb of neighbors) {
+      // Phase difference (torsion is the twist between neighbors)
+      const phaseDiff = Math.abs(phi[i] - phi[nb]);
+      const wrappedDiff = Math.min(phaseDiff, 2 * Math.PI - phaseDiff);
+      
+      // Energy gradient (density difference creates stress)
+      const energyDiff = Math.abs(rhoE[i] - rhoE[nb]);
+      
+      // Combined torsion load = twist × energy gradient
+      torsionSum += wrappedDiff * (1 + energyDiff * 10);
+    }
+    
+    // Normalize by neighbor count and smooth
+    torsion[i] = 0.8 * torsion[i] + 0.2 * (torsionSum / Math.max(1, neighbors.length));
+  }
+  
+  // Auto T-state transitions based on torsion load (T1 <-> T2 only for now)
+  if (autoTorsion) {
+    const maxTorsion = Math.max(0.001, ...torsion);
+    
+    for (let i = 0; i < n; i++) {
+      const normalizedTorsion = torsion[i] / maxTorsion;
+      
+      if (normalizedTorsion < TORSION_THRESHOLD_LOW) {
+        // Low torsion -> T1 (pure radiant flow)
+        cellTypes[i] = 'T1';
+      } else {
+        // Medium/High torsion -> T2 (contained tension, EM regime)
+        cellTypes[i] = 'T2';
+      }
+    }
+  }
+  
   const newPsiR = [];
   const newPsiI = [];
   
@@ -435,49 +769,100 @@ function step() {
   psiR = newPsiR;
   psiI = newPsiI;
   normalize();
-  
   t++;
 }
 
-function drawWasher(x, y, radius, phase) {
-  // Apply T1 rotation limits (135° total: 45° left + 90° right)
-  let degrees = ((phase * 180 / Math.PI) % 360 + 360) % 360;
-  let constrainedPhase = phase;
+// === DRAWING ===
+function getCellType(col, row) {
+  const i = row * COLS + col;
+  return cellTypes[i] || 'T1';
+}
+
+function drawWasher(x, y, type, phase, energy) {
+  const spec = T_SPECS[type];
+  const pixelsPerUnit = CELL_SIZE / GRID_UNITS;
   
-  if (degrees > 90 && degrees < 180) {
-    constrainedPhase = 90 * Math.PI / 180;
-  } else if (degrees > 180 && degrees < 315) {
-    constrainedPhase = -45 * Math.PI / 180;
+  // Apply girth multiplier
+  const girth = spec.girth * girthMult;
+  
+  // Energy affects size slightly (breathing effect)
+  const energyMod = 0.9 + energy * 0.2;
+  
+  if (type === 'T2') {
+    // T2 = 4 smaller toroids, each filling one quadrant
+    const quadrantSize = CELL_SIZE / 2;
+    const quadrantPixelsPerUnit = quadrantSize / GRID_UNITS;
+    // Use T1's majorR (4.0) so they fill their quadrant
+    const subMajorR = 4.0 * quadrantPixelsPerUnit * energyMod;
+    const subMinorR = Math.max(0, subMajorR - girth * quadrantPixelsPerUnit);
+    
+    // Each toroid centered in its own quadrant
+    const offsets = [
+      [-CELL_SIZE/4, -CELL_SIZE/4],  // Top-left quadrant
+      [CELL_SIZE/4, -CELL_SIZE/4],   // Top-right quadrant
+      [-CELL_SIZE/4, CELL_SIZE/4],   // Bottom-left quadrant
+      [CELL_SIZE/4, CELL_SIZE/4]     // Bottom-right quadrant
+    ];
+    
+    // T2 oscillates within ±22.5° (bounces back at limits)
+    const t2MaxAngle = 22.5 * Math.PI / 180;
+    const t2Phase = Math.sin(phase * 2) * t2MaxAngle;  // Bounce oscillation
+    
+    for (let i = 0; i < offsets.length; i++) {
+      const [ox, oy] = offsets[i];
+      // Each sub-toroid can have slightly different phase
+      const subPhase = t2Phase + (i * 0.1);
+      drawSingleWasher(x + ox, y + oy, subMajorR, subMinorR, spec.mass, type, subPhase);
+    }
+  } else {
+    // T1 or T3 = single large torus (T3 cut out for now, renders same as T1)
+    const majorR = spec.majorR * pixelsPerUnit * energyMod;
+    const minorR = Math.max(0, majorR - girth * pixelsPerUnit);
+    drawSingleWasher(x, y, majorR, minorR, spec.mass, type, phase);
   }
-  
-  const thickness = 8;
+}
+
+function drawSingleWasher(x, y, majorR, minorR, massRatio, type, rotation) {
+  // Mass ratio determines black segment size
+  const massAngle = massRatio * 360;
   
   ctx.save();
   ctx.translate(x, y);
-  ctx.rotate(constrainedPhase);
+  ctx.rotate(rotation || 0);  // Apply rotation from phase
   
-  // Black half (left)
+  // Black (mass) segment - ALWAYS AT BOTTOM (before rotation)
+  const massStart = 90 - massAngle / 2;
+  const massEnd = 90 + massAngle / 2;
+  
   ctx.beginPath();
-  ctx.arc(0, 0, radius, Math.PI / 2, 3 * Math.PI / 2);
-  ctx.arc(0, 0, Math.max(1, radius - thickness), 3 * Math.PI / 2, Math.PI / 2, true);
+  ctx.arc(0, 0, majorR, massStart * Math.PI / 180, massEnd * Math.PI / 180);
+  ctx.arc(0, 0, minorR, massEnd * Math.PI / 180, massStart * Math.PI / 180, true);
   ctx.closePath();
-  ctx.fillStyle = '#1a1a1a';
+  ctx.fillStyle = colors.mass;
   ctx.fill();
   
-  // White half (right)
+  // White (radiance) segment - the rest
   ctx.beginPath();
-  ctx.arc(0, 0, radius, -Math.PI / 2, Math.PI / 2);
-  ctx.arc(0, 0, Math.max(1, radius - thickness), Math.PI / 2, -Math.PI / 2, true);
+  ctx.arc(0, 0, majorR, massEnd * Math.PI / 180, massStart * Math.PI / 180);
+  ctx.arc(0, 0, minorR, massStart * Math.PI / 180, massEnd * Math.PI / 180, true);
   ctx.closePath();
-  ctx.fillStyle = '#e8e8e8';
+  ctx.fillStyle = colors.radiance;
   ctx.fill();
   
   // Outline
   ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = 'rgba(233, 69, 96, 0.6)';
-  ctx.lineWidth = 1;
+  ctx.arc(0, 0, majorR, 0, Math.PI * 2);
+  ctx.strokeStyle = type === 'T1' ? 'rgba(233, 69, 96, 0.5)' : 
+                    type === 'T2' ? 'rgba(96, 165, 250, 0.5)' : 
+                    'rgba(16, 185, 129, 0.5)';
+  ctx.lineWidth = 0.5;
   ctx.stroke();
+  
+  if (minorR > 0) {
+    ctx.beginPath();
+    ctx.arc(0, 0, minorR, 0, Math.PI * 2);
+    ctx.stroke();
+  }
   
   ctx.restore();
 }
@@ -487,18 +872,20 @@ function draw() {
   const height = canvas.height;
   
   // Clear
-  ctx.fillStyle = '#0b0f14';
+  ctx.fillStyle = colors.bg;
   ctx.fillRect(0, 0, width, height);
   
   // Draw grid
-  ctx.strokeStyle = '#22303d';
+  ctx.strokeStyle = colors.grid;
   ctx.lineWidth = 1;
+  
   for (let i = 0; i <= COLS; i++) {
     ctx.beginPath();
     ctx.moveTo(i * CELL_SIZE, 0);
     ctx.lineTo(i * CELL_SIZE, height);
     ctx.stroke();
   }
+  
   for (let i = 0; i <= ROWS; i++) {
     ctx.beginPath();
     ctx.moveTo(0, i * CELL_SIZE);
@@ -508,16 +895,20 @@ function draw() {
   
   // Draw connections
   const maxRho = Math.max(1e-12, ...rhoE);
-  for (let i = 0; i < grid.length; i++) {
+  
+  for (let i = 0; i < COLS * ROWS; i++) {
     const neighbors = getNeighbors(i);
     for (const n of neighbors) {
       if (i < n) {
         const grad = Math.abs(rhoE[n] - rhoE[i]);
-        if (grad < 0.6 / grid.length) {
+        if (grad < 0.6 / (COLS * ROWS)) {
+          const col1 = i % COLS, row1 = Math.floor(i / COLS);
+          const col2 = n % COLS, row2 = Math.floor(n / COLS);
+          
           ctx.beginPath();
-          ctx.moveTo(grid[i].x + width / 2, grid[i].y + height / 2);
-          ctx.lineTo(grid[n].x + width / 2, grid[n].y + height / 2);
-          ctx.strokeStyle = 'rgba(96, 165, 250, 0.25)';
+          ctx.moveTo(col1 * CELL_SIZE + CELL_SIZE/2, row1 * CELL_SIZE + CELL_SIZE/2);
+          ctx.lineTo(col2 * CELL_SIZE + CELL_SIZE/2, row2 * CELL_SIZE + CELL_SIZE/2);
+          ctx.strokeStyle = 'rgba(96, 165, 250, 0.2)';
           ctx.lineWidth = 1;
           ctx.stroke();
         }
@@ -526,31 +917,117 @@ function draw() {
   }
   
   // Draw washers
-  const MIN_RADIUS = 8;
-  const MAX_RADIUS = CELL_SIZE / 2 - 2;
-  
-  for (let i = 0; i < grid.length; i++) {
-    const p = grid[i];
-    const rsrc = rhoE[i];
-    const radius = MIN_RADIUS + (MAX_RADIUS - MIN_RADIUS) * (rsrc / maxRho);
-    
-    drawWasher(
-      p.x + width / 2,
-      p.y + height / 2,
-      radius,
-      phi[i]
-    );
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const i = row * COLS + col;
+      const type = getCellType(col, row);
+      const x = col * CELL_SIZE + CELL_SIZE / 2;
+      const y = row * CELL_SIZE + CELL_SIZE / 2;
+      const energy = rhoE[i] / maxRho;
+      
+      drawWasher(x, y, type, phi[i], energy);
+    }
   }
   
   // Update metrics
-  const avgEnergy = rhoE.reduce((a, b) => a + b, 0) / rhoE.length;
-  document.getElementById('timeSteps').textContent = t;
-  document.getElementById('avgEnergy').textContent = avgEnergy.toFixed(4);
+  updateMetrics();
 }
 
+function updateMetrics() {
+  document.getElementById('metricTime').textContent = t;
+  
+  // Average torsion
+  const avgTorsion = torsion.reduce((a, b) => a + b, 0) / torsion.length;
+  document.getElementById('metricTorsion').textContent = avgTorsion.toFixed(3);
+  
+  // Count T-states
+  let t1Count = 0, t2Count = 0, t3Count = 0;
+  for (const type of cellTypes) {
+    if (type === 'T1') t1Count++;
+    else if (type === 'T2') t2Count++;
+    else if (type === 'T3') t3Count++;
+  }
+  
+  document.getElementById('metricT1').textContent = t1Count;
+  document.getElementById('metricT2').textContent = t2Count;
+  document.getElementById('metricT3').textContent = t3Count;
+  
+  document.getElementById('metricInteractions').textContent = Math.floor(t / 10);
+}
+
+// === UI CONTROLS ===
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
+}
+
+function reset() {
+  init();
+}
+
+function updateSpeed() {
+  speed = parseFloat(document.getElementById('speed').value);
+  document.getElementById('speedVal').textContent = speed.toFixed(1) + 'x';
+}
+
+function updateGirth() {
+  girthMult = parseFloat(document.getElementById('girth').value);
+  document.getElementById('girthVal').textContent = girthMult.toFixed(1) + 'x';
+  document.getElementById('girthT1').textContent = (T_SPECS.T1.girth * girthMult).toFixed(2);
+  document.getElementById('girthT2').textContent = (T_SPECS.T2.girth * girthMult).toFixed(2);
+  document.getElementById('girthT3').textContent = (T_SPECS.T3.girth * girthMult).toFixed(2);
+}
+
+function updateAlpha() {
+  alpha = parseFloat(document.getElementById('alpha').value);
+  document.getElementById('alphaVal').textContent = alpha.toFixed(2);
+}
+
+function updateBeta() {
+  beta = parseFloat(document.getElementById('beta').value);
+  document.getElementById('betaVal').textContent = beta.toFixed(2);
+}
+
+function updateJitter() {
+  jitter = parseFloat(document.getElementById('jitter').value);
+  document.getElementById('jitterVal').textContent = jitter.toFixed(2);
+}
+
+function updateColors() {
+  colors.bg = document.getElementById('colorBg').value;
+  colors.grid = document.getElementById('colorGrid').value;
+  colors.mass = document.getElementById('colorMass').value;
+  colors.radiance = document.getElementById('colorRadiance').value;
+}
+
+function toggleAutoTorsion() {
+  autoTorsion = document.getElementById('autoTorsion').checked;
+  if (!autoTorsion) {
+    // Reset cell types from selectors when turning off auto
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        const i = row * COLS + col;
+        if (colTypes[col] !== 'T1') {
+          cellTypes[i] = colTypes[col];
+        } else {
+          cellTypes[i] = rowTypes[row];
+        }
+      }
+    }
+  }
+}
+
+function updateThresholds() {
+  TORSION_THRESHOLD_LOW = parseFloat(document.getElementById('threshLow').value);
+  TORSION_THRESHOLD_HIGH = parseFloat(document.getElementById('threshHigh').value);
+  document.getElementById('threshLowVal').textContent = TORSION_THRESHOLD_LOW.toFixed(2);
+  document.getElementById('threshHighVal').textContent = TORSION_THRESHOLD_HIGH.toFixed(2);
+}
+
+// === ANIMATION LOOP ===
 function animate() {
   if (!isPaused) {
-    for (let s = 0; s < Math.ceil(speed * 5); s++) {
+    for (let s = 0; s < Math.ceil(speed * 3); s++) {
       step();
     }
   }
@@ -558,49 +1035,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-// UI Controls
-document.getElementById('pauseBtn').onclick = () => {
-  isPaused = !isPaused;
-  document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
-};
-
-document.getElementById('resetBtn').onclick = () => {
-  init();
-};
-
-document.getElementById('speed').oninput = (e) => {
-  speed = parseFloat(e.target.value);
-  document.getElementById('speedVal').textContent = speed.toFixed(1) + 'x';
-};
-
-document.getElementById('alpha').oninput = (e) => {
-  alpha = parseFloat(e.target.value);
-  document.getElementById('alphaVal').textContent = alpha.toFixed(2);
-};
-
-document.getElementById('beta').oninput = (e) => {
-  beta = parseFloat(e.target.value);
-  document.getElementById('betaVal').textContent = beta.toFixed(2);
-};
-
-document.getElementById('jitter').oninput = (e) => {
-  jitter = parseFloat(e.target.value);
-  document.getElementById('jitterVal').textContent = jitter.toFixed(2);
-};
-
-document.getElementById('cols').oninput = (e) => {
-  COLS = parseInt(e.target.value);
-  document.getElementById('colsVal').textContent = COLS;
-  init();
-};
-
-document.getElementById('rows').oninput = (e) => {
-  ROWS = parseInt(e.target.value);
-  document.getElementById('rowsVal').textContent = ROWS;
-  init();
-};
-
-// Start
+// === START ===
 init();
 animate();
 </script>
