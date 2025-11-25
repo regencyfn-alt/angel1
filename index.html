@@ -269,8 +269,10 @@ input[type="range"]::-webkit-slider-thumb {
       <div class="playback">
         <button id="pauseBtn" class="primary" onclick="togglePause()">Pause</button>
         <button class="secondary" onclick="reset()">Reset</button>
-        <button class="secondary" onclick="subdivideSelected()">Subdivide</button>
       </div>
+      <button id="subdivideBtn" style="margin-top:8px;width:100%;padding:12px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:1px solid #10b981;border-radius:6px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;" onclick="subdivideSelected()">
+        Click a chronon, then: SUBDIVIDE
+      </button>
     </div>
 
     <div class="panel">
@@ -855,6 +857,21 @@ canvas.addEventListener('click', (e) => {
       selectedChronon = c;
       break;
     }
+  }
+
+  // Update button to show selection
+  const btn = document.getElementById('subdivideBtn');
+  if (selectedChronon) {
+    const canSub = selectedChronon.config.subdivides > 0;
+    btn.textContent = canSub
+      ? `SUBDIVIDE ${selectedChronon.phase} → ${selectedChronon.phase === 'T1' ? '4×T2' : '2×T3'}`
+      : 'T3 cannot subdivide further';
+    btn.style.background = canSub
+      ? 'linear-gradient(135deg,#10b981 0%,#059669 100%)'
+      : 'linear-gradient(135deg,#4b5563 0%,#374151 100%)';
+  } else {
+    btn.textContent = 'Click a chronon first';
+    btn.style.background = 'linear-gradient(135deg,#4b5563 0%,#374151 100%)';
   }
 });
 
