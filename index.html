@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANGEL-1 · Michron Physics Dashboard</title>
+<title>ANGEL-1 · Chronomic Network</title>
 <style>
 * {
   margin: 0;
@@ -13,7 +13,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #0b0f14;
+  background: #0a0c10;
   color: #e8ecef;
   min-height: 100vh;
 }
@@ -25,7 +25,7 @@ body {
 }
 
 .header h1 {
-  font-size: 24px;
+  font-size: 22px;
   background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -34,13 +34,14 @@ body {
 
 .header .subtitle {
   color: #9ca3af;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .main {
   display: flex;
-  gap: 20px;
-  padding: 20px;
+  gap: 16px;
+  padding: 16px;
+  height: calc(100vh - 80px);
 }
 
 .canvas-section {
@@ -51,77 +52,41 @@ body {
 }
 
 .sidebar {
-  width: 300px;
+  width: 280px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  overflow-y: auto;
 }
 
 .panel {
   background: #1a1f2e;
   border: 1px solid #22303d;
   border-radius: 8px;
-  padding: 16px;
+  padding: 14px;
 }
 
 .panel h3 {
   color: #60a5fa;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  margin-bottom: 10px;
 }
 
-.grid-controls {
+.canvas-container {
+  background: #12161e;
+  border: 2px solid #22303d;
+  border-radius: 8px;
+  flex: 1;
   display: flex;
-  gap: 8px;
-  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
+  overflow: hidden;
 }
 
-.grid-controls button {
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
-  border: 1px solid #22303d;
+canvas {
   border-radius: 4px;
-  color: #e8ecef;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.grid-controls button:hover {
-  border-color: #60a5fa;
-  transform: translateY(-1px);
-}
-
-.grid-controls span {
-  color: #60a5fa;
-  font-weight: 600;
-  min-width: 100px;
-  text-align: center;
-}
-
-.type-selectors {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-.type-selectors select {
-  padding: 4px 6px;
-  font-size: 10px;
-  background: #0b0f14;
-  border: 1px solid #22303d;
-  border-radius: 3px;
-  color: #e8ecef;
-  cursor: pointer;
 }
 
 .playback {
@@ -135,23 +100,27 @@ body {
   border: 1px solid #22303d;
   border-radius: 6px;
   color: #e8ecef;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .playback button.primary {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-  border-color: #60a5fa;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #3b82f6;
 }
 
 .playback button.secondary {
   background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
 }
 
+.playback button:hover {
+  transform: translateY(-1px);
+}
+
 .slider-group {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .slider-group:last-child {
@@ -161,7 +130,7 @@ body {
 .slider-group label {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 11px;
   color: #d1d5db;
   margin-bottom: 4px;
 }
@@ -183,139 +152,112 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
   cursor: pointer;
 }
 
-.color-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.color-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.color-item label {
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-.color-item input[type="color"] {
-  width: 32px;
-  height: 24px;
-  border: 1px solid #22303d;
-  border-radius: 3px;
-  cursor: pointer;
-  background: none;
-}
-
 .metrics-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
 }
 
 .metric {
   background: #0b0f14;
   border-radius: 4px;
-  padding: 8px;
+  padding: 8px 6px;
   text-align: center;
 }
 
 .metric .label {
-  font-size: 10px;
+  font-size: 9px;
   color: #9ca3af;
   margin-bottom: 2px;
 }
 
 .metric .value {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  color: #10b981;
   font-family: 'Courier New', monospace;
 }
 
-.canvas-container {
-  background: #1a1f2e;
-  border: 2px solid #22303d;
-  border-radius: 8px;
-  padding: 16px;
+.metric .value.t1 { color: #3bd5ff; }
+.metric .value.t2 { color: #ffd86a; }
+.metric .value.t3 { color: #ff4b6a; }
+.metric .value.conn { color: #10b981; }
+
+.legend {
   display: flex;
+  gap: 12px;
   justify-content: center;
-  align-items: center;
-  min-height: 400px;
+  flex-wrap: wrap;
 }
 
-canvas {
-  border: 1px solid #22303d;
-  border-radius: 4px;
-}
-
-.canvas-with-rows {
+.legend-item {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 6px;
+  font-size: 10px;
 }
 
-.row-selectors {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.row-selectors select {
-  padding: 2px 4px;
-  font-size: 9px;
-  background: #0b0f14;
-  border: 1px solid #22303d;
-  border-radius: 2px;
-  color: #e8ecef;
-  cursor: pointer;
-  width: 36px;
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
 .info-box {
-  background: rgba(96, 165, 250, 0.1);
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   border-radius: 6px;
-  padding: 12px;
-  font-size: 11px;
-  line-height: 1.6;
+  padding: 10px;
+  font-size: 10px;
+  line-height: 1.5;
   color: #9ca3af;
 }
 
 .info-box strong {
   color: #60a5fa;
 }
+
+.phase-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  background: #0b0f14;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+.phase-arrow {
+  color: #4b5563;
+}
+
+.phase-label {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.phase-label.t1 { background: rgba(59, 213, 255, 0.2); color: #3bd5ff; }
+.phase-label.t2 { background: rgba(255, 216, 106, 0.2); color: #ffd86a; }
+.phase-label.t3 { background: rgba(255, 75, 106, 0.2); color: #ff4b6a; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>ANGEL-1 · MICHRON PHYSICS</h1>
-  <div class="subtitle">Radial Wave Propagation · Torsion-Driven State Transitions · Inner-Rim Mass</div>
+  <h1>ANGEL-1 · CHRONOMIC NETWORK</h1>
+  <div class="subtitle">Hierarchical Torsion Field · T1→4×T2→8×T3 Subdivision · Connection-Based Persistence</div>
 </div>
 
 <div class="main">
   <div class="canvas-section">
-    <div class="panel">
-      <div class="grid-controls">
-        <button onclick="removeColumn()">− Col</button>
-        <span id="colCount">Columns: 12</span>
-        <button onclick="addColumn()">+ Col</button>
-        <button onclick="removeRow()">− Row</button>
-        <span id="rowCount">Rows: 8</span>
-        <button onclick="addRow()">+ Row</button>
-      </div>
-    </div>
-
     <div class="canvas-container">
       <canvas id="canvas"></canvas>
     </div>
@@ -323,464 +265,537 @@ canvas {
 
   <div class="sidebar">
     <div class="panel">
-      <h3>⚡ Control</h3>
+      <h3>Control</h3>
       <div class="playback">
         <button id="pauseBtn" class="primary" onclick="togglePause()">Pause</button>
         <button class="secondary" onclick="reset()">Reset</button>
+        <button class="secondary" onclick="subdivideSelected()">Subdivide</button>
       </div>
     </div>
 
     <div class="panel">
-      <h3>📊 Metrics</h3>
+      <h3>Phase Hierarchy</h3>
+      <div class="phase-diagram">
+        <span class="phase-label t1">T1</span>
+        <span class="phase-arrow">→ 4×</span>
+        <span class="phase-label t2">T2</span>
+        <span class="phase-arrow">→ 2×</span>
+        <span class="phase-label t3">T3</span>
+      </div>
+      <div style="margin-top: 8px; font-size: 10px; color: #6b7280; text-align: center;">
+        Click chronon to select · Subdivide breaks down phase
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Field Metrics</h3>
       <div class="metrics-grid">
         <div class="metric">
-          <div class="label">Time Steps</div>
-          <div class="value" id="metricTime">0</div>
+          <div class="label">T1 (Fluid)</div>
+          <div class="value t1" id="metricT1">0</div>
         </div>
         <div class="metric">
-          <div class="label">Avg Torsion</div>
-          <div class="value" id="metricTorsion">0.00</div>
+          <div class="label">T2 (Meso)</div>
+          <div class="value t2" id="metricT2">0</div>
         </div>
         <div class="metric">
-          <div class="label">T1 Cells</div>
-          <div class="value" id="metricT1" style="color:#3bd5ff;">0</div>
+          <div class="label">T3 (Crystal)</div>
+          <div class="value t3" id="metricT3">0</div>
         </div>
         <div class="metric">
-          <div class="label">T2 Cells</div>
-          <div class="value" id="metricT2" style="color:#ffd86a;">0</div>
+          <div class="label">Total</div>
+          <div class="value conn" id="metricTotal">0</div>
         </div>
         <div class="metric">
-          <div class="label">T3 Cells</div>
-          <div class="value" id="metricT3" style="color:#ff4b6a;">0</div>
+          <div class="label">Connections</div>
+          <div class="value conn" id="metricConn">0</div>
         </div>
         <div class="metric">
-          <div class="label">Transitions</div>
-          <div class="value" id="metricTransitions">0</div>
+          <div class="label">Field Sum</div>
+          <div class="value conn" id="metricSum">0</div>
         </div>
       </div>
     </div>
 
     <div class="panel">
-      <h3>⏱️ Speed</h3>
+      <h3>Dynamics</h3>
       <div class="slider-group">
         <label>
-          <span>Simulation Speed</span>
-          <span class="value" id="speedVal">1.0x</span>
+          <span>Connection Decay</span>
+          <span class="value" id="decayVal">0.02</span>
         </label>
-        <input type="range" id="speed" min="0.25" max="4" step="0.25" value="1" oninput="updateSpeed()">
+        <input type="range" id="decay" min="0" max="0.1" step="0.005" value="0.02" oninput="updateDecay()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Subdivision Threshold</span>
+          <span class="value" id="subThreshVal">0.70</span>
+        </label>
+        <input type="range" id="subThresh" min="0.3" max="0.9" step="0.05" value="0.7" oninput="updateSubThresh()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Wave Speed</span>
+          <span class="value" id="waveSpeedVal">1.0</span>
+        </label>
+        <input type="range" id="waveSpeed" min="0.2" max="3" step="0.1" value="1" oninput="updateWaveSpeed()">
       </div>
     </div>
 
     <div class="panel">
-      <h3>🌊 Wave Dynamics</h3>
+      <h3>Mass-Radiance</h3>
       <div class="slider-group">
         <label>
-          <span>Wave Frequency</span>
-          <span class="value" id="waveFreqVal">0.90</span>
+          <span>Complementarity (C)</span>
+          <span class="value" id="compVal">0.50</span>
         </label>
-        <input type="range" id="waveFreq" min="0.3" max="2.0" step="0.1" value="0.9" oninput="updateWaveFreq()">
+        <input type="range" id="comp" min="0" max="1" step="0.05" value="0.5" oninput="updateComp()">
       </div>
-      <div class="slider-group">
-        <label>
-          <span>Swirl Factor</span>
-          <span class="value" id="swirlVal">0.30</span>
-        </label>
-        <input type="range" id="swirl" min="0" max="1" step="0.05" value="0.3" oninput="updateSwirl()">
-      </div>
-      <div class="slider-group">
-        <label>
-          <span>Jitter</span>
-          <span class="value" id="jitterVal">0.20</span>
-        </label>
-        <input type="range" id="jitter" min="0" max="0.5" step="0.05" value="0.2" oninput="updateJitter()">
+      <div style="font-size: 10px; color: #6b7280; margin-top: 6px;">
+        C→0: Mass dominant (slow, contracted)<br>
+        C→1: Radiance dominant (fast, expanded)
       </div>
     </div>
 
     <div class="panel">
-      <h3>🌀 Torsion Thresholds</h3>
-      <div class="slider-group">
-        <label>
-          <span>T1↔T2 Threshold</span>
-          <span class="value" id="t12Val">0.50</span>
-        </label>
-        <input type="range" id="t12" min="0.2" max="0.6" step="0.05" value="0.5" oninput="updateT12()">
-      </div>
-      <div class="slider-group">
-        <label>
-          <span>T2↔T3 Threshold</span>
-          <span class="value" id="t23Val">0.70</span>
-        </label>
-        <input type="range" id="t23" min="0.5" max="0.9" step="0.05" value="0.7" oninput="updateT23()">
-      </div>
-    </div>
-
-    <div class="panel">
-      <h3>🔧 Girth</h3>
-      <div class="slider-group">
-        <label>
-          <span>Master Girth</span>
-          <span class="value" id="girthVal">1.0x</span>
-        </label>
-        <input type="range" id="girth" min="0.5" max="2" step="0.1" value="1" oninput="updateGirth()">
+      <h3>Legend</h3>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background: #3bd5ff;"></div>
+          <span>T1 Fluid</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background: #ffd86a;"></div>
+          <span>T2 Meso</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background: #ff4b6a;"></div>
+          <span>T3 Crystal</span>
+        </div>
       </div>
     </div>
 
     <div class="info-box">
-      <strong>Wave Mechanics (Agent 1):</strong><br>
-      • Radial wave expands from center<br>
-      • Swirl adds rotational component<br>
-      • Torsion = wave + swirl + neighbors<br><br>
-      <strong>State Transitions:</strong><br>
-      T1 (radiant): torsion &lt; 0.50<br>
-      T2 (EM): 0.50 ≤ torsion &lt; 0.70<br>
-      T3 (mass): torsion ≥ 0.70
+      <strong>Chronomic Network (CHR Theory):</strong><br>
+      • T1: Fluid phase, largest tori, radiant<br>
+      • T2: Mesophase, 4× smaller, EM domain<br>
+      • T3: Crystalline, 8× smaller, mass-locked<br>
+      • Isolated chronons decay (Connection Axiom)<br>
+      • Field sum stored in connection weights<br><br>
+      <strong>Controls:</strong> Click to select, Subdivide to break down
     </div>
   </div>
 </div>
 
 <script>
-// === CONFIGURATION ===
-let COLS = 12;
-let ROWS = 8;
-const CELL_SIZE = 40;
-
-// T-Class specifications
-const T_SPECS = {
-  T1: { 
-    girth: 0.25, 
-    mass: 0.33,
-    torsion: 0.2,
-    color: '#3bd5ff'   // cyan - radiant
-  },
-  T2: { 
-    girth: 0.45, 
-    mass: 0.50,
-    torsion: 0.55,
-    color: '#ffd86a'   // gold - EM mesophase
-  },
-  T3: { 
-    girth: 0.65, 
-    mass: 0.90,
-    torsion: 0.85,
-    color: '#ff4b6a'   // red - mass-locked
-  }
-};
-
-// === STATE ===
-let isPaused = false;
-let steps = 0;
-let totalTransitions = 0;
-
-// Per-cell state
-let cells = [];
-
-// Parameters
-let simSpeed = 1.0;
-let waveFreq = 0.9;
-let swirlFactor = 0.3;
-let jitter = 0.2;
-let t12Threshold = 0.5;
-let t23Threshold = 0.7;
-let girthMult = 1.0;
-
-// Colors
-const BG_COLOR = '#0b0f14';
-const GRID_COLOR = '#182034';
-const MASS_COLOR = '#1a1a1a';
-const RADIANCE_COLOR = '#e8e8e8';
+// === CHRONOMIC NETWORK SIMULATION ===
+// Based on CHR Theory: Temporal Primacy framework
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+// Size ratios based on theory: T1 → 4×T2 → 8×T3
+const PHASE_CONFIG = {
+  T1: {
+    sizeRatio: 1.0,      // Base size
+    massQuotient: 0.33,  // Low mass
+    speed: 1.0,          // Fast
+    color: '#3bd5ff',    // Cyan - radiant
+    subdivides: 4        // Becomes 4 T2s
+  },
+  T2: {
+    sizeRatio: 0.5,      // Half size
+    massQuotient: 0.55,  // Medium mass
+    speed: 0.6,          // Medium
+    color: '#ffd86a',    // Gold - EM mesophase
+    subdivides: 2        // Becomes 2 T3s
+  },
+  T3: {
+    sizeRatio: 0.35,     // Smallest
+    massQuotient: 0.90,  // High mass
+    speed: 0.25,         // Slowest
+    color: '#ff4b6a',    // Red - mass-locked
+    subdivides: 0        // Cannot subdivide further
+  }
+};
+
+// Parameters
+let decayRate = 0.02;
+let subdivisionThreshold = 0.7;
+let waveSpeed = 1.0;
+let globalComplementarity = 0.5;
+
+// State
+let chronons = [];
+let selectedChronon = null;
+let isPaused = false;
+let fieldSum = 0;  // Accumulated field memory
 let lastTime = null;
 
-// === CELL CLASS ===
-class Cell {
-  constructor(x, y) {
+// Chronon class - represents a single temporal unit
+class Chronon {
+  constructor(x, y, phase = 'T1', parent = null) {
+    this.id = Math.random().toString(36).substr(2, 9);
     this.x = x;
     this.y = y;
-    this.state = 'T1';
-    this.phase = Math.random() * Math.PI * 2;
-    this.torsion = T_SPECS.T1.torsion;
-    this.localTorsion = 0;  // computed each frame
-    this.wave = 0;
-    this.swirl = 0;
-  }
-  
-  get spec() {
-    return T_SPECS[this.state];
-  }
-  
-  // Distance and angle from center
-  get dx() { return this.x - (COLS - 1) / 2; }
-  get dy() { return this.y - (ROWS - 1) / 2; }
-  get r() { return Math.sqrt(this.dx * this.dx + this.dy * this.dy); }
-  get angle() { return Math.atan2(this.dy, this.dx); }
-}
+    this.phase = phase;
+    this.parent = parent;
+    this.children = [];
 
-// === INITIALIZATION ===
-function init() {
-  cells = [];
-  
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLS; x++) {
-      cells.push(new Cell(x, y));
+    // 9D state space (simplified to key parameters)
+    this.theta = Math.random() * Math.PI * 2;      // Rotation phase
+    this.chi = Math.random() > 0.5 ? 1 : -1;       // Chirality
+    this.R = PHASE_CONFIG[phase].sizeRatio;        // Girth
+    this.C = globalComplementarity;                 // Complementarity
+    this.omega = PHASE_CONFIG[phase].speed;        // Angular frequency
+
+    // Connection and persistence
+    this.connectionWeight = 1.0;  // Starts fully connected
+    this.neighbors = [];
+    this.torsion = 0;
+    this.accumulatedTorsion = 0;  // Memory of field history
+
+    // Visual
+    this.pulsePhase = Math.random() * Math.PI * 2;
+  }
+
+  get config() {
+    return PHASE_CONFIG[this.phase];
+  }
+
+  get baseSize() {
+    return 50 * this.config.sizeRatio;
+  }
+
+  // Update chronon state
+  update(dt) {
+    if (isPaused) return;
+
+    const speed = this.omega * waveSpeed;
+
+    // Advance rotation
+    this.theta += dt * speed * 2;
+    this.pulsePhase += dt * speed * 3;
+
+    // Calculate local torsion from neighbors
+    let neighborTorsion = 0;
+    let higherPhaseNeighbors = 0;
+
+    for (const neighbor of this.neighbors) {
+      const phaseDiff = Math.abs(this.theta - neighbor.theta);
+      neighborTorsion += Math.sin(phaseDiff) * neighbor.connectionWeight;
+
+      if (this.getPhaseOrder(neighbor.phase) > this.getPhaseOrder(this.phase)) {
+        higherPhaseNeighbors++;
+      }
     }
-  }
-  
-  canvas.width = COLS * CELL_SIZE;
-  canvas.height = ROWS * CELL_SIZE;
-  
-  steps = 0;
-  totalTransitions = 0;
-  lastTime = null;
-  
-  draw();
-}
 
-// === GRID CONTROLS ===
-function addColumn() {
-  if (COLS < 20) { COLS++; init(); }
-}
-function removeColumn() {
-  if (COLS > 6) { COLS--; init(); }
-}
-function addRow() {
-  if (ROWS < 14) { ROWS++; init(); }
-}
-function removeRow() {
-  if (ROWS > 4) { ROWS--; init(); }
-}
-
-// === GET NEIGHBORS ===
-function getNeighbors(cell) {
-  const neighbors = [];
-  const coords = [
-    [cell.x - 1, cell.y],
-    [cell.x + 1, cell.y],
-    [cell.x, cell.y - 1],
-    [cell.x, cell.y + 1]
-  ];
-  
-  for (const [nx, ny] of coords) {
-    if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS) {
-      neighbors.push(cells[ny * COLS + nx]);
+    if (this.neighbors.length > 0) {
+      neighborTorsion /= this.neighbors.length;
     }
-  }
-  
-  return neighbors;
-}
 
-// === EVOLUTION (from Agent 1) ===
-function evolve(dt) {
-  let transitionsThisFrame = 0;
-  
-  // First pass: compute local torsion for each cell
-  for (const cell of cells) {
-    // Radial wave: expanding from center
-    cell.wave = Math.sin(cell.r * waveFreq - cell.phase) * 0.5 + 0.5;
-    
-    // Swirl: rotational component
-    cell.swirl = Math.sin(cell.angle + cell.phase * swirlFactor) * 0.5 + 0.5;
-    
-    // Neighbor influence
-    const neighbors = getNeighbors(cell);
-    let higherNeighbors = 0;
-    for (const n of neighbors) {
-      if (n.state === 'T2' || n.state === 'T3') higherNeighbors++;
-    }
-    const neighborInfluence = higherNeighbors / Math.max(1, neighbors.length);
-    
-    // Noise
-    const noise = (Math.random() - 0.5) * jitter;
-    
-    // Combined local torsion
-    cell.localTorsion = 0.5 * cell.wave + 0.3 * cell.swirl + 0.4 * neighborInfluence + noise;
-    cell.localTorsion = Math.max(0, Math.min(1, cell.localTorsion));
-  }
-  
-  // Second pass: state transitions based on torsion
-  for (const cell of cells) {
-    const oldState = cell.state;
-    
-    if (cell.localTorsion >= t23Threshold) {
-      cell.state = 'T3';
-    } else if (cell.localTorsion >= t12Threshold) {
-      cell.state = 'T2';
+    // Torsion combines self-rotation, neighbor influence, and chirality
+    this.torsion = 0.5 + 0.3 * Math.sin(this.theta) + 0.2 * neighborTorsion;
+    this.torsion *= (1 + 0.1 * this.chi);
+    this.torsion = Math.max(0, Math.min(1, this.torsion));
+
+    // Accumulate torsion (field memory)
+    this.accumulatedTorsion += this.torsion * dt * 0.1;
+
+    // Connection decay (Connection Axiom: isolated chronons decay)
+    if (this.neighbors.length === 0) {
+      this.connectionWeight -= decayRate * dt * 10;
     } else {
-      cell.state = 'T1';
+      // Strengthen connections with active neighbors
+      const avgNeighborConnection = this.neighbors.reduce((sum, n) => sum + n.connectionWeight, 0) / this.neighbors.length;
+      this.connectionWeight += (avgNeighborConnection - this.connectionWeight) * dt * 0.5;
     }
-    
-    if (cell.state !== oldState) {
-      transitionsThisFrame++;
+
+    this.connectionWeight = Math.max(0, Math.min(1, this.connectionWeight));
+
+    // Auto-subdivision when torsion exceeds threshold
+    if (this.torsion > subdivisionThreshold && this.config.subdivides > 0 && this.children.length === 0) {
+      // Mark for subdivision (handled in main loop to avoid mutation during iteration)
+      this.shouldSubdivide = true;
     }
-    
-    cell.torsion = T_SPECS[cell.state].torsion;
-    
-    // Advance phase (controls wave speed)
-    cell.phase += dt * 2.0;
   }
-  
-  totalTransitions += transitionsThisFrame;
-  steps++;
+
+  getPhaseOrder(phase) {
+    return { 'T1': 0, 'T2': 1, 'T3': 2 }[phase];
+  }
+
+  // Subdivide into smaller chronons
+  subdivide() {
+    if (this.config.subdivides === 0) return [];
+
+    const nextPhase = this.phase === 'T1' ? 'T2' : 'T3';
+    const count = this.config.subdivides;
+    const childSize = PHASE_CONFIG[nextPhase].sizeRatio * 50;
+    const spread = this.baseSize * 0.4;
+
+    const newChronons = [];
+
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + this.theta;
+      const offsetX = Math.cos(angle) * spread;
+      const offsetY = Math.sin(angle) * spread;
+
+      const child = new Chronon(
+        this.x + offsetX,
+        this.y + offsetY,
+        nextPhase,
+        this
+      );
+
+      // Inherit some properties
+      child.chi = this.chi * (i % 2 === 0 ? 1 : -1);
+      child.accumulatedTorsion = this.accumulatedTorsion / count;
+      child.connectionWeight = this.connectionWeight * 0.8;
+
+      this.children.push(child);
+      newChronons.push(child);
+    }
+
+    return newChronons;
+  }
+
+  // Draw the chronon
+  draw(ctx, isSelected = false) {
+    const size = this.baseSize;
+    const pulse = 1 + 0.1 * Math.sin(this.pulsePhase);
+    const alpha = 0.3 + 0.7 * this.connectionWeight;
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.theta * 0.5);
+
+    // Outer glow based on connection weight
+    if (this.connectionWeight > 0.3) {
+      const gradient = ctx.createRadialGradient(0, 0, size * 0.3, 0, 0, size * pulse);
+      gradient.addColorStop(0, this.config.color + '40');
+      gradient.addColorStop(1, this.config.color + '00');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(0, 0, size * pulse, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Main torus (as washer shape)
+    const outerR = size * 0.8 * pulse;
+    const innerR = size * 0.3 * pulse;
+    const massAngle = this.config.massQuotient * Math.PI * 2;
+
+    // Radiance ring (white/colored)
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(0, 0, outerR, 0, Math.PI * 2);
+    ctx.arc(0, 0, innerR, Math.PI * 2, 0, true);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255, 255, 255, ${0.6 + 0.4 * this.C})`;
+    ctx.fill();
+
+    // Colored edge
+    ctx.strokeStyle = this.config.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Mass region (dark) - size based on mass quotient
+    const massR = innerR + (outerR - innerR) * this.config.massQuotient * 0.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, massR, -massAngle/2, massAngle/2);
+    ctx.arc(0, 0, innerR, massAngle/2, -massAngle/2, true);
+    ctx.closePath();
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fill();
+
+    // Torsion indicator (inner glow intensity)
+    if (this.torsion > 0.5) {
+      ctx.beginPath();
+      ctx.arc(0, 0, innerR * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = this.config.color + Math.floor(this.torsion * 80).toString(16).padStart(2, '0');
+      ctx.fill();
+    }
+
+    // Selection indicator
+    if (isSelected) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.arc(0, 0, outerR + 8, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.restore();
+
+    // Draw connections to neighbors
+    ctx.globalAlpha = 0.15 * this.connectionWeight;
+    ctx.strokeStyle = this.config.color;
+    ctx.lineWidth = 1;
+    for (const neighbor of this.neighbors) {
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(neighbor.x, neighbor.y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Check if point is inside this chronon
+  containsPoint(px, py) {
+    const dx = px - this.x;
+    const dy = py - this.y;
+    return Math.sqrt(dx*dx + dy*dy) < this.baseSize;
+  }
 }
 
-// === DRAWING ===
-function drawCell(cell) {
-  const cx = cell.x * CELL_SIZE + CELL_SIZE / 2;
-  const cy = cell.y * CELL_SIZE + CELL_SIZE / 2;
-  const spec = cell.spec;
-  
-  // Pulse based on wave (breathing effect)
-  const pulse = 1 + 0.15 * Math.sin(cell.phase);
-  
-  // Washer dimensions
-  const majorR = CELL_SIZE * 0.42 * pulse;
-  const girth = spec.girth * girthMult * CELL_SIZE * 0.25;
-  const minorR = Math.max(3, majorR - girth);
-  
-  // Rotation follows the swirl
-  const rotation = cell.angle + cell.phase * swirlFactor * 0.5;
-  
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(rotation);
-  
-  // Tube thickness
-  const tubeThickness = majorR - minorR;
-  
-  // Mass creep based on torsion (higher torsion = more creep)
-  const creepAmount = cell.localTorsion * 0.4;
-  const massThickness = tubeThickness * (0.25 + creepAmount * spec.mass);
-  const massOuterR = minorR + massThickness;
-  
-  // Angular extent of mass on inner rim
-  const massAngle = spec.mass * 360;
-  const massStart = 90 - massAngle / 2;
-  const massEnd = 90 + massAngle / 2;
-  
-  // Draw radiance (outer ring) - with state color tint
-  ctx.beginPath();
-  ctx.arc(0, 0, majorR, 0, Math.PI * 2);
-  ctx.arc(0, 0, minorR, Math.PI * 2, 0, true);
-  ctx.closePath();
-  
-  // Blend white with state color based on wave
-  const alpha = 0.7 + cell.wave * 0.3;
-  ctx.fillStyle = RADIANCE_COLOR;
-  ctx.globalAlpha = alpha;
-  ctx.fill();
-  ctx.globalAlpha = 1.0;
-  
-  // State color glow on outer edge
-  ctx.strokeStyle = spec.color;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  
-  // Draw mass (black) on inner rim
-  ctx.beginPath();
-  ctx.arc(0, 0, massOuterR, massStart * Math.PI / 180, massEnd * Math.PI / 180);
-  ctx.arc(0, 0, minorR, massEnd * Math.PI / 180, massStart * Math.PI / 180, true);
-  ctx.closePath();
-  ctx.fillStyle = MASS_COLOR;
-  ctx.fill();
-  
-  // Creep tendrils
-  if (creepAmount > 0.1) {
-    const tendrilWidth = 10 * Math.PI / 180;
-    const tendrilHeight = tubeThickness * creepAmount * 1.2;
-    
-    // Left tendril
-    ctx.beginPath();
-    ctx.arc(0, 0, minorR + tendrilHeight, 
-            (massStart - tendrilWidth) * Math.PI / 180, 
-            massStart * Math.PI / 180);
-    ctx.arc(0, 0, minorR, 
-            massStart * Math.PI / 180, 
-            (massStart - tendrilWidth) * Math.PI / 180, true);
-    ctx.closePath();
-    ctx.fill();
-    
-    // Right tendril
-    ctx.beginPath();
-    ctx.arc(0, 0, minorR + tendrilHeight, 
-            massEnd * Math.PI / 180, 
-            (massEnd + tendrilWidth) * Math.PI / 180);
-    ctx.arc(0, 0, minorR, 
-            (massEnd + tendrilWidth) * Math.PI / 180, 
-            massEnd * Math.PI / 180, true);
-    ctx.closePath();
-    ctx.fill();
+// Initialize simulation
+function init() {
+  canvas.width = canvas.parentElement.clientWidth - 4;
+  canvas.height = canvas.parentElement.clientHeight - 4;
+
+  chronons = [];
+  selectedChronon = null;
+  fieldSum = 0;
+
+  // Create initial T1 chronons in a grid
+  const cols = 4;
+  const rows = 3;
+  const spacing = 120;
+  const offsetX = (canvas.width - (cols - 1) * spacing) / 2;
+  const offsetY = (canvas.height - (rows - 1) * spacing) / 2;
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const chronon = new Chronon(
+        offsetX + x * spacing,
+        offsetY + y * spacing,
+        'T1'
+      );
+      chronons.push(chronon);
+    }
   }
-  
-  // Inner rim highlight with state color
-  ctx.beginPath();
-  ctx.arc(0, 0, minorR, 0, Math.PI * 2);
-  ctx.strokeStyle = spec.color;
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.5;
-  ctx.stroke();
-  ctx.globalAlpha = 1.0;
-  
-  ctx.restore();
+
+  updateNeighbors();
+  lastTime = null;
 }
 
+// Update neighbor connections
+function updateNeighbors() {
+  const connectionDistance = 150;
+
+  for (const c of chronons) {
+    c.neighbors = [];
+    for (const other of chronons) {
+      if (c === other) continue;
+      const dx = c.x - other.x;
+      const dy = c.y - other.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      // Connection distance scales with phase
+      const maxDist = connectionDistance * (c.config.sizeRatio + other.config.sizeRatio) / 2;
+      if (dist < maxDist) {
+        c.neighbors.push(other);
+      }
+    }
+  }
+}
+
+// Main update loop
+function update(dt) {
+  if (isPaused) return;
+
+  // Update all chronons
+  for (const c of chronons) {
+    c.update(dt);
+  }
+
+  // Handle subdivisions
+  const toSubdivide = chronons.filter(c => c.shouldSubdivide);
+  for (const c of toSubdivide) {
+    c.shouldSubdivide = false;
+    const newChronons = c.subdivide();
+    chronons.push(...newChronons);
+
+    // Remove parent from active list (but keep reference)
+    const idx = chronons.indexOf(c);
+    if (idx > -1) {
+      chronons.splice(idx, 1);
+    }
+  }
+
+  // Remove decayed chronons
+  chronons = chronons.filter(c => c.connectionWeight > 0.05);
+
+  // Update neighbors if topology changed
+  if (toSubdivide.length > 0) {
+    updateNeighbors();
+  }
+
+  // Calculate field sum (memory)
+  fieldSum = chronons.reduce((sum, c) => sum + c.accumulatedTorsion * c.connectionWeight, 0);
+}
+
+// Draw everything
 function draw() {
-  // Clear
-  ctx.fillStyle = BG_COLOR;
+  ctx.fillStyle = '#0a0c10';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // Grid lines
-  ctx.strokeStyle = GRID_COLOR;
+
+  // Draw grid
+  ctx.strokeStyle = '#1a1f2e';
   ctx.lineWidth = 1;
-  
-  for (let x = 0; x <= COLS; x++) {
+  const gridSize = 60;
+  for (let x = 0; x < canvas.width; x += gridSize) {
     ctx.beginPath();
-    ctx.moveTo(x * CELL_SIZE + 0.5, 0);
-    ctx.lineTo(x * CELL_SIZE + 0.5, canvas.height);
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
     ctx.stroke();
   }
-  
-  for (let y = 0; y <= ROWS; y++) {
+  for (let y = 0; y < canvas.height; y += gridSize) {
     ctx.beginPath();
-    ctx.moveTo(0, y * CELL_SIZE + 0.5);
-    ctx.lineTo(canvas.width, y * CELL_SIZE + 0.5);
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
     ctx.stroke();
   }
-  
-  // Draw cells
-  for (const cell of cells) {
-    drawCell(cell);
+
+  // Sort by phase for layering (T3 on top)
+  const sorted = [...chronons].sort((a, b) =>
+    a.getPhaseOrder(a.phase) - b.getPhaseOrder(b.phase)
+  );
+
+  // Draw chronons
+  for (const c of sorted) {
+    c.draw(ctx, c === selectedChronon);
   }
-  
-  updateMetrics();
+
+  // Update metrics
+  const t1Count = chronons.filter(c => c.phase === 'T1').length;
+  const t2Count = chronons.filter(c => c.phase === 'T2').length;
+  const t3Count = chronons.filter(c => c.phase === 'T3').length;
+  const totalConnections = chronons.reduce((sum, c) => sum + c.neighbors.length, 0) / 2;
+
+  document.getElementById('metricT1').textContent = t1Count;
+  document.getElementById('metricT2').textContent = t2Count;
+  document.getElementById('metricT3').textContent = t3Count;
+  document.getElementById('metricTotal').textContent = chronons.length;
+  document.getElementById('metricConn').textContent = Math.floor(totalConnections);
+  document.getElementById('metricSum').textContent = fieldSum.toFixed(1);
 }
 
-function updateMetrics() {
-  document.getElementById('metricTime').textContent = steps;
-  
-  // Average torsion
-  const avgTorsion = cells.reduce((sum, c) => sum + c.localTorsion, 0) / cells.length;
-  document.getElementById('metricTorsion').textContent = avgTorsion.toFixed(2);
-  
-  // Count states
-  let t1 = 0, t2 = 0, t3 = 0;
-  for (const cell of cells) {
-    if (cell.state === 'T1') t1++;
-    else if (cell.state === 'T2') t2++;
-    else t3++;
-  }
-  
-  document.getElementById('metricT1').textContent = t1;
-  document.getElementById('metricT2').textContent = t2;
-  document.getElementById('metricT3').textContent = t3;
-  document.getElementById('metricTransitions').textContent = totalTransitions;
-  
-  document.getElementById('colCount').textContent = `Columns: ${COLS}`;
-  document.getElementById('rowCount').textContent = `Rows: ${ROWS}`;
+// Animation loop
+function animate(timestamp) {
+  if (lastTime === null) lastTime = timestamp;
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+  lastTime = timestamp;
+
+  update(dt);
+  draw();
+
+  requestAnimationFrame(animate);
 }
 
-// === UI CONTROLS ===
+// UI Controls
 function togglePause() {
   isPaused = !isPaused;
   document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
@@ -790,56 +805,66 @@ function reset() {
   init();
 }
 
-function updateSpeed() {
-  simSpeed = parseFloat(document.getElementById('speed').value);
-  document.getElementById('speedVal').textContent = simSpeed.toFixed(2) + 'x';
-}
+function subdivideSelected() {
+  if (selectedChronon && selectedChronon.config.subdivides > 0) {
+    const newChronons = selectedChronon.subdivide();
+    chronons.push(...newChronons);
 
-function updateWaveFreq() {
-  waveFreq = parseFloat(document.getElementById('waveFreq').value);
-  document.getElementById('waveFreqVal').textContent = waveFreq.toFixed(2);
-}
+    const idx = chronons.indexOf(selectedChronon);
+    if (idx > -1) {
+      chronons.splice(idx, 1);
+    }
 
-function updateSwirl() {
-  swirlFactor = parseFloat(document.getElementById('swirl').value);
-  document.getElementById('swirlVal').textContent = swirlFactor.toFixed(2);
-}
-
-function updateJitter() {
-  jitter = parseFloat(document.getElementById('jitter').value);
-  document.getElementById('jitterVal').textContent = jitter.toFixed(2);
-}
-
-function updateT12() {
-  t12Threshold = parseFloat(document.getElementById('t12').value);
-  document.getElementById('t12Val').textContent = t12Threshold.toFixed(2);
-}
-
-function updateT23() {
-  t23Threshold = parseFloat(document.getElementById('t23').value);
-  document.getElementById('t23Val').textContent = t23Threshold.toFixed(2);
-}
-
-function updateGirth() {
-  girthMult = parseFloat(document.getElementById('girth').value);
-  document.getElementById('girthVal').textContent = girthMult.toFixed(1) + 'x';
-}
-
-// === ANIMATION LOOP ===
-function animate(timestamp) {
-  if (lastTime === null) lastTime = timestamp;
-  const dt = (timestamp - lastTime) / 1000;
-  lastTime = timestamp;
-  
-  if (!isPaused) {
-    evolve(dt * simSpeed);
+    selectedChronon = null;
+    updateNeighbors();
   }
-  
-  draw();
-  requestAnimationFrame(animate);
 }
 
-// === START ===
+function updateDecay() {
+  decayRate = parseFloat(document.getElementById('decay').value);
+  document.getElementById('decayVal').textContent = decayRate.toFixed(3);
+}
+
+function updateSubThresh() {
+  subdivisionThreshold = parseFloat(document.getElementById('subThresh').value);
+  document.getElementById('subThreshVal').textContent = subdivisionThreshold.toFixed(2);
+}
+
+function updateWaveSpeed() {
+  waveSpeed = parseFloat(document.getElementById('waveSpeed').value);
+  document.getElementById('waveSpeedVal').textContent = waveSpeed.toFixed(1);
+}
+
+function updateComp() {
+  globalComplementarity = parseFloat(document.getElementById('comp').value);
+  document.getElementById('compVal').textContent = globalComplementarity.toFixed(2);
+  for (const c of chronons) {
+    c.C = globalComplementarity;
+  }
+}
+
+// Mouse interaction
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  selectedChronon = null;
+  for (const c of chronons) {
+    if (c.containsPoint(x, y)) {
+      selectedChronon = c;
+      break;
+    }
+  }
+});
+
+// Handle resize
+window.addEventListener('resize', () => {
+  canvas.width = canvas.parentElement.clientWidth - 4;
+  canvas.height = canvas.parentElement.clientHeight - 4;
+});
+
+// Start
 init();
 requestAnimationFrame(animate);
 </script>
