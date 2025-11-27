@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANGEL-1 · Michron Physics · Sound</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.simulator-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.canvas-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#canvas {
+  border: 2px solid #22303d;
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.grid-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.grid-controls button {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
+  border: 1px solid #22303d;
+  border-radius: 4px;
+  color: #e8ecef;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grid-controls button:hover {
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+}
+
+.grid-controls span {
+  color: #60a5fa;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
+}
+
+.playback {
+  display: flex;
+  gap: 8px;
+}
+
+.playback button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #22303d;
+  border-radius: 6px;
+  color: #e8ecef;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.playback button.primary {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border-color: #60a5fa;
+}
+
+.playback button.secondary {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f2e 100%);
+}
+
+.playback button.sound-on {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+}
+
+.slider-group {
+  margin-bottom: 12px;
+}
+
+.slider-group:last-child {
+  margin-bottom: 0;
+}
+
+.slider-group label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #d1d5db;
+  margin-bottom: 4px;
+}
+
+.slider-group .value {
+  color: #60a5fa;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #0b0f14;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
+  cursor: pointer;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.metric {
+  background: #0b0f14;
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+}
+
+.metric .label {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-bottom: 2px;
+}
+
+.metric .value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #10b981;
+  font-family: 'Courier New', monospace;
+}
+
+.sound-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #10b981;
+}
+
+.sound-indicator.off {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+@media (max-width: 600px) {
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-controls span {
+    min-width: 60px;
+    font-size: 11px;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">MICHRON PHYSICS</div>
+  <div class="nav-links">
+    <a href="index.html">Simulator</a>
+    <a href="chronos.html">Chronos</a>
+  </div>
+</nav>
+
+<div class="simulator-container">
+  
+  <!-- Grid Size Controls -->
+  <div class="grid-controls">
+    <button onclick="removeColumn()">− Col</button>
+    <span id="colCount">12</span>
+    <button onclick="addColumn()">+ Col</button>
+    <button onclick="removeRow()">− Row</button>
+    <span id="rowCount">8</span>
+    <button onclick="addRow()">+ Row</button>
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-wrapper">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Controls Below -->
+  <div class="controls-grid">
+    
+    <!-- Control Panel -->
+    <div class="panel">
+      <h3>⚡ Control</h3>
+      <div class="playback">
+        <button id="pauseBtn" class="primary" onclick="togglePause()">Pause</button>
+        <button class="secondary" onclick="reset()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Sound Control -->
+    <div class="panel">
+      <h3>🔊 Sound</h3>
+      <div class="playback">
+        <button id="soundBtn" class="secondary" onclick="toggleSound()">Enable Sound</button>
+      </div>
+      <div class="sound-indicator off" id="soundIndicator" style="margin-top: 12px;">
+        <span>🔇 Sound Off</span>
+      </div>
+      <div class="slider-group" style="margin-top: 12px;">
+        <label>
+          <span>Master Volume</span>
+          <span class="value" id="volumeVal">50%</span>
+        </label>
+        <input type="range" id="volume" min="0" max="100" step="5" value="50" oninput="updateVolume()">
+      </div>
+    </div>
+
+    <!-- Metrics Panel -->
+    <div class="panel">
+      <h3>📊 Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="label">Steps</div>
+          <div class="value" id="metricTime">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Torsion</div>
+          <div class="value" id="metricTorsion">0.00</div>
+        </div>
+        <div class="metric">
+          <div class="label">Transitions</div>
+          <div class="value" id="metricTransitions">0</div>
+        </div>
+        <div class="metric">
+          <div class="label" style="color:#3bd5ff;">T1</div>
+          <div class="value" id="metricT1" style="color:#3bd5ff;">0</div>
+        </div>
+        <div class="metric">
+          <div class="label" style="color:#ffd86a;">T2</div>
+          <div class="value" id="metricT2" style="color:#ffd86a;">0</div>
+        </div>
+        <div class="metric">
+          <div class="label" style="color:#ff4b6a;">T3</div>
+          <div class="value" id="metricT3" style="color:#ff4b6a;">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Speed Panel -->
+    <div class="panel">
+      <h3>⏱️ Speed</h3>
+      <div class="slider-group">
+        <label>
+          <span>Simulation Speed</span>
+          <span class="value" id="speedVal">1.0x</span>
+        </label>
+        <input type="range" id="speed" min="0.25" max="4" step="0.25" value="1" oninput="updateSpeed()">
+      </div>
+    </div>
+
+    <!-- Wave Dynamics Panel -->
+    <div class="panel">
+      <h3>🌊 Wave Dynamics</h3>
+      <div class="slider-group">
+        <label>
+          <span>Wave Frequency</span>
+          <span class="value" id="waveFreqVal">0.90</span>
+        </label>
+        <input type="range" id="waveFreq" min="0.3" max="2.0" step="0.1" value="0.9" oninput="updateWaveFreq()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Swirl Factor</span>
+          <span class="value" id="swirlVal">0.30</span>
+        </label>
+        <input type="range" id="swirl" min="0" max="1" step="0.05" value="0.3" oninput="updateSwirl()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Jitter</span>
+          <span class="value" id="jitterVal">0.20</span>
+        </label>
+        <input type="range" id="jitter" min="0" max="0.5" step="0.05" value="0.2" oninput="updateJitter()">
+      </div>
+    </div>
+
+    <!-- Sound Tuning Panel -->
+    <div class="panel">
+      <h3>🎵 Sound Tuning</h3>
+      <div class="slider-group">
+        <label>
+          <span>Base Frequency (Hz)</span>
+          <span class="value" id="baseFreqVal">110</span>
+        </label>
+        <input type="range" id="baseFreq" min="55" max="220" step="5" value="110" oninput="updateBaseFreq()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Drone Mix</span>
+          <span class="value" id="droneMixVal">30%</span>
+        </label>
+        <input type="range" id="droneMix" min="0" max="100" step="5" value="30" oninput="updateDroneMix()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Transition Chime</span>
+          <span class="value" id="chimeVal">50%</span>
+        </label>
+        <input type="range" id="chime" min="0" max="100" step="5" value="50" oninput="updateChime()">
+      </div>
+    </div>
+
+    <!-- Torsion Thresholds Panel -->
+    <div class="panel">
+      <h3>🌀 Torsion Thresholds</h3>
+      <div class="slider-group">
+        <label>
+          <span>T1↔T2</span>
+          <span class="value" id="t12Val">0.50</span>
+        </label>
+        <input type="range" id="t12" min="0.2" max="0.6" step="0.05" value="0.5" oninput="updateT12()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>T2↔T3</span>
+          <span class="value" id="t23Val">0.70</span>
+        </label>
+        <input type="range" id="t23" min="0.5" max="0.9" step="0.05" value="0.7" oninput="updateT23()">
+      </div>
+    </div>
+
+    <!-- Girth Panel -->
+    <div class="panel">
+      <h3>🔧 Girth</h3>
+      <div class="slider-group">
+        <label>
+          <span>Master Girth</span>
+          <span class="value" id="girthVal">1.0x</span>
+        </label>
+        <input type="range" id="girth" min="0.5" max="2" step="0.1" value="1" oninput="updateGirth()">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// === CONFIGURATION ===
+let COLS = 12;
+let ROWS = 8;
+let CELL_SIZE = 40;
+
+function calculateCellSize() {
+  const maxWidth = Math.min(window.innerWidth - 40, 1000);
+  const maxHeight = window.innerHeight * 0.45;
+  const sizeByWidth = Math.floor(maxWidth / COLS);
+  const sizeByHeight = Math.floor(maxHeight / ROWS);
+  CELL_SIZE = Math.min(sizeByWidth, sizeByHeight, 50);
+  CELL_SIZE = Math.max(CELL_SIZE, 24);
+}
+
+const T_SPECS = {
+  T1: { girth: 0.25, mass: 0.33, torsion: 0.2, color: '#3bd5ff' },
+  T2: { girth: 0.45, mass: 0.50, torsion: 0.55, color: '#ffd86a' },
+  T3: { girth: 0.65, mass: 0.90, torsion: 0.85, color: '#ff4b6a' }
+};
+
+// Sound: frequency ratios based on arc ranges
+// T1: 135° (root), T2: 67.5° (octave up), T3: 20° (~7th harmonic)
+const T_FREQUENCIES = {
+  T1: 1.0,      // Root
+  T2: 2.0,      // Octave
+  T3: 7.0       // Natural 7th harmonic (slightly flat, eerie)
+};
+
+// === STATE ===
+let isPaused = false;
+let steps = 0;
+let totalTransitions = 0;
+let cells = [];
+
+// Visual parameters
+let simSpeed = 1.0;
+let waveFreq = 0.9;
+let swirlFactor = 0.3;
+let jitter = 0.2;
+let t12Threshold = 0.5;
+let t23Threshold = 0.7;
+let girthMult = 1.0;
+
+// Sound parameters
+let soundEnabled = false;
+let masterVolume = 0.5;
+let baseFrequency = 110; // A2
+let droneMix = 0.3;
+let chimeMix = 0.5;
+
+const BG_COLOR = '#0b0f14';
+const GRID_COLOR = '#182034';
+const MASS_COLOR = '#1a1a1a';
+const RADIANCE_COLOR = '#e8e8e8';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let lastTime = null;
+
+// === WEB AUDIO ===
+let audioCtx = null;
+let masterGain = null;
+let droneGain = null;
+let chimeGain = null;
+let droneOscillators = { T1: null, T2: null, T3: null };
+let droneGains = { T1: null, T2: null, T3: null };
+
+function initAudio() {
+  if (audioCtx) return;
+  
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  // Master gain
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = masterVolume * 0.3; // Keep it subtle
+  masterGain.connect(audioCtx.destination);
+  
+  // Drone layer (continuous oscillators for each T-state)
+  droneGain = audioCtx.createGain();
+  droneGain.gain.value = droneMix;
+  droneGain.connect(masterGain);
+  
+  // Chime layer (for transitions)
+  chimeGain = audioCtx.createGain();
+  chimeGain.gain.value = chimeMix;
+  chimeGain.connect(masterGain);
+  
+  // Create drone oscillators for each T-state
+  for (const tState of ['T1', 'T2', 'T3']) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = tState === 'T1' ? 'sine' : tState === 'T2' ? 'triangle' : 'sawtooth';
+    osc.frequency.value = baseFrequency * T_FREQUENCIES[tState];
+    
+    gain.gain.value = 0; // Start silent
+    
+    osc.connect(gain);
+    gain.connect(droneGain);
+    osc.start();
+    
+    droneOscillators[tState] = osc;
+    droneGains[tState] = gain;
+  }
+}
+
+function updateDroneVolumes() {
+  if (!audioCtx || !soundEnabled) return;
+  
+  // Count cells in each state
+  let counts = { T1: 0, T2: 0, T3: 0 };
+  let totalTorsion = { T1: 0, T2: 0, T3: 0 };
+  
+  for (const cell of cells) {
+    counts[cell.state]++;
+    totalTorsion[cell.state] += cell.localTorsion;
+  }
+  
+  const total = cells.length;
+  const now = audioCtx.currentTime;
+  
+  for (const tState of ['T1', 'T2', 'T3']) {
+    const proportion = counts[tState] / total;
+    const avgTorsion = counts[tState] > 0 ? totalTorsion[tState] / counts[tState] : 0;
+    
+    // Volume based on proportion and torsion intensity
+    const targetVol = proportion * (0.5 + avgTorsion * 0.5);
+    
+    droneGains[tState].gain.linearRampToValueAtTime(targetVol, now + 0.1);
+    
+    // Slight frequency modulation based on average torsion (creates beating)
+    const freqMod = 1 + (avgTorsion - 0.5) * 0.02;
+    droneOscillators[tState].frequency.linearRampToValueAtTime(
+      baseFrequency * T_FREQUENCIES[tState] * freqMod, 
+      now + 0.1
+    );
+  }
+}
+
+function playTransitionChime(cell, fromState, toState) {
+  if (!audioCtx || !soundEnabled || chimeMix === 0) return;
+  
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const panner = audioCtx.createStereoPanner();
+  
+  // Frequency based on transition type
+  let freq;
+  if (toState === 'T3') {
+    // Going to mass: low, heavy tone
+    freq = baseFrequency * 0.5;
+    osc.type = 'sawtooth';
+  } else if (toState === 'T1') {
+    // Going to radiant: high, bright tone
+    freq = baseFrequency * 4;
+    osc.type = 'sine';
+  } else {
+    // Going to T2 (EM): middle, complex tone
+    freq = baseFrequency * 2;
+    osc.type = 'triangle';
+  }
+  
+  osc.frequency.value = freq;
+  
+  // Stereo position based on cell x-position
+  const pan = (cell.x / (COLS - 1)) * 2 - 1; // -1 to 1
+  panner.pan.value = pan;
+  
+  // Quick envelope
+  const now = audioCtx.currentTime;
+  gain.gain.setValueAtTime(0.3 * chimeMix, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+  
+  osc.connect(gain);
+  gain.connect(panner);
+  panner.connect(chimeGain);
+  
+  osc.start(now);
+  osc.stop(now + 0.15);
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  
+  const btn = document.getElementById('soundBtn');
+  const indicator = document.getElementById('soundIndicator');
+  
+  if (soundEnabled) {
+    initAudio();
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    btn.textContent = 'Disable Sound';
+    btn.classList.add('sound-on');
+    btn.classList.remove('secondary');
+    indicator.innerHTML = '<span>🔊 Sound On</span>';
+    indicator.classList.remove('off');
+  } else {
+    btn.textContent = 'Enable Sound';
+    btn.classList.remove('sound-on');
+    btn.classList.add('secondary');
+    indicator.innerHTML = '<span>🔇 Sound Off</span>';
+    indicator.classList.add('off');
+    
+    // Silence all drones
+    if (audioCtx) {
+      const now = audioCtx.currentTime;
+      for (const tState of ['T1', 'T2', 'T3']) {
+        droneGains[tState].gain.linearRampToValueAtTime(0, now + 0.1);
+      }
+    }
+  }
+}
+
+function updateVolume() {
+  masterVolume = parseInt(document.getElementById('volume').value) / 100;
+  document.getElementById('volumeVal').textContent = Math.round(masterVolume * 100) + '%';
+  if (masterGain) {
+    masterGain.gain.value = masterVolume * 0.3;
+  }
+}
+
+function updateBaseFreq() {
+  baseFrequency = parseInt(document.getElementById('baseFreq').value);
+  document.getElementById('baseFreqVal').textContent = baseFrequency;
+  
+  if (audioCtx) {
+    const now = audioCtx.currentTime;
+    for (const tState of ['T1', 'T2', 'T3']) {
+      droneOscillators[tState].frequency.linearRampToValueAtTime(
+        baseFrequency * T_FREQUENCIES[tState],
+        now + 0.1
+      );
+    }
+  }
+}
+
+function updateDroneMix() {
+  droneMix = parseInt(document.getElementById('droneMix').value) / 100;
+  document.getElementById('droneMixVal').textContent = Math.round(droneMix * 100) + '%';
+  if (droneGain) {
+    droneGain.gain.value = droneMix;
+  }
+}
+
+function updateChime() {
+  chimeMix = parseInt(document.getElementById('chime').value) / 100;
+  document.getElementById('chimeVal').textContent = Math.round(chimeMix * 100) + '%';
+  if (chimeGain) {
+    chimeGain.gain.value = chimeMix;
+  }
+}
+
+// === CELL CLASS ===
+class Cell {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.state = 'T1';
+    this.phase = Math.random() * Math.PI * 2;
+    this.torsion = T_SPECS.T1.torsion;
+    this.localTorsion = 0;
+    this.wave = 0;
+    this.swirl = 0;
+  }
+  
+  get spec() { return T_SPECS[this.state]; }
+  get dx() { return this.x - (COLS - 1) / 2; }
+  get dy() { return this.y - (ROWS - 1) / 2; }
+  get r() { return Math.sqrt(this.dx * this.dx + this.dy * this.dy); }
+  get angle() { return Math.atan2(this.dy, this.dx); }
+}
+
+// === INITIALIZATION ===
+function init() {
+  calculateCellSize();
+  cells = [];
+  
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      cells.push(new Cell(x, y));
+    }
+  }
+  
+  canvas.width = COLS * CELL_SIZE;
+  canvas.height = ROWS * CELL_SIZE;
+  
+  steps = 0;
+  totalTransitions = 0;
+  lastTime = null;
+  
+  document.getElementById('colCount').textContent = COLS;
+  document.getElementById('rowCount').textContent = ROWS;
+  
+  draw();
+}
+
+// === GRID CONTROLS ===
+function addColumn() { if (COLS < 20) { COLS++; init(); } }
+function removeColumn() { if (COLS > 6) { COLS--; init(); } }
+function addRow() { if (ROWS < 14) { ROWS++; init(); } }
+function removeRow() { if (ROWS > 4) { ROWS--; init(); } }
+
+// === GET NEIGHBORS ===
+function getNeighbors(cell) {
+  const neighbors = [];
+  const coords = [
+    [cell.x - 1, cell.y], [cell.x + 1, cell.y],
+    [cell.x, cell.y - 1], [cell.x, cell.y + 1]
+  ];
+  for (const [nx, ny] of coords) {
+    if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS) {
+      neighbors.push(cells[ny * COLS + nx]);
+    }
+  }
+  return neighbors;
+}
+
+// === EVOLUTION ===
+function evolve(dt) {
+  let transitionsThisFrame = 0;
+  
+  for (const cell of cells) {
+    cell.wave = Math.sin(cell.r * waveFreq - cell.phase) * 0.5 + 0.5;
+    cell.swirl = Math.sin(cell.angle + cell.phase * swirlFactor) * 0.5 + 0.5;
+    
+    const neighbors = getNeighbors(cell);
+    let higherNeighbors = 0;
+    for (const n of neighbors) {
+      if (n.state === 'T2' || n.state === 'T3') higherNeighbors++;
+    }
+    const neighborInfluence = higherNeighbors / Math.max(1, neighbors.length);
+    
+    const noise = (Math.random() - 0.5) * jitter;
+    cell.localTorsion = 0.5 * cell.wave + 0.3 * cell.swirl + 0.4 * neighborInfluence + noise;
+    cell.localTorsion = Math.max(0, Math.min(1, cell.localTorsion));
+  }
+  
+  for (const cell of cells) {
+    const oldState = cell.state;
+    
+    if (cell.localTorsion >= t23Threshold) cell.state = 'T3';
+    else if (cell.localTorsion >= t12Threshold) cell.state = 'T2';
+    else cell.state = 'T1';
+    
+    if (cell.state !== oldState) {
+      transitionsThisFrame++;
+      playTransitionChime(cell, oldState, cell.state);
+    }
+    
+    cell.torsion = T_SPECS[cell.state].torsion;
+    cell.phase += dt * 2.0;
+  }
+  
+  totalTransitions += transitionsThisFrame;
+  steps++;
+  
+  // Update drone volumes based on current state distribution
+  updateDroneVolumes();
+}
+
+// === DRAWING ===
+function drawCell(cell) {
+  const cx = cell.x * CELL_SIZE + CELL_SIZE / 2;
+  const cy = cell.y * CELL_SIZE + CELL_SIZE / 2;
+  const spec = cell.spec;
+  
+  const pulse = 1 + 0.15 * Math.sin(cell.phase);
+  const majorR = CELL_SIZE * 0.42 * pulse;
+  const girth = spec.girth * girthMult * CELL_SIZE * 0.25;
+  const minorR = Math.max(3, majorR - girth);
+  const rotation = cell.angle + cell.phase * swirlFactor * 0.5;
+  
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotation);
+  
+  const tubeThickness = majorR - minorR;
+  const creepAmount = cell.localTorsion * 0.4;
+  const massThickness = tubeThickness * (0.25 + creepAmount * spec.mass);
+  const massOuterR = minorR + massThickness;
+  
+  const massAngle = spec.mass * 360;
+  const massStart = 90 - massAngle / 2;
+  const massEnd = 90 + massAngle / 2;
+  
+  const alpha = 0.7 + cell.wave * 0.3;
+  
+  // Radiance
+  ctx.beginPath();
+  ctx.arc(0, 0, majorR, 0, Math.PI * 2);
+  ctx.arc(0, 0, minorR, Math.PI * 2, 0, true);
+  ctx.closePath();
+  ctx.fillStyle = RADIANCE_COLOR;
+  ctx.globalAlpha = alpha;
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+  
+  ctx.strokeStyle = spec.color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Mass on inner rim
+  ctx.beginPath();
+  ctx.arc(0, 0, massOuterR, massStart * Math.PI / 180, massEnd * Math.PI / 180);
+  ctx.arc(0, 0, minorR, massEnd * Math.PI / 180, massStart * Math.PI / 180, true);
+  ctx.closePath();
+  ctx.fillStyle = MASS_COLOR;
+  ctx.fill();
+  
+  // Creep tendrils
+  if (creepAmount > 0.1) {
+    const tendrilWidth = 10 * Math.PI / 180;
+    const tendrilHeight = tubeThickness * creepAmount * 1.2;
+    
+    ctx.beginPath();
+    ctx.arc(0, 0, minorR + tendrilHeight, (massStart - tendrilWidth) * Math.PI / 180, massStart * Math.PI / 180);
+    ctx.arc(0, 0, minorR, massStart * Math.PI / 180, (massStart - tendrilWidth) * Math.PI / 180, true);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(0, 0, minorR + tendrilHeight, massEnd * Math.PI / 180, (massEnd + tendrilWidth) * Math.PI / 180);
+    ctx.arc(0, 0, minorR, (massEnd + tendrilWidth) * Math.PI / 180, massEnd * Math.PI / 180, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  ctx.beginPath();
+  ctx.arc(0, 0, minorR, 0, Math.PI * 2);
+  ctx.strokeStyle = spec.color;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.5;
+  ctx.stroke();
+  ctx.globalAlpha = 1.0;
+  
+  ctx.restore();
+}
+
+function draw() {
+  ctx.fillStyle = BG_COLOR;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.strokeStyle = GRID_COLOR;
+  ctx.lineWidth = 1;
+  
+  for (let x = 0; x <= COLS; x++) {
+    ctx.beginPath();
+    ctx.moveTo(x * CELL_SIZE + 0.5, 0);
+    ctx.lineTo(x * CELL_SIZE + 0.5, canvas.height);
+    ctx.stroke();
+  }
+  
+  for (let y = 0; y <= ROWS; y++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y * CELL_SIZE + 0.5);
+    ctx.lineTo(canvas.width, y * CELL_SIZE + 0.5);
+    ctx.stroke();
+  }
+  
+  for (const cell of cells) {
+    drawCell(cell);
+  }
+  
+  updateMetrics();
+}
+
+function updateMetrics() {
+  document.getElementById('metricTime').textContent = steps;
+  const avgTorsion = cells.reduce((sum, c) => sum + c.localTorsion, 0) / cells.length;
+  document.getElementById('metricTorsion').textContent = avgTorsion.toFixed(2);
+  
+  let t1 = 0, t2 = 0, t3 = 0;
+  for (const cell of cells) {
+    if (cell.state === 'T1') t1++;
+    else if (cell.state === 'T2') t2++;
+    else t3++;
+  }
+  
+  document.getElementById('metricT1').textContent = t1;
+  document.getElementById('metricT2').textContent = t2;
+  document.getElementById('metricT3').textContent = t3;
+  document.getElementById('metricTransitions').textContent = totalTransitions;
+}
+
+// === UI CONTROLS ===
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
+}
+
+function reset() { init(); }
+
+function updateSpeed() {
+  simSpeed = parseFloat(document.getElementById('speed').value);
+  document.getElementById('speedVal').textContent = simSpeed.toFixed(2) + 'x';
+}
+
+function updateWaveFreq() {
+  waveFreq = parseFloat(document.getElementById('waveFreq').value);
+  document.getElementById('waveFreqVal').textContent = waveFreq.toFixed(2);
+}
+
+function updateSwirl() {
+  swirlFactor = parseFloat(document.getElementById('swirl').value);
+  document.getElementById('swirlVal').textContent = swirlFactor.toFixed(2);
+}
+
+function updateJitter() {
+  jitter = parseFloat(document.getElementById('jitter').value);
+  document.getElementById('jitterVal').textContent = jitter.toFixed(2);
+}
+
+function updateT12() {
+  t12Threshold = parseFloat(document.getElementById('t12').value);
+  document.getElementById('t12Val').textContent = t12Threshold.toFixed(2);
+}
+
+function updateT23() {
+  t23Threshold = parseFloat(document.getElementById('t23').value);
+  document.getElementById('t23Val').textContent = t23Threshold.toFixed(2);
+}
+
+function updateGirth() {
+  girthMult = parseFloat(document.getElementById('girth').value);
+  document.getElementById('girthVal').textContent = girthMult.toFixed(1) + 'x';
+}
+
+// === RESIZE HANDLER ===
+window.addEventListener('resize', () => {
+  calculateCellSize();
+  canvas.width = COLS * CELL_SIZE;
+  canvas.height = ROWS * CELL_SIZE;
+});
+
+// === ANIMATION LOOP ===
+function animate(timestamp) {
+  if (lastTime === null) lastTime = timestamp;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+  
+  if (!isPaused) evolve(dt * simSpeed);
+  draw();
+  requestAnimationFrame(animate);
+}
+
+// === START ===
+init();
+requestAnimationFrame(animate);
+</script>
+
+</body>
+</html>
