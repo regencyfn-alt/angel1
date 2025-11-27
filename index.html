@@ -3,76 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANGEL-1 · Michron Physics Dashboard</title>
+<title>ANGEL-1 · Michron Physics</title>
+<link rel="stylesheet" href="shared.css">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #0b0f14;
-  color: #e8ecef;
-  min-height: 100vh;
-}
-
-.header {
-  background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
-  border-bottom: 2px solid #22303d;
-  padding: 16px 24px;
-}
-
-.header h1 {
-  font-size: 24px;
-  background: linear-gradient(135deg, #60a5fa 0%, #10b981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 4px;
-}
-
-.header .subtitle {
-  color: #9ca3af;
-  font-size: 12px;
-}
-
-.main {
+.simulator-container {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 20px;
   padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.canvas-section {
-  flex: 1;
+.canvas-wrapper {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.sidebar {
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.panel {
-  background: #1a1f2e;
-  border: 1px solid #22303d;
+#canvas {
+  border: 2px solid #22303d;
   border-radius: 8px;
-  padding: 16px;
+  max-width: 100%;
+  height: auto;
 }
 
-.panel h3 {
-  color: #60a5fa;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
 .grid-controls {
@@ -81,6 +43,7 @@ body {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 16px;
 }
 
 .grid-controls button {
@@ -102,26 +65,8 @@ body {
 .grid-controls span {
   color: #60a5fa;
   font-weight: 600;
-  min-width: 100px;
+  min-width: 80px;
   text-align: center;
-}
-
-.type-selectors {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-.type-selectors select {
-  padding: 4px 6px;
-  font-size: 10px;
-  background: #0b0f14;
-  border: 1px solid #22303d;
-  border-radius: 3px;
-  color: #e8ecef;
-  cursor: pointer;
 }
 
 .playback {
@@ -190,35 +135,9 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
-.color-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.color-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.color-item label {
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-.color-item input[type="color"] {
-  width: 32px;
-  height: 24px;
-  border: 1px solid #22303d;
-  border-radius: 3px;
-  cursor: pointer;
-  background: none;
-}
-
 .metrics-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 
@@ -236,92 +155,59 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .metric .value {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: #10b981;
   font-family: 'Courier New', monospace;
 }
 
-.canvas-container {
-  background: #1a1f2e;
-  border: 2px solid #22303d;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-canvas {
-  border: 1px solid #22303d;
-  border-radius: 4px;
-}
-
-.canvas-with-rows {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.row-selectors {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.row-selectors select {
-  padding: 2px 4px;
-  font-size: 9px;
-  background: #0b0f14;
-  border: 1px solid #22303d;
-  border-radius: 2px;
-  color: #e8ecef;
-  cursor: pointer;
-  width: 36px;
-}
-
-.info-box {
-  background: rgba(96, 165, 250, 0.1);
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  border-radius: 6px;
-  padding: 12px;
-  font-size: 11px;
-  line-height: 1.6;
-  color: #9ca3af;
-}
-
-.info-box strong {
-  color: #60a5fa;
+@media (max-width: 600px) {
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-controls span {
+    min-width: 60px;
+    font-size: 11px;
+  }
 }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>ANGEL-1 · MICHRON PHYSICS</h1>
-  <div class="subtitle">Radial Wave Propagation · Torsion-Driven State Transitions · Inner-Rim Mass</div>
-</div>
+<nav class="nav">
+  <div class="nav-brand">MICHRON PHYSICS</div>
+  <div class="nav-links">
+    <a href="index.html" class="active">Simulator</a>
+    <a href="chronos.html">Chronos</a>
+  </div>
+</nav>
 
-<div class="main">
-  <div class="canvas-section">
-    <div class="panel">
-      <div class="grid-controls">
-        <button onclick="removeColumn()">− Col</button>
-        <span id="colCount">Columns: 12</span>
-        <button onclick="addColumn()">+ Col</button>
-        <button onclick="removeRow()">− Row</button>
-        <span id="rowCount">Rows: 8</span>
-        <button onclick="addRow()">+ Row</button>
-      </div>
-    </div>
-
-    <div class="canvas-container">
-      <canvas id="canvas"></canvas>
-    </div>
+<div class="simulator-container">
+  
+  <!-- Grid Size Controls -->
+  <div class="grid-controls">
+    <button onclick="removeColumn()">− Col</button>
+    <span id="colCount">16</span>
+    <button onclick="addColumn()">+ Col</button>
+    <button onclick="removeRow()">− Row</button>
+    <span id="rowCount">12</span>
+    <button onclick="addRow()">+ Row</button>
   </div>
 
-  <div class="sidebar">
+  <!-- Canvas -->
+  <div class="canvas-wrapper">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Controls Below -->
+  <div class="controls-grid">
+    
+    <!-- Control Panel -->
     <div class="panel">
       <h3>⚡ Control</h3>
       <div class="playback">
@@ -330,36 +216,38 @@ canvas {
       </div>
     </div>
 
+    <!-- Metrics Panel -->
     <div class="panel">
       <h3>📊 Metrics</h3>
       <div class="metrics-grid">
         <div class="metric">
-          <div class="label">Time Steps</div>
+          <div class="label">Steps</div>
           <div class="value" id="metricTime">0</div>
         </div>
         <div class="metric">
-          <div class="label">Avg Torsion</div>
+          <div class="label">Torsion</div>
           <div class="value" id="metricTorsion">0.00</div>
-        </div>
-        <div class="metric">
-          <div class="label">T1 Cells</div>
-          <div class="value" id="metricT1" style="color:#3bd5ff;">0</div>
-        </div>
-        <div class="metric">
-          <div class="label">T2 Cells</div>
-          <div class="value" id="metricT2" style="color:#ffd86a;">0</div>
-        </div>
-        <div class="metric">
-          <div class="label">T3 Cells</div>
-          <div class="value" id="metricT3" style="color:#ff4b6a;">0</div>
         </div>
         <div class="metric">
           <div class="label">Transitions</div>
           <div class="value" id="metricTransitions">0</div>
         </div>
+        <div class="metric">
+          <div class="label" style="color:#3bd5ff;">T1</div>
+          <div class="value" id="metricT1" style="color:#3bd5ff;">0</div>
+        </div>
+        <div class="metric">
+          <div class="label" style="color:#ffd86a;">T2</div>
+          <div class="value" id="metricT2" style="color:#ffd86a;">0</div>
+        </div>
+        <div class="metric">
+          <div class="label" style="color:#ff4b6a;">T3</div>
+          <div class="value" id="metricT3" style="color:#ff4b6a;">0</div>
+        </div>
       </div>
     </div>
 
+    <!-- Speed Panel -->
     <div class="panel">
       <h3>⏱️ Speed</h3>
       <div class="slider-group">
@@ -371,6 +259,7 @@ canvas {
       </div>
     </div>
 
+    <!-- Wave Dynamics Panel -->
     <div class="panel">
       <h3>🌊 Wave Dynamics</h3>
       <div class="slider-group">
@@ -396,24 +285,26 @@ canvas {
       </div>
     </div>
 
+    <!-- Torsion Thresholds Panel -->
     <div class="panel">
       <h3>🌀 Torsion Thresholds</h3>
       <div class="slider-group">
         <label>
-          <span>T1↔T2 Threshold</span>
+          <span>T1↔T2</span>
           <span class="value" id="t12Val">0.50</span>
         </label>
         <input type="range" id="t12" min="0.2" max="0.6" step="0.05" value="0.5" oninput="updateT12()">
       </div>
       <div class="slider-group">
         <label>
-          <span>T2↔T3 Threshold</span>
+          <span>T2↔T3</span>
           <span class="value" id="t23Val">0.70</span>
         </label>
         <input type="range" id="t23" min="0.5" max="0.9" step="0.05" value="0.7" oninput="updateT23()">
       </div>
     </div>
 
+    <!-- Girth Panel -->
     <div class="panel">
       <h3>🔧 Girth</h3>
       <div class="slider-group">
@@ -425,53 +316,36 @@ canvas {
       </div>
     </div>
 
-    <div class="info-box">
-      <strong>Wave Mechanics (Agent 1):</strong><br>
-      • Radial wave expands from center<br>
-      • Swirl adds rotational component<br>
-      • Torsion = wave + swirl + neighbors<br><br>
-      <strong>State Transitions:</strong><br>
-      T1 (radiant): torsion &lt; 0.50<br>
-      T2 (EM): 0.50 ≤ torsion &lt; 0.70<br>
-      T3 (mass): torsion ≥ 0.70
-    </div>
   </div>
 </div>
 
 <script>
 // === CONFIGURATION ===
-let COLS = 12;
-let ROWS = 8;
-const CELL_SIZE = 40;
+let COLS = 16;
+let ROWS = 12;
+let CELL_SIZE = 40;
+
+// Auto-scale based on viewport
+function calculateCellSize() {
+  const maxWidth = Math.min(window.innerWidth - 40, 1200);
+  const maxHeight = window.innerHeight * 0.55;
+  const sizeByWidth = Math.floor(maxWidth / COLS);
+  const sizeByHeight = Math.floor(maxHeight / ROWS);
+  CELL_SIZE = Math.min(sizeByWidth, sizeByHeight, 50);
+  CELL_SIZE = Math.max(CELL_SIZE, 24); // minimum
+}
 
 // T-Class specifications
 const T_SPECS = {
-  T1: { 
-    girth: 0.25, 
-    mass: 0.33,
-    torsion: 0.2,
-    color: '#3bd5ff'   // cyan - radiant
-  },
-  T2: { 
-    girth: 0.45, 
-    mass: 0.50,
-    torsion: 0.55,
-    color: '#ffd86a'   // gold - EM mesophase
-  },
-  T3: { 
-    girth: 0.65, 
-    mass: 0.90,
-    torsion: 0.85,
-    color: '#ff4b6a'   // red - mass-locked
-  }
+  T1: { girth: 0.25, mass: 0.33, torsion: 0.2, color: '#3bd5ff' },
+  T2: { girth: 0.45, mass: 0.50, torsion: 0.55, color: '#ffd86a' },
+  T3: { girth: 0.65, mass: 0.90, torsion: 0.85, color: '#ff4b6a' }
 };
 
 // === STATE ===
 let isPaused = false;
 let steps = 0;
 let totalTransitions = 0;
-
-// Per-cell state
 let cells = [];
 
 // Parameters
@@ -483,7 +357,6 @@ let t12Threshold = 0.5;
 let t23Threshold = 0.7;
 let girthMult = 1.0;
 
-// Colors
 const BG_COLOR = '#0b0f14';
 const GRID_COLOR = '#182034';
 const MASS_COLOR = '#1a1a1a';
@@ -491,7 +364,6 @@ const RADIANCE_COLOR = '#e8e8e8';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-
 let lastTime = null;
 
 // === CELL CLASS ===
@@ -502,16 +374,12 @@ class Cell {
     this.state = 'T1';
     this.phase = Math.random() * Math.PI * 2;
     this.torsion = T_SPECS.T1.torsion;
-    this.localTorsion = 0;  // computed each frame
+    this.localTorsion = 0;
     this.wave = 0;
     this.swirl = 0;
   }
   
-  get spec() {
-    return T_SPECS[this.state];
-  }
-  
-  // Distance and angle from center
+  get spec() { return T_SPECS[this.state]; }
   get dx() { return this.x - (COLS - 1) / 2; }
   get dy() { return this.y - (ROWS - 1) / 2; }
   get r() { return Math.sqrt(this.dx * this.dx + this.dy * this.dy); }
@@ -520,6 +388,7 @@ class Cell {
 
 // === INITIALIZATION ===
 function init() {
+  calculateCellSize();
   cells = [];
   
   for (let y = 0; y < ROWS; y++) {
@@ -535,55 +404,41 @@ function init() {
   totalTransitions = 0;
   lastTime = null;
   
+  document.getElementById('colCount').textContent = COLS;
+  document.getElementById('rowCount').textContent = ROWS;
+  
   draw();
 }
 
 // === GRID CONTROLS ===
-function addColumn() {
-  if (COLS < 20) { COLS++; init(); }
-}
-function removeColumn() {
-  if (COLS > 6) { COLS--; init(); }
-}
-function addRow() {
-  if (ROWS < 14) { ROWS++; init(); }
-}
-function removeRow() {
-  if (ROWS > 4) { ROWS--; init(); }
-}
+function addColumn() { if (COLS < 24) { COLS++; init(); } }
+function removeColumn() { if (COLS > 6) { COLS--; init(); } }
+function addRow() { if (ROWS < 18) { ROWS++; init(); } }
+function removeRow() { if (ROWS > 4) { ROWS--; init(); } }
 
 // === GET NEIGHBORS ===
 function getNeighbors(cell) {
   const neighbors = [];
   const coords = [
-    [cell.x - 1, cell.y],
-    [cell.x + 1, cell.y],
-    [cell.x, cell.y - 1],
-    [cell.x, cell.y + 1]
+    [cell.x - 1, cell.y], [cell.x + 1, cell.y],
+    [cell.x, cell.y - 1], [cell.x, cell.y + 1]
   ];
-  
   for (const [nx, ny] of coords) {
     if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS) {
       neighbors.push(cells[ny * COLS + nx]);
     }
   }
-  
   return neighbors;
 }
 
-// === EVOLUTION (from Agent 1) ===
+// === EVOLUTION ===
 function evolve(dt) {
   let transitionsThisFrame = 0;
   
-  // First pass: compute local torsion for each cell
   for (const cell of cells) {
-    // Radial wave: expanding from center
     cell.wave = Math.sin(cell.r * waveFreq - cell.phase) * 0.5 + 0.5;
-    
-    // Swirl: rotational component
     cell.swirl = Math.sin(cell.angle + cell.phase * swirlFactor) * 0.5 + 0.5;
     
-    // Neighbor influence
     const neighbors = getNeighbors(cell);
     let higherNeighbors = 0;
     for (const n of neighbors) {
@@ -591,33 +446,21 @@ function evolve(dt) {
     }
     const neighborInfluence = higherNeighbors / Math.max(1, neighbors.length);
     
-    // Noise
     const noise = (Math.random() - 0.5) * jitter;
-    
-    // Combined local torsion
     cell.localTorsion = 0.5 * cell.wave + 0.3 * cell.swirl + 0.4 * neighborInfluence + noise;
     cell.localTorsion = Math.max(0, Math.min(1, cell.localTorsion));
   }
   
-  // Second pass: state transitions based on torsion
   for (const cell of cells) {
     const oldState = cell.state;
     
-    if (cell.localTorsion >= t23Threshold) {
-      cell.state = 'T3';
-    } else if (cell.localTorsion >= t12Threshold) {
-      cell.state = 'T2';
-    } else {
-      cell.state = 'T1';
-    }
+    if (cell.localTorsion >= t23Threshold) cell.state = 'T3';
+    else if (cell.localTorsion >= t12Threshold) cell.state = 'T2';
+    else cell.state = 'T1';
     
-    if (cell.state !== oldState) {
-      transitionsThisFrame++;
-    }
+    if (cell.state !== oldState) transitionsThisFrame++;
     
     cell.torsion = T_SPECS[cell.state].torsion;
-    
-    // Advance phase (controls wave speed)
     cell.phase += dt * 2.0;
   }
   
@@ -631,53 +474,42 @@ function drawCell(cell) {
   const cy = cell.y * CELL_SIZE + CELL_SIZE / 2;
   const spec = cell.spec;
   
-  // Pulse based on wave (breathing effect)
   const pulse = 1 + 0.15 * Math.sin(cell.phase);
-  
-  // Washer dimensions
   const majorR = CELL_SIZE * 0.42 * pulse;
   const girth = spec.girth * girthMult * CELL_SIZE * 0.25;
   const minorR = Math.max(3, majorR - girth);
-  
-  // Rotation follows the swirl
   const rotation = cell.angle + cell.phase * swirlFactor * 0.5;
   
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(rotation);
   
-  // Tube thickness
   const tubeThickness = majorR - minorR;
-  
-  // Mass creep based on torsion (higher torsion = more creep)
   const creepAmount = cell.localTorsion * 0.4;
   const massThickness = tubeThickness * (0.25 + creepAmount * spec.mass);
   const massOuterR = minorR + massThickness;
   
-  // Angular extent of mass on inner rim
   const massAngle = spec.mass * 360;
   const massStart = 90 - massAngle / 2;
   const massEnd = 90 + massAngle / 2;
   
-  // Draw radiance (outer ring) - with state color tint
+  const alpha = 0.7 + cell.wave * 0.3;
+  
+  // Radiance
   ctx.beginPath();
   ctx.arc(0, 0, majorR, 0, Math.PI * 2);
   ctx.arc(0, 0, minorR, Math.PI * 2, 0, true);
   ctx.closePath();
-  
-  // Blend white with state color based on wave
-  const alpha = 0.7 + cell.wave * 0.3;
   ctx.fillStyle = RADIANCE_COLOR;
   ctx.globalAlpha = alpha;
   ctx.fill();
   ctx.globalAlpha = 1.0;
   
-  // State color glow on outer edge
   ctx.strokeStyle = spec.color;
   ctx.lineWidth = 2;
   ctx.stroke();
   
-  // Draw mass (black) on inner rim
+  // Mass on inner rim
   ctx.beginPath();
   ctx.arc(0, 0, massOuterR, massStart * Math.PI / 180, massEnd * Math.PI / 180);
   ctx.arc(0, 0, minorR, massEnd * Math.PI / 180, massStart * Math.PI / 180, true);
@@ -690,30 +522,19 @@ function drawCell(cell) {
     const tendrilWidth = 10 * Math.PI / 180;
     const tendrilHeight = tubeThickness * creepAmount * 1.2;
     
-    // Left tendril
     ctx.beginPath();
-    ctx.arc(0, 0, minorR + tendrilHeight, 
-            (massStart - tendrilWidth) * Math.PI / 180, 
-            massStart * Math.PI / 180);
-    ctx.arc(0, 0, minorR, 
-            massStart * Math.PI / 180, 
-            (massStart - tendrilWidth) * Math.PI / 180, true);
+    ctx.arc(0, 0, minorR + tendrilHeight, (massStart - tendrilWidth) * Math.PI / 180, massStart * Math.PI / 180);
+    ctx.arc(0, 0, minorR, massStart * Math.PI / 180, (massStart - tendrilWidth) * Math.PI / 180, true);
     ctx.closePath();
     ctx.fill();
     
-    // Right tendril
     ctx.beginPath();
-    ctx.arc(0, 0, minorR + tendrilHeight, 
-            massEnd * Math.PI / 180, 
-            (massEnd + tendrilWidth) * Math.PI / 180);
-    ctx.arc(0, 0, minorR, 
-            (massEnd + tendrilWidth) * Math.PI / 180, 
-            massEnd * Math.PI / 180, true);
+    ctx.arc(0, 0, minorR + tendrilHeight, massEnd * Math.PI / 180, (massEnd + tendrilWidth) * Math.PI / 180);
+    ctx.arc(0, 0, minorR, (massEnd + tendrilWidth) * Math.PI / 180, massEnd * Math.PI / 180, true);
     ctx.closePath();
     ctx.fill();
   }
   
-  // Inner rim highlight with state color
   ctx.beginPath();
   ctx.arc(0, 0, minorR, 0, Math.PI * 2);
   ctx.strokeStyle = spec.color;
@@ -726,11 +547,9 @@ function drawCell(cell) {
 }
 
 function draw() {
-  // Clear
   ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // Grid lines
   ctx.strokeStyle = GRID_COLOR;
   ctx.lineWidth = 1;
   
@@ -748,7 +567,6 @@ function draw() {
     ctx.stroke();
   }
   
-  // Draw cells
   for (const cell of cells) {
     drawCell(cell);
   }
@@ -758,12 +576,9 @@ function draw() {
 
 function updateMetrics() {
   document.getElementById('metricTime').textContent = steps;
-  
-  // Average torsion
   const avgTorsion = cells.reduce((sum, c) => sum + c.localTorsion, 0) / cells.length;
   document.getElementById('metricTorsion').textContent = avgTorsion.toFixed(2);
   
-  // Count states
   let t1 = 0, t2 = 0, t3 = 0;
   for (const cell of cells) {
     if (cell.state === 'T1') t1++;
@@ -775,9 +590,6 @@ function updateMetrics() {
   document.getElementById('metricT2').textContent = t2;
   document.getElementById('metricT3').textContent = t3;
   document.getElementById('metricTransitions').textContent = totalTransitions;
-  
-  document.getElementById('colCount').textContent = `Columns: ${COLS}`;
-  document.getElementById('rowCount').textContent = `Rows: ${ROWS}`;
 }
 
 // === UI CONTROLS ===
@@ -786,9 +598,7 @@ function togglePause() {
   document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
 }
 
-function reset() {
-  init();
-}
+function reset() { init(); }
 
 function updateSpeed() {
   simSpeed = parseFloat(document.getElementById('speed').value);
@@ -825,16 +635,20 @@ function updateGirth() {
   document.getElementById('girthVal').textContent = girthMult.toFixed(1) + 'x';
 }
 
+// === RESIZE HANDLER ===
+window.addEventListener('resize', () => {
+  calculateCellSize();
+  canvas.width = COLS * CELL_SIZE;
+  canvas.height = ROWS * CELL_SIZE;
+});
+
 // === ANIMATION LOOP ===
 function animate(timestamp) {
   if (lastTime === null) lastTime = timestamp;
   const dt = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
   
-  if (!isPaused) {
-    evolve(dt * simSpeed);
-  }
-  
+  if (!isPaused) evolve(dt * simSpeed);
   draw();
   requestAnimationFrame(animate);
 }

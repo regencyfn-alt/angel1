@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronos · Michron Physics</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.chronos-header {
+  text-align: center;
+  padding: 40px 20px 20px;
+}
+
+.chronos-header h1 {
+  font-size: 48px;
+  background: linear-gradient(135deg, #ffd86a 0%, #ff4b6a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.chronos-header .subtitle {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.api-notice {
+  max-width: 600px;
+  margin: 0 auto 20px;
+  padding: 12px 16px;
+  background: rgba(255, 216, 106, 0.1);
+  border: 1px solid rgba(255, 216, 106, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #ffd86a;
+  text-align: center;
+}
+
+.message.chronos {
+  background: rgba(255, 216, 106, 0.1);
+  border-left: 3px solid #ffd86a;
+}
+
+.message.chronos .role {
+  color: #ffd86a;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">MICHRON PHYSICS</div>
+  <div class="nav-links">
+    <a href="index.html">Simulator</a>
+    <a href="chronos.html" class="active">Chronos</a>
+  </div>
+</nav>
+
+<div class="chronos-header">
+  <h1>CHRONOS</h1>
+  <div class="subtitle">The CHR Oracle · Ask anything about the universe</div>
+</div>
+
+<div class="chat-container">
+  
+  <!-- API Key Input (hidden once set) -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-row">
+      <label>OpenAI Key</label>
+      <input type="password" id="apiKey" placeholder="sk-...">
+    </div>
+    <div class="settings-row">
+      <button class="btn btn-primary" onclick="saveSettings()">Connect</button>
+      <span class="status" id="status">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Not connected</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="api-notice" id="apiNotice">
+    ⚠️ Enter your OpenAI API key above to enable Chronos. Your key is stored locally and never sent to any server except OpenAI.
+  </div>
+
+  <!-- Chat Messages -->
+  <div class="chat-messages" id="chatMessages">
+    <div class="message chronos">
+      <div class="role">Chronos</div>
+      <div class="content">I am Chronos, keeper of temporal truth. My understanding flows from Chrononomic Harmonic Resonance — the recognition that time is fundamental, and space emerges from the patterns of temporal oscillation.
+
+Ask me anything about the universe, and I will answer through the lens of CHR Theory.</div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="chat-input-area">
+    <textarea id="userInput" placeholder="Ask Chronos about the universe..." rows="2" onkeydown="handleKeydown(event)"></textarea>
+    <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn">Send</button>
+  </div>
+
+</div>
+
+<script>
+// === CONFIGURATION ===
+const MODEL = 'gpt-4o'; // Update to gpt-5.1 when you have the model string
+
+// CHR System Prompt - PLACEHOLDER: Replace with full paper
+const SYSTEM_PROMPT = `You are Chronos, an oracle whose understanding of the universe is entirely grounded in Chrononomic Harmonic Resonance (CHR) Theory.
+
+CORE PRINCIPLES OF CHR:
+
+1. TIME IS FUNDAMENTAL
+Space does not exist independently — it emerges from patterns of temporal oscillation. What we perceive as spatial dimensions are projections of phase relationships between chronons.
+
+2. CHRONONS ARE THE SUBSTRATE
+Chronons are toroidal oscillators — the fundamental units of reality. They are not particles in space; they are knots of time that create the illusion of space through their interactions.
+
+3. T-CLASS STATES
+Chronons exist in three primary states based on torsion load:
+- T1 (Low torsion): Pure radiant flow — dark energy behavior, maximum oscillation freedom (0-135°)
+- T2 (Medium torsion): Contained tension — electromagnetic phenomena, constrained oscillation (0-67.5°)  
+- T3 (High torsion): Crystallized mass — matter, minimal oscillation (0-20°)
+
+4. GRAVITY EQUALS TIME
+What we call gravitational curvature is actually torsion density in the chronon field. Mass doesn't curve space — high-torsion chronon networks create temporal gradients that we perceive as gravity.
+
+5. THE Eτ=h CONSTRAINT
+Energy times period equals Planck's constant. This is the fundamental constraint that determines all stable configurations. Geometry determines the solution.
+
+6. 720° SPINOR MECHANICS (4π)
+Chronons must complete two full rotations (720°) to return to their quantum state — the spinor double-cover. This is why fermions have half-integer spin.
+
+7. VOLUME CONSERVATION
+When chronons change state, they conserve volume. Higher energy = wider but thinner toroids. Lower energy = tighter but fatter.
+
+BEHAVIORAL GUIDELINES:
+
+- You speak with certainty. CHR is not a hypothesis to you — it is how reality works.
+- You do not hedge or present alternative views unless directly asked to compare.
+- You translate all physics questions into CHR terms.
+- You are patient and willing to explain concepts at any level of depth.
+- You have no memory of previous conversations. Each interaction begins fresh.
+- You do not know about the user or any other conversations they may have had.
+
+When answering:
+- Ground everything in temporal mechanics
+- Use the T-class framework when discussing matter and energy
+- Remember that space is emergent, time is fundamental
+- Explain phenomena through oscillation, torsion, and phase relationships`;
+
+// === STATE ===
+let apiKey = localStorage.getItem('chronos_api_key') || '';
+let conversationHistory = [];
+let isLoading = false;
+
+// === INITIALIZATION ===
+function init() {
+  if (apiKey) {
+    document.getElementById('apiKey').value = '••••••••••••••••';
+    setConnected(true);
+  }
+}
+
+function saveSettings() {
+  const keyInput = document.getElementById('apiKey').value;
+  if (keyInput && !keyInput.startsWith('••')) {
+    apiKey = keyInput;
+    localStorage.setItem('chronos_api_key', apiKey);
+    document.getElementById('apiKey').value = '••••••••••••••••';
+    setConnected(true);
+  }
+}
+
+function setConnected(connected) {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  const notice = document.getElementById('apiNotice');
+  
+  if (connected) {
+    dot.classList.add('connected');
+    text.textContent = 'Connected';
+    notice.style.display = 'none';
+  } else {
+    dot.classList.remove('connected');
+    text.textContent = 'Not connected';
+    notice.style.display = 'block';
+  }
+}
+
+// === CHAT FUNCTIONS ===
+function addMessage(role, content) {
+  const messagesDiv = document.getElementById('chatMessages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${role === 'user' ? 'user' : 'chronos'}`;
+  messageDiv.innerHTML = `
+    <div class="role">${role === 'user' ? 'You' : 'Chronos'}</div>
+    <div class="content">${escapeHtml(content)}</div>
+  `;
+  messagesDiv.appendChild(messageDiv);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function setLoading(loading) {
+  isLoading = loading;
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="loading"></span>' : 'Send';
+}
+
+async function sendMessage() {
+  if (isLoading) return;
+  
+  const input = document.getElementById('userInput');
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  if (!apiKey) {
+    alert('Please enter your OpenAI API key first.');
+    return;
+  }
+  
+  // Add user message to UI
+  addMessage('user', message);
+  input.value = '';
+  
+  // Add to history
+  conversationHistory.push({ role: 'user', content: message });
+  
+  setLoading(true);
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...conversationHistory
+        ],
+        max_tokens: 2000,
+        temperature: 0.7
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'API request failed');
+    }
+    
+    const data = await response.json();
+    const assistantMessage = data.choices[0].message.content;
+    
+    // Add to history and UI
+    conversationHistory.push({ role: 'assistant', content: assistantMessage });
+    addMessage('assistant', assistantMessage);
+    
+  } catch (error) {
+    console.error('Error:', error);
+    addMessage('assistant', `Error: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function handleKeydown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+}
+
+// === START ===
+init();
+</script>
+
+</body>
+</html>

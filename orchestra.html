@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orchestra · Michron Physics</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.orchestra-header {
+  text-align: center;
+  padding: 30px 20px 20px;
+}
+
+.orchestra-header h1 {
+  font-size: 36px;
+  background: linear-gradient(135deg, #60a5fa 0%, #ffd86a 50%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.orchestra-header .subtitle {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.orchestra-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.api-settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.api-card {
+  background: #1a1f2e;
+  border: 1px solid #22303d;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.api-card h4 {
+  font-size: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.api-card.openai h4 { color: #10b981; }
+.api-card.anthropic h4 { color: #60a5fa; }
+.api-card.google h4 { color: #ffd86a; }
+
+.api-card input {
+  margin-bottom: 8px;
+}
+
+.chat-area {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.shared-conversation {
+  background: #1a1f2e;
+  border: 1px solid #22303d;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 400px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.message.gpt { border-left-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.message.gpt .role { color: #10b981; }
+
+.message.claude { border-left-color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
+.message.claude .role { color: #60a5fa; }
+
+.message.gemini { border-left-color: #ffd86a; background: rgba(255, 216, 106, 0.1); }
+.message.gemini .role { color: #ffd86a; }
+
+.message.human { border-left-color: #e8ecef; background: rgba(232, 236, 239, 0.1); }
+.message.human .role { color: #e8ecef; }
+
+.controls-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.turn-indicator {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.turn-indicator.gpt { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.turn-indicator.claude { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+.turn-indicator.gemini { background: rgba(255, 216, 106, 0.2); color: #ffd86a; }
+.turn-indicator.human { background: rgba(232, 236, 239, 0.2); color: #e8ecef; }
+
+.input-section {
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .api-settings {
+    grid-template-columns: 1fr;
+  }
+  
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">MICHRON PHYSICS</div>
+  <div class="nav-links">
+    <a href="index.html">Simulator</a>
+    <a href="chronos.html">Chronos</a>
+    <!-- Orchestra not in public nav -->
+  </div>
+</nav>
+
+<div class="orchestra-header">
+  <h1>🎼 ORCHESTRA</h1>
+  <div class="subtitle">Multi-Agent Round Robin · GPT + Claude + Gemini + You</div>
+</div>
+
+<div class="orchestra-container">
+  
+  <!-- API Keys -->
+  <div class="api-settings" id="apiSettings">
+    <div class="api-card openai">
+      <h4>🟢 GPT (OpenAI)</h4>
+      <input type="password" id="openaiKey" placeholder="sk-...">
+      <div class="status" id="openaiStatus">
+        <span class="status-dot" id="openaiDot"></span>
+        <span>Not connected</span>
+      </div>
+    </div>
+    
+    <div class="api-card anthropic">
+      <h4>🔵 Claude (Anthropic)</h4>
+      <input type="password" id="anthropicKey" placeholder="sk-ant-...">
+      <div class="status" id="anthropicStatus">
+        <span class="status-dot" id="anthropicDot"></span>
+        <span>Not connected</span>
+      </div>
+    </div>
+    
+    <div class="api-card google">
+      <h4>🟡 Gemini (Google)</h4>
+      <input type="password" id="googleKey" placeholder="AIza...">
+      <div class="status" id="googleDot">
+        <span class="status-dot"></span>
+        <span>Not connected</span>
+      </div>
+    </div>
+  </div>
+  
+  <button class="btn btn-primary" onclick="saveAllKeys()" style="margin-bottom: 20px;">Connect All</button>
+
+  <!-- Controls -->
+  <div class="controls-row">
+    <div class="turn-indicator" id="turnIndicator">Next: Human</div>
+    <button class="btn" onclick="advanceTurn()">Next Turn</button>
+    <button class="btn" onclick="autoRun()" id="autoBtn">Auto Run</button>
+    <button class="btn btn-danger" onclick="clearConversation()">Clear</button>
+  </div>
+
+  <!-- Shared Conversation -->
+  <div class="shared-conversation" id="conversation">
+    <div class="message human">
+      <div class="role">System</div>
+      <div class="content">Orchestra initialized. Enter a topic or question to begin the round-robin discussion.</div>
+    </div>
+  </div>
+
+  <!-- Human Input -->
+  <div class="input-section">
+    <div class="chat-input-area">
+      <textarea id="humanInput" placeholder="Your contribution to the conversation..." rows="2" onkeydown="handleKeydown(event)"></textarea>
+      <button class="btn btn-primary" onclick="humanSpeak()">Speak</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// === CONFIGURATION ===
+const MODELS = {
+  openai: 'gpt-4o',      // Update to gpt-5.1
+  anthropic: 'claude-sonnet-4-20250514',  // Or claude-opus-4-5-20251101
+  google: 'gemini-1.5-pro'  // Update to gemini-3
+};
+
+// === STATE ===
+let keys = {
+  openai: localStorage.getItem('orchestra_openai') || '',
+  anthropic: localStorage.getItem('orchestra_anthropic') || '',
+  google: localStorage.getItem('orchestra_google') || ''
+};
+
+let conversation = [];
+let turnOrder = ['human', 'gpt', 'claude', 'gemini'];
+let currentTurn = 0;
+let isRunning = false;
+let autoMode = false;
+
+// === INITIALIZATION ===
+function init() {
+  if (keys.openai) document.getElementById('openaiKey').value = '••••••••';
+  if (keys.anthropic) document.getElementById('anthropicKey').value = '••••••••';
+  if (keys.google) document.getElementById('googleKey').value = '••••••••';
+  updateTurnIndicator();
+}
+
+function saveAllKeys() {
+  const openai = document.getElementById('openaiKey').value;
+  const anthropic = document.getElementById('anthropicKey').value;
+  const google = document.getElementById('googleKey').value;
+  
+  if (openai && !openai.startsWith('••')) {
+    keys.openai = openai;
+    localStorage.setItem('orchestra_openai', openai);
+    document.getElementById('openaiKey').value = '••••••••';
+    document.getElementById('openaiDot').classList.add('connected');
+  }
+  
+  if (anthropic && !anthropic.startsWith('••')) {
+    keys.anthropic = anthropic;
+    localStorage.setItem('orchestra_anthropic', anthropic);
+    document.getElementById('anthropicKey').value = '••••••••';
+    document.getElementById('anthropicDot').classList.add('connected');
+  }
+  
+  if (google && !google.startsWith('••')) {
+    keys.google = google;
+    localStorage.setItem('orchestra_google', google);
+    document.getElementById('googleKey').value = '••••••••';
+  }
+}
+
+// === CONVERSATION FUNCTIONS ===
+function addMessage(speaker, content) {
+  conversation.push({ speaker, content, timestamp: Date.now() });
+  
+  const div = document.getElementById('conversation');
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `message ${speaker}`;
+  msgDiv.innerHTML = `
+    <div class="role">${speaker.toUpperCase()}</div>
+    <div class="content">${escapeHtml(content)}</div>
+  `;
+  div.appendChild(msgDiv);
+  div.scrollTop = div.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function getConversationForAI() {
+  return conversation.map(m => ({
+    role: m.speaker === 'human' ? 'user' : 'assistant',
+    content: `[${m.speaker.toUpperCase()}]: ${m.content}`
+  }));
+}
+
+function updateTurnIndicator() {
+  const indicator = document.getElementById('turnIndicator');
+  const turn = turnOrder[currentTurn];
+  indicator.textContent = `Next: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`;
+  indicator.className = `turn-indicator ${turn}`;
+}
+
+// === TURN FUNCTIONS ===
+function humanSpeak() {
+  const input = document.getElementById('humanInput');
+  const message = input.value.trim();
+  if (!message) return;
+  
+  addMessage('human', message);
+  input.value = '';
+  
+  // Move to next turn
+  currentTurn = (currentTurn + 1) % turnOrder.length;
+  if (turnOrder[currentTurn] === 'human') {
+    currentTurn = (currentTurn + 1) % turnOrder.length;
+  }
+  updateTurnIndicator();
+}
+
+async function advanceTurn() {
+  if (isRunning) return;
+  
+  const turn = turnOrder[currentTurn];
+  
+  if (turn === 'human') {
+    // Skip to next AI
+    currentTurn = (currentTurn + 1) % turnOrder.length;
+    updateTurnIndicator();
+    return;
+  }
+  
+  isRunning = true;
+  
+  try {
+    let response;
+    
+    if (turn === 'gpt') {
+      response = await callOpenAI();
+    } else if (turn === 'claude') {
+      response = await callAnthropic();
+    } else if (turn === 'gemini') {
+      response = await callGoogle();
+    }
+    
+    if (response) {
+      addMessage(turn, response);
+    }
+    
+  } catch (error) {
+    console.error(`${turn} error:`, error);
+    addMessage(turn, `[Error: ${error.message}]`);
+  }
+  
+  currentTurn = (currentTurn + 1) % turnOrder.length;
+  updateTurnIndicator();
+  isRunning = false;
+  
+  if (autoMode && turnOrder[currentTurn] !== 'human') {
+    setTimeout(advanceTurn, 1500);
+  }
+}
+
+function autoRun() {
+  autoMode = !autoMode;
+  document.getElementById('autoBtn').textContent = autoMode ? 'Stop Auto' : 'Auto Run';
+  
+  if (autoMode && turnOrder[currentTurn] !== 'human') {
+    advanceTurn();
+  }
+}
+
+function clearConversation() {
+  conversation = [];
+  document.getElementById('conversation').innerHTML = `
+    <div class="message human">
+      <div class="role">System</div>
+      <div class="content">Conversation cleared. Enter a new topic to begin.</div>
+    </div>
+  `;
+  currentTurn = 0;
+  updateTurnIndicator();
+}
+
+// === API CALLS ===
+async function callOpenAI() {
+  if (!keys.openai) throw new Error('OpenAI API key not set');
+  
+  const systemPrompt = `You are GPT, participating in a round-robin discussion with Claude (Anthropic), Gemini (Google), and a human researcher. 
+
+The topic relates to physics, consciousness, and theoretical frameworks. Be concise but substantive. Build on what others have said. If you disagree, explain why.
+
+Keep responses under 200 words unless complexity demands more.`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${keys.openai}`
+    },
+    body: JSON.stringify({
+      model: MODELS.openai,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...getConversationForAI()
+      ],
+      max_tokens: 500
+    })
+  });
+  
+  if (!response.ok) throw new Error('OpenAI API error');
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+async function callAnthropic() {
+  if (!keys.anthropic) throw new Error('Anthropic API key not set');
+  
+  const systemPrompt = `You are Claude, participating in a round-robin discussion with GPT (OpenAI), Gemini (Google), and a human researcher.
+
+The topic relates to physics, consciousness, and theoretical frameworks. Be concise but substantive. Build on what others have said. If you disagree, explain why.
+
+Keep responses under 200 words unless complexity demands more.`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': keys.anthropic,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: MODELS.anthropic,
+      max_tokens: 500,
+      system: systemPrompt,
+      messages: getConversationForAI()
+    })
+  });
+  
+  if (!response.ok) throw new Error('Anthropic API error');
+  const data = await response.json();
+  return data.content[0].text;
+}
+
+async function callGoogle() {
+  if (!keys.google) throw new Error('Google API key not set');
+  
+  const systemPrompt = `You are Gemini, participating in a round-robin discussion with GPT (OpenAI), Claude (Anthropic), and a human researcher.
+
+The topic relates to physics, consciousness, and theoretical frameworks. Be concise but substantive. Build on what others have said. If you disagree, explain why.
+
+Keep responses under 200 words unless complexity demands more.`;
+
+  const conversationText = conversation.map(m => `[${m.speaker.toUpperCase()}]: ${m.content}`).join('\n\n');
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS.google}:generateContent?key=${keys.google}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      contents: [{
+        parts: [{
+          text: `${systemPrompt}\n\nConversation so far:\n${conversationText}\n\nYour response as Gemini:`
+        }]
+      }]
+    })
+  });
+  
+  if (!response.ok) throw new Error('Google API error');
+  const data = await response.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
+function handleKeydown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    humanSpeak();
+  }
+}
+
+// === START ===
+init();
+</script>
+
+</body>
+</html>
