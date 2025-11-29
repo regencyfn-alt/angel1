@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANGEL-1 · Torsion Field · The Underworld</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  min-height: 100vh;
+}
+
+.simulator-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.canvas-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#canvas {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.grid-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.grid-controls button {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grid-controls button:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.grid-controls span {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.panel h3 {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+}
+
+.playback {
+  display: flex;
+  gap: 8px;
+}
+
+.playback button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.playback button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.playback button.sound-on {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.slider-group {
+  margin-bottom: 12px;
+}
+
+.slider-group:last-child {
+  margin-bottom: 0;
+}
+
+.slider-group label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 4px;
+}
+
+.slider-group .value {
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Courier New', monospace;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.metric {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+}
+
+.metric .label {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric .value {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Courier New', monospace;
+}
+
+.color-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.color-row label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.color-row input[type="color"] {
+  width: 40px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.color-row input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.color-row input[type="color"]::-webkit-color-swatch {
+  border-radius: 2px;
+  border: none;
+}
+
+.description {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-style: italic;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">MICHRON PHYSICS</div>
+  <div class="nav-links">
+    <a href="index.html">Classic</a>
+    <a href="torsion-field.html" class="active">Torsion Field</a>
+    <a href="chronos.html">Chronos</a>
+  </div>
+</nav>
+
+<div class="simulator-container">
+  
+  <p class="description">
+    Chronons are not here. They are time — existing in a separate dimension.<br>
+    What you see are the consequences: arcs of contact, traces of mass, the field itself.
+  </p>
+  
+  <!-- Grid Size Controls -->
+  <div class="grid-controls">
+    <button onclick="removeColumn()">− Col</button>
+    <span id="colCount">8</span>
+    <button onclick="addColumn()">+ Col</button>
+    <button onclick="removeRow()">− Row</button>
+    <span id="rowCount">8</span>
+    <button onclick="addRow()">+ Row</button>
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-wrapper">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Controls Below -->
+  <div class="controls-grid">
+    
+    <!-- Control Panel -->
+    <div class="panel">
+      <h3>Control</h3>
+      <div class="playback">
+        <button id="pauseBtn" onclick="togglePause()">Pause</button>
+        <button onclick="reset()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Sound Control -->
+    <div class="panel">
+      <h3>Sound</h3>
+      <div class="playback">
+        <button id="soundBtn" onclick="toggleSound()">Enable Sound</button>
+      </div>
+      <div class="slider-group" style="margin-top: 12px;">
+        <label>
+          <span>Volume</span>
+          <span class="value" id="volumeVal">40%</span>
+        </label>
+        <input type="range" id="volume" min="0" max="100" step="5" value="40" oninput="updateVolume()">
+      </div>
+    </div>
+
+    <!-- Dynamics Panel -->
+    <div class="panel">
+      <h3>Dynamics</h3>
+      <div class="slider-group">
+        <label>
+          <span>Interaction Rate</span>
+          <span class="value" id="rateVal">0.15</span>
+        </label>
+        <input type="range" id="rate" min="0.02" max="0.4" step="0.01" value="0.15" oninput="updateRate()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Arc Duration</span>
+          <span class="value" id="durationVal">0.8s</span>
+        </label>
+        <input type="range" id="duration" min="0.3" max="2.0" step="0.1" value="0.8" oninput="updateDuration()">
+      </div>
+    </div>
+
+    <!-- Metrics Panel -->
+    <div class="panel">
+      <h3>Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="label">Steps</div>
+          <div class="value" id="metricSteps">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Contacts</div>
+          <div class="value" id="metricContacts">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Active Arcs</div>
+          <div class="value" id="metricArcs">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Active Mass</div>
+          <div class="value" id="metricMass">0.00</div>
+        </div>
+        <div class="metric">
+          <div class="label">Peak Arcs</div>
+          <div class="value" id="metricPeak">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Nodes</div>
+          <div class="value" id="metricNodes">64</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color Controls Panel -->
+    <div class="panel">
+      <h3>Colors</h3>
+      <div class="color-row">
+        <label>Arc Flash</label>
+        <input type="color" id="colorArc" value="#ffffff" onchange="updateColors()">
+      </div>
+      <div class="color-row">
+        <label>Inner Glow</label>
+        <input type="color" id="colorInner" value="#508cff" onchange="updateColors()">
+      </div>
+      <div class="color-row">
+        <label>Nodes</label>
+        <input type="color" id="colorNode" value="#648cb4" onchange="updateColors()">
+      </div>
+      <div class="color-row">
+        <label>Grid</label>
+        <input type="color" id="colorGrid" value="#648cb4" onchange="updateColors()">
+      </div>
+      <div class="slider-group" style="margin-top: 8px;">
+        <label>
+          <span>Node Opacity</span>
+          <span class="value" id="nodeOpacityVal">12%</span>
+        </label>
+        <input type="range" id="nodeOpacity" min="5" max="60" step="5" value="12" oninput="updateColors()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Grid Opacity</span>
+          <span class="value" id="gridOpacityVal">5%</span>
+        </label>
+        <input type="range" id="gridOpacity" min="2" max="30" step="2" value="5" oninput="updateColors()">
+      </div>
+      <div class="slider-group">
+        <label>
+          <span>Mass Opacity</span>
+          <span class="value" id="massOpacityVal">60%</span>
+        </label>
+        <input type="range" id="massOpacity" min="0" max="100" step="5" value="60" oninput="updateMassOpacity()">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// === CONFIGURATION ===
+let COLS = 8;
+let ROWS = 8;
+let CELL_SIZE = 70;
+const NODE_RADIUS = 4; // Small, just coordinate markers
+
+// Colors - ethereal, minimal
+const BG_COLOR = '#000000';
+const GRID_LINE_COLOR = 'rgba(255, 255, 255, 0.04)';
+const NODE_COLOR = 'rgba(255, 255, 255, 0.12)';
+const NODE_GLOW_COLOR = 'rgba(255, 255, 255, 0.25)';
+const ARC_COLOR = '#ffffff';
+const MASS_COLOR = 'rgba(255, 255, 255, 0.6)';
+
+// State
+let canvas, ctx;
+let nodes = [];
+let arcs = [];
+let isPaused = false;
+let lastTime = null;
+let steps = 0;
+let totalContacts = 0;
+let peakMass = 0;
+
+// Parameters
+let interactionRate = 0.15;
+let arcDuration = 0.8;
+let masterVolume = 0.4;
+
+// Colors - configurable
+let arcColor = 'rgba(255, 255, 255, 1)';
+let innerGlowColor = 'rgba(80, 140, 255, 1)';
+let nodeColor = 'rgba(100, 140, 180, 0.12)'; // Very dim
+let gridColor = 'rgba(100, 140, 180, 0.05)'; // Very subtle
+let massOpacity = 0.6; // Tuneable mass visibility
+
+// Sound
+let audioCtx = null;
+let soundEnabled = false;
+
+// Piano frequencies for 8 octaves (C1 to C8)
+const BASE_FREQ = 32.70; // C1
+function getNoteFrequency(col, row) {
+  // Map grid position to note index (0-63)
+  // Bottom-left = lowest, top-right = highest
+  const noteIndex = (ROWS - 1 - row) * COLS + col;
+  const totalNotes = COLS * ROWS;
+  // Map to ~5 octaves for pleasant range
+  const octaveSpan = 5;
+  const semitone = (noteIndex / totalNotes) * (octaveSpan * 12);
+  return BASE_FREQ * Math.pow(2, semitone / 12);
+}
+
+// === NODE CLASS ===
+class Node {
+  constructor(col, row) {
+    this.col = col;
+    this.row = row;
+    this.mass = 0;
+    this.phase = Math.random() * Math.PI * 2;
+    this.lastInteraction = 0;
+  }
+  
+  get x() { return this.col * CELL_SIZE + CELL_SIZE / 2; }
+  get y() { return this.row * CELL_SIZE + CELL_SIZE / 2; }
+  get frequency() { return getNoteFrequency(this.col, this.row); }
+}
+
+// === ARC CLASS ===
+// Represents a contact between two adjacent chronons
+class Arc {
+  constructor(node1, node2, startTime, massGain) {
+    this.node1 = node1;
+    this.node2 = node2;
+    this.startTime = startTime;
+    this.massGain = massGain || 0.5;
+    
+    // Midpoint - ON the line between nodes
+    this.midX = (node1.x + node2.x) / 2;
+    this.midY = (node1.y + node2.y) / 2;
+    
+    // Direction of the connection
+    const dx = node2.x - node1.x;
+    const dy = node2.y - node1.y;
+    this.baseAngle = Math.atan2(dy, dx);
+    
+    // Random direction - left (-1) or right (1)
+    // Left arcs: smaller range (45°), longer duration
+    // Right arcs: larger range (90°), shorter duration
+    this.direction = Math.random() > 0.5 ? 1 : -1;
+    
+    // Left arcs last longer
+    this.duration = this.direction === -1 ? arcDuration * 1.5 : arcDuration;
+    
+    this.progress = 0;
+    this.phase = 0;
+  }
+  
+  update(dt) {
+    this.progress += dt / this.duration;
+    return this.progress >= 1;
+  }
+  
+  draw(ctx, arcColor, innerGlowColor, massOpacity) {
+    const alpha = this.getAlpha();
+    if (alpha <= 0) return;
+    
+    ctx.save();
+    
+    // Arc circles around ONE of the nodes (not midpoint)
+    // Use node1 as the center
+    ctx.translate(this.node1.x, this.node1.y);
+    
+    // Arc radii - donut around the node
+    const arcR = CELL_SIZE * 0.35; // Outer white arc radius
+    const massR = arcR * 0.6; // Inner blue mass radius (stable ring)
+    
+    // Direction: left arcs (-1) = 45°, right arcs (1) = 90°
+    const isLeftArc = this.direction === -1;
+    const totalSweep = isLeftArc ? (Math.PI * 0.25) : (Math.PI * 0.5); // 45° or 90°
+    
+    // Start angle points toward the other node
+    const startAngle = this.baseAngle;
+    // Sweep direction based on left/right
+    const endAngle = startAngle + (isLeftArc ? totalSweep : totalSweep);
+    
+    // Progress determines sweep position
+    let sweepProgress;
+    let isFlashing = false;
+    
+    if (this.progress < 0.1) {
+      sweepProgress = 0;
+      isFlashing = true;
+    } else if (this.progress < 0.9) {
+      sweepProgress = (this.progress - 0.1) / 0.8;
+    } else {
+      sweepProgress = 1;
+    }
+    
+    // Current sweep position
+    const sweepAngle = startAngle + totalSweep * sweepProgress;
+    
+    // BLUE MASS - stable inner ring (full extent, always visible)
+    if (massOpacity > 0.01) {
+      const massAlpha = alpha * massOpacity * (isFlashing ? 1.0 : 0.7);
+      
+      ctx.beginPath();
+      ctx.arc(0, 0, massR, startAngle, endAngle, false);
+      
+      ctx.strokeStyle = innerGlowColor.replace('1)', `${Math.min(1, massAlpha)})`);
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = innerGlowColor;
+      ctx.shadowBlur = isFlashing ? 12 : 6;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    
+    // WHITE ARC - thin line, sweeps from start to current position
+    // Flash: full arc. Sweep: from sweep point to end (erasing behind)
+    let arcStart, arcEnd;
+    
+    if (isFlashing) {
+      arcStart = startAngle;
+      arcEnd = endAngle;
+    } else {
+      // Remaining arc: from current sweep to end
+      arcStart = sweepAngle;
+      arcEnd = endAngle;
+    }
+    
+    const arcLength = Math.abs(arcEnd - arcStart);
+    
+    if (arcLength > 0.02) {
+      ctx.beginPath();
+      ctx.arc(0, 0, arcR, arcStart, arcEnd, false);
+      
+      ctx.strokeStyle = arcColor.replace('1)', `${alpha})`);
+      ctx.lineWidth = 1; // Very thin single line
+      ctx.lineCap = 'round';
+      ctx.shadowColor = arcColor;
+      ctx.shadowBlur = isFlashing ? 15 : 8;
+      ctx.stroke();
+    }
+    
+    // SWEEP POINT - dot at leading edge
+    if (!isFlashing && this.progress < 0.88) {
+      const pointX = Math.cos(sweepAngle) * arcR;
+      const pointY = Math.sin(sweepAngle) * arcR;
+      
+      ctx.beginPath();
+      ctx.arc(pointX, pointY, 2, 0, Math.PI * 2);
+      ctx.fillStyle = arcColor.replace('1)', `${alpha})`);
+      ctx.shadowColor = arcColor;
+      ctx.shadowBlur = 10;
+      ctx.fill();
+    }
+    
+    ctx.restore();
+  }
+  
+  getAlpha() {
+    if (this.progress < 0.15) {
+      // FLASH - full brightness, quick fade in
+      return Math.min(1, this.progress / 0.05);
+    } else if (this.progress < 0.85) {
+      // SWEEP - steady brightness
+      return 0.9;
+    } else {
+      // FADE OUT
+      return 0.9 * (1 - (this.progress - 0.85) / 0.15);
+    }
+  }
+}
+
+// === SOUND ===
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playContactSound(node1, node2, intensity) {
+  if (!soundEnabled || !audioCtx) return;
+  
+  const freq1 = node1.frequency;
+  const freq2 = node2.frequency;
+  const avgFreq = (freq1 + freq2) / 2;
+  
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(avgFreq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(avgFreq * 1.02, audioCtx.currentTime + arcDuration * 0.3);
+  osc.frequency.exponentialRampToValueAtTime(avgFreq * 0.98, audioCtx.currentTime + arcDuration);
+  
+  const volume = masterVolume * 0.15 * intensity;
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.05);
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime + arcDuration * 0.35);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + arcDuration);
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + arcDuration + 0.1);
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('soundBtn');
+  
+  if (soundEnabled) {
+    initAudio();
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    btn.textContent = 'Sound On';
+    btn.classList.add('sound-on');
+  } else {
+    btn.textContent = 'Enable Sound';
+    btn.classList.remove('sound-on');
+  }
+}
+
+function updateVolume() {
+  masterVolume = parseInt(document.getElementById('volume').value) / 100;
+  document.getElementById('volumeVal').textContent = Math.round(masterVolume * 100) + '%';
+}
+
+// === INITIALIZATION ===
+function calculateCellSize() {
+  const maxWidth = Math.min(window.innerWidth - 60, 900);
+  const maxHeight = Math.min(window.innerHeight - 400, 700);
+  CELL_SIZE = Math.min(Math.floor(maxWidth / COLS), Math.floor(maxHeight / ROWS), 80);
+  CELL_SIZE = Math.max(CELL_SIZE, 40);
+}
+
+function init() {
+  canvas = document.getElementById('canvas');
+  ctx = canvas.getContext('2d');
+  
+  calculateCellSize();
+  
+  canvas.width = COLS * CELL_SIZE;
+  canvas.height = ROWS * CELL_SIZE;
+  
+  // Create nodes
+  nodes = [];
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      nodes.push(new Node(col, row));
+    }
+  }
+  
+  arcs = [];
+  steps = 0;
+  totalContacts = 0;
+  peakMass = 0;
+  lastTime = null;
+  
+  document.getElementById('colCount').textContent = COLS;
+  document.getElementById('rowCount').textContent = ROWS;
+  document.getElementById('metricNodes').textContent = COLS * ROWS;
+  
+  draw();
+}
+
+// === GRID CONTROLS ===
+function addColumn() { if (COLS < 12) { COLS++; init(); } }
+function removeColumn() { if (COLS > 4) { COLS--; init(); } }
+function addRow() { if (ROWS < 12) { ROWS++; init(); } }
+function removeRow() { if (ROWS > 4) { ROWS--; init(); } }
+
+// === GET NODE ===
+function getNode(col, row) {
+  if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return null;
+  return nodes[row * COLS + col];
+}
+
+// === EVOLUTION ===
+function evolve(dt, currentTime) {
+  steps++;
+  
+  // Update existing arcs
+  arcs = arcs.filter(arc => !arc.update(dt));
+  
+  // Update node phases
+  for (const node of nodes) {
+    node.phase += dt * 0.5;
+  }
+  
+  // Random interactions between adjacent chronons
+  for (const node of nodes) {
+    if (Math.random() > interactionRate * dt * 60) continue;
+    
+    // Pick random adjacent node
+    const directions = [
+      [0, -1], [0, 1], [-1, 0], [1, 0]
+    ];
+    const [dc, dr] = directions[Math.floor(Math.random() * 4)];
+    const neighbor = getNode(node.col + dc, node.row + dr);
+    
+    if (!neighbor) continue;
+    
+    // Check if we already have an arc between these nodes
+    const existingArcIndex = arcs.findIndex(a => 
+      (a.node1 === node && a.node2 === neighbor) ||
+      (a.node1 === neighbor && a.node2 === node)
+    );
+    
+    // If there's an existing arc, small chance to interrupt it
+    if (existingArcIndex !== -1) {
+      if (Math.random() < 0.3) {
+        // INTERRUPT - arc vanishes instantly, new one opens in different direction
+        arcs.splice(existingArcIndex, 1);
+      } else {
+        continue; // Don't create new arc
+      }
+    }
+    
+    // Create contact arc with mass intensity
+    const massGain = 0.3 + Math.random() * 0.7;
+    const arc = new Arc(node, neighbor, currentTime, massGain);
+    arcs.push(arc);
+    totalContacts++;
+    
+    // Play sound
+    playContactSound(node, neighbor, massGain);
+  }
+  
+  // Track peak arcs
+  peakMass = Math.max(peakMass, arcs.length);
+}
+
+// === DRAWING ===
+function draw() {
+  // Clear to black
+  ctx.fillStyle = BG_COLOR;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw the underworld grid lines
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  
+  // Vertical lines
+  for (let col = 0; col < COLS; col++) {
+    const x = col * CELL_SIZE + CELL_SIZE / 2;
+    ctx.beginPath();
+    ctx.moveTo(x, CELL_SIZE / 2);
+    ctx.lineTo(x, canvas.height - CELL_SIZE / 2);
+    ctx.stroke();
+  }
+  
+  // Horizontal lines
+  for (let row = 0; row < ROWS; row++) {
+    const y = row * CELL_SIZE + CELL_SIZE / 2;
+    ctx.beginPath();
+    ctx.moveTo(CELL_SIZE / 2, y);
+    ctx.lineTo(canvas.width - CELL_SIZE / 2, y);
+    ctx.stroke();
+  }
+  
+  // Draw nodes - neutral, unchanging
+  for (const node of nodes) {
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = nodeColor;
+    ctx.fill();
+  }
+  
+  // Draw connection lines between nodes
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  for (const node of nodes) {
+    const rightNode = getNode(node.col + 1, node.row);
+    const downNode = getNode(node.col, node.row + 1);
+    
+    if (rightNode) {
+      ctx.beginPath();
+      ctx.moveTo(node.x, node.y);
+      ctx.lineTo(rightNode.x, rightNode.y);
+      ctx.stroke();
+    }
+    
+    if (downNode) {
+      ctx.beginPath();
+      ctx.moveTo(node.x, node.y);
+      ctx.lineTo(downNode.x, downNode.y);
+      ctx.stroke();
+    }
+  }
+  
+  // Draw contact arcs - pass colors and mass opacity
+  for (const arc of arcs) {
+    arc.draw(ctx, arcColor, innerGlowColor, massOpacity);
+  }
+  
+  updateMetrics();
+}
+
+function updateMetrics() {
+  document.getElementById('metricSteps').textContent = steps;
+  document.getElementById('metricContacts').textContent = totalContacts;
+  document.getElementById('metricArcs').textContent = arcs.length;
+  
+  // Active mass is sum of mass in current arcs
+  const activeMass = arcs.reduce((sum, arc) => sum + arc.massGain * (1 - arc.progress), 0);
+  document.getElementById('metricMass').textContent = activeMass.toFixed(2);
+  document.getElementById('metricPeak').textContent = peakMass; // Peak simultaneous arcs
+}
+
+// === UI CONTROLS ===
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
+}
+
+function reset() {
+  init();
+}
+
+function updateRate() {
+  interactionRate = parseFloat(document.getElementById('rate').value);
+  document.getElementById('rateVal').textContent = interactionRate.toFixed(2);
+}
+
+function updateDuration() {
+  arcDuration = parseFloat(document.getElementById('duration').value);
+  document.getElementById('durationVal').textContent = arcDuration.toFixed(1) + 's';
+}
+
+function updateColors() {
+  // Get color values
+  const arcHex = document.getElementById('colorArc').value;
+  const innerHex = document.getElementById('colorInner').value;
+  const nodeHex = document.getElementById('colorNode').value;
+  const gridHex = document.getElementById('colorGrid').value;
+  
+  // Get opacity values
+  const nodeOp = parseInt(document.getElementById('nodeOpacity').value) / 100;
+  const gridOp = parseInt(document.getElementById('gridOpacity').value) / 100;
+  
+  document.getElementById('nodeOpacityVal').textContent = Math.round(nodeOp * 100) + '%';
+  document.getElementById('gridOpacityVal').textContent = Math.round(gridOp * 100) + '%';
+  
+  // Convert hex to rgba
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  
+  arcColor = hexToRgba(arcHex, 1);
+  innerGlowColor = hexToRgba(innerHex, 1);
+  nodeColor = hexToRgba(nodeHex, nodeOp);
+  gridColor = hexToRgba(gridHex, gridOp);
+}
+
+function updateMassOpacity() {
+  massOpacity = parseInt(document.getElementById('massOpacity').value) / 100;
+  document.getElementById('massOpacityVal').textContent = Math.round(massOpacity * 100) + '%';
+}
+
+// === RESIZE ===
+window.addEventListener('resize', () => {
+  calculateCellSize();
+  canvas.width = COLS * CELL_SIZE;
+  canvas.height = ROWS * CELL_SIZE;
+});
+
+// === ANIMATION LOOP ===
+function animate(timestamp) {
+  if (lastTime === null) lastTime = timestamp;
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+  lastTime = timestamp;
+  
+  if (!isPaused) {
+    evolve(dt, timestamp / 1000);
+  }
+  
+  draw();
+  requestAnimationFrame(animate);
+}
+
+// === START ===
+init();
+requestAnimationFrame(animate);
+</script>
+
+</body>
+</html>
