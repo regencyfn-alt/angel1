@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANGEL-1 · Breath Field</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Space+Mono:wght@400&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #0a0a0c;
+            color: #e8e4dc;
+            font-family: 'Cormorant Garamond', serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        .logo {
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: #c9a55a;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        nav { display: flex; gap: 2rem; }
+        
+        nav a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            font-family: 'Space Mono', monospace;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active { color: #e8e4dc; }
+        
+        .epigraph {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.1rem;
+            color: #888;
+            font-style: italic;
+            letter-spacing: 0.02em;
+            line-height: 1.8;
+        }
+        
+        .epigraph em { color: #a89060; }
+        
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 2rem 3rem;
+        }
+        
+        .canvas-container {
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(169, 144, 96, 0.05), inset 0 0 60px rgba(0,0,0,0.3);
+        }
+        
+        #field-canvas {
+            display: block;
+            background: #050507;
+            cursor: crosshair;
+        }
+        
+        .interaction-hint {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: #555;
+            margin-top: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 3rem;
+            margin-top: 2rem;
+            padding: 1.5rem 2rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 2px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group label {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: #666;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+        }
+        
+        .control-group input[type="range"] {
+            width: 140px;
+            height: 2px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 1px;
+            cursor: pointer;
+        }
+        
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #c9a55a;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            padding: 0.6rem 1.2rem;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #e8e4dc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: rgba(201, 165, 90, 0.1);
+            border-color: #c9a55a;
+        }
+        
+        button.active {
+            background: rgba(201, 165, 90, 0.15);
+            border-color: #c9a55a;
+            color: #c9a55a;
+        }
+        
+        .visualization-modes {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .mode-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.65rem;
+        }
+        
+        .metrics {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: #555;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .metric-value {
+            font-size: 1.1rem;
+            color: #c9a55a;
+        }
+        
+        .metric-label {
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        .probe-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 10, 12, 0.95);
+            border: 1px solid rgba(201, 165, 90, 0.3);
+            padding: 1rem 1.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            min-width: 200px;
+            display: none;
+            z-index: 100;
+        }
+        
+        .probe-panel.active { display: block; }
+        
+        .probe-title {
+            color: #c9a55a;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+        
+        .probe-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.4rem;
+            color: #888;
+        }
+        
+        .probe-row .label { color: #666; }
+        .probe-row .value { color: #e8e4dc; }
+        .probe-row.highlight .value { color: #c9a55a; }
+        
+        .probe-coords {
+            color: #555;
+            font-size: 0.65rem;
+            margin-top: 0.8rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">MICHRON PHYSICS</div>
+        <nav>
+            <a href="index.html">Classic</a>
+            <a href="torsion-field.html">Torsion Field</a>
+            <a href="#" class="active">Breath Field</a>
+            <a href="chronos.html">Chronos</a>
+        </nav>
+    </header>
+    
+    <div class="epigraph">
+        The field breathes. <em>Inhale</em>: contraction, withdrawal, return.<br>
+        <em>Exhale</em>: expansion, emergence, presence. The vortex persists through both.
+    </div>
+    
+    <div class="probe-panel" id="probe-panel">
+        <div class="probe-title">Field Probe</div>
+        <div class="probe-row">
+            <span class="label">Amplitude</span>
+            <span class="value" id="probe-amp">—</span>
+        </div>
+        <div class="probe-row">
+            <span class="label">Phase</span>
+            <span class="value" id="probe-phase">—</span>
+        </div>
+        <div class="probe-row">
+            <span class="label">Velocity</span>
+            <span class="value" id="probe-vel">—</span>
+        </div>
+        <div class="probe-row highlight">
+            <span class="label">Vorticity</span>
+            <span class="value" id="probe-vort">—</span>
+        </div>
+        <div class="probe-row">
+            <span class="label">State</span>
+            <span class="value" id="probe-state">—</span>
+        </div>
+        <div class="probe-coords" id="probe-coords">Hover over field</div>
+    </div>
+    
+    <main>
+        <div class="canvas-container">
+            <canvas id="field-canvas" width="900" height="600"></canvas>
+        </div>
+        
+        <div class="interaction-hint">
+            Hover to probe · Shift+Click to perturb · Export downloads full field data
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Breath Rate</label>
+                <input type="range" id="breath-rate" min="0.1" max="2" step="0.1" value="0.8">
+            </div>
+            <div class="control-group">
+                <label>Coupling Strength</label>
+                <input type="range" id="coupling" min="0.01" max="0.3" step="0.01" value="0.12">
+            </div>
+            <div class="control-group">
+                <label>Initial Twist</label>
+                <input type="range" id="twist" min="0" max="5" step="0.5" value="2">
+            </div>
+            <div class="control-group">
+                <label>Damping</label>
+                <input type="range" id="damping" min="0.99" max="1" step="0.001" value="0.997">
+            </div>
+        </div>
+        
+        <div class="control-row">
+            <button id="pause-btn">Pause</button>
+            <button id="reset-btn">Reset</button>
+            <button id="perturb-btn">Add Perturbation</button>
+            <button id="vortex-btn">Seed Vortex</button>
+            <button id="export-btn">Export Data</button>
+        </div>
+        
+        <div class="visualization-modes">
+            <button class="mode-btn active" data-mode="amplitude">Amplitude</button>
+            <button class="mode-btn" data-mode="phase">Phase</button>
+            <button class="mode-btn" data-mode="vorticity">Vorticity</button>
+            <button class="mode-btn" data-mode="breath">Breath</button>
+        </div>
+        
+        <div class="metrics">
+            <div class="metric">
+                <span class="metric-value" id="vortex-count">0</span>
+                <span class="metric-label">Vortices</span>
+            </div>
+            <div class="metric">
+                <span class="metric-value" id="total-energy">0</span>
+                <span class="metric-label">Field Energy</span>
+            </div>
+            <div class="metric">
+                <span class="metric-value" id="avg-phase">0</span>
+                <span class="metric-label">Coherence</span>
+            </div>
+            <div class="metric">
+                <span class="metric-value" id="tick">0</span>
+                <span class="metric-label">Tick</span>
+            </div>
+            <div class="metric">
+                <span class="metric-value" id="breath-phase">—</span>
+                <span class="metric-label">Breath</span>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // ========================================
+        // BREATH FIELD SIMULATION v2
+        // The field breathes. Chronons emerge.
+        // ========================================
+        
+        const canvas = document.getElementById('field-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Field dimensions
+        const GRID_W = 180;
+        const GRID_H = 120;
+        const CELL_W = canvas.width / GRID_W;
+        const CELL_H = canvas.height / GRID_H;
+        
+        // Field state
+        let field = {
+            amplitude: [],
+            phase: [],
+            velocity: [],
+            vorticity: []
+        };
+        
+        // Simulation parameters
+        let params = {
+            breathRate: 0.8,
+            coupling: 0.12,
+            initialTwist: 2,
+            damping: 0.997
+        };
+        
+        // Global state
+        let running = true;
+        let tick = 0;
+        let vizMode = 'amplitude';
+        let globalBreathPhase = 0;
+        const BREATH_PERIOD = 200;
+        const REST_AMPLITUDE = 0.25;
+        
+        // Initialize field with pre-existing twist
+        function initField() {
+            field.amplitude = [];
+            field.phase = [];
+            field.velocity = [];
+            field.vorticity = [];
+            
+            const twist = params.initialTwist;
+            
+            for (let y = 0; y < GRID_H; y++) {
+                field.amplitude[y] = [];
+                field.phase[y] = [];
+                field.velocity[y] = [];
+                field.vorticity[y] = [];
+                
+                for (let x = 0; x < GRID_W; x++) {
+                    const nx = x / GRID_W;
+                    const ny = y / GRID_H;
+                    
+                    // Pre-twisted structure
+                    const basePhase = twist * (
+                        Math.sin(nx * Math.PI * 4) * Math.cos(ny * Math.PI * 3) +
+                        0.5 * Math.sin(nx * Math.PI * 7 + ny * Math.PI * 5) +
+                        0.3 * Math.sin((nx + ny) * Math.PI * 11)
+                    );
+                    
+                    const noise = (Math.random() - 0.5) * 0.5;
+                    
+                    field.amplitude[y][x] = REST_AMPLITUDE + 0.05 * Math.sin(nx * Math.PI * 2) * Math.sin(ny * Math.PI * 2) + (Math.random() - 0.5) * 0.05;
+                    field.phase[y][x] = basePhase + noise;
+                    field.velocity[y][x] = (Math.random() - 0.5) * 0.05;
+                    field.vorticity[y][x] = 0;
+                }
+            }
+            
+            tick = 0;
+            globalBreathPhase = 0;
+        }
+        
+        // Get field value with wrapping
+        function getPhase(x, y) {
+            const wx = ((x % GRID_W) + GRID_W) % GRID_W;
+            const wy = ((y % GRID_H) + GRID_H) % GRID_H;
+            return field.phase[wy][wx];
+        }
+        
+        function getAmplitude(x, y) {
+            const wx = ((x % GRID_W) + GRID_W) % GRID_W;
+            const wy = ((y % GRID_H) + GRID_H) % GRID_H;
+            return field.amplitude[wy][wx];
+        }
+        
+        // Phase difference accounting for wraparound
+        function phaseDiff(p1, p2) {
+            let diff = p1 - p2;
+            while (diff > Math.PI) diff -= 2 * Math.PI;
+            while (diff < -Math.PI) diff += 2 * Math.PI;
+            return diff;
+        }
+        
+        // Compute local vorticity
+        function computeVorticity(x, y) {
+            const pN = getPhase(x, y - 1);
+            const pS = getPhase(x, y + 1);
+            const pE = getPhase(x + 1, y);
+            const pW = getPhase(x - 1, y);
+            const pNE = getPhase(x + 1, y - 1);
+            const pNW = getPhase(x - 1, y - 1);
+            const pSE = getPhase(x + 1, y + 1);
+            const pSW = getPhase(x - 1, y + 1);
+            
+            let circulation = 0;
+            circulation += phaseDiff(pE, pNE);
+            circulation += phaseDiff(pSE, pE);
+            circulation += phaseDiff(pS, pSE);
+            circulation += phaseDiff(pSW, pS);
+            circulation += phaseDiff(pW, pSW);
+            circulation += phaseDiff(pNW, pW);
+            circulation += phaseDiff(pN, pNW);
+            circulation += phaseDiff(pNE, pN);
+            
+            return circulation / (2 * Math.PI);
+        }
+        
+        // THE BREATH: Update field state
+        function updateField() {
+            const dt = 0.1 * params.breathRate;
+            const coupling = params.coupling;
+            const damping = params.damping;
+            
+            // Global breath tide
+            globalBreathPhase += (2 * Math.PI / BREATH_PERIOD) * params.breathRate;
+            const breathTide = Math.sin(globalBreathPhase);
+            const isInhaling = breathTide < 0;
+            const isExhaling = breathTide > 0;
+            
+            const newPhase = [];
+            const newVelocity = [];
+            const newAmplitude = [];
+            
+            for (let y = 0; y < GRID_H; y++) {
+                newPhase[y] = [];
+                newVelocity[y] = [];
+                newAmplitude[y] = [];
+                
+                for (let x = 0; x < GRID_W; x++) {
+                    const currentPhase = field.phase[y][x];
+                    const currentVel = field.velocity[y][x];
+                    const currentAmp = field.amplitude[y][x];
+                    
+                    const pN = getPhase(x, y - 1);
+                    const pS = getPhase(x, y + 1);
+                    const pE = getPhase(x + 1, y);
+                    const pW = getPhase(x - 1, y);
+                    
+                    const aN = getAmplitude(x, y - 1);
+                    const aS = getAmplitude(x, y + 1);
+                    const aE = getAmplitude(x + 1, y);
+                    const aW = getAmplitude(x - 1, y);
+                    
+                    // Phase coupling
+                    let phaseForce = 0;
+                    phaseForce += aN * Math.sin(phaseDiff(pN, currentPhase));
+                    phaseForce += aS * Math.sin(phaseDiff(pS, currentPhase));
+                    phaseForce += aE * Math.sin(phaseDiff(pE, currentPhase));
+                    phaseForce += aW * Math.sin(phaseDiff(pW, currentPhase));
+                    phaseForce *= coupling;
+                    
+                    const ampLaplacian = (aN + aS + aE + aW - 4 * currentAmp);
+                    const vort = Math.abs(field.vorticity[y][x]);
+                    const stabilization = 1.0 / (1.0 + vort * 3);
+                    
+                    // Update velocity
+                    let newVel = currentVel + phaseForce * dt * stabilization;
+                    newVel *= damping;
+                    
+                    // Update phase
+                    let newPh = currentPhase + newVel * dt;
+                    
+                    // BREATH DYNAMICS
+                    const springForce = (REST_AMPLITUDE - currentAmp) * 0.02;
+                    const tideInfluence = breathTide * 0.015 * (1 - Math.min(vort, 0.8));
+                    
+                    let vortexGrowth = 0;
+                    if (vort > 0.3) {
+                        if (isExhaling) {
+                            vortexGrowth = vort * 0.005 * Math.max(0, 1 - currentAmp);
+                        } else {
+                            vortexGrowth = -vort * 0.003;
+                        }
+                    }
+                    
+                    const diffusion = 0.01 * ampLaplacian * dt;
+                    
+                    let newAmp = currentAmp + springForce + tideInfluence + vortexGrowth + diffusion;
+                    newAmp = Math.max(0.05, Math.min(1.0, newAmp));
+                    
+                    newPhase[y][x] = newPh;
+                    newVelocity[y][x] = newVel;
+                    newAmplitude[y][x] = newAmp;
+                }
+            }
+            
+            // Copy and compute vorticity
+            for (let y = 0; y < GRID_H; y++) {
+                for (let x = 0; x < GRID_W; x++) {
+                    field.phase[y][x] = newPhase[y][x];
+                    field.velocity[y][x] = newVelocity[y][x];
+                    field.amplitude[y][x] = newAmplitude[y][x];
+                    field.vorticity[y][x] = computeVorticity(x, y);
+                }
+            }
+            
+            tick++;
+        }
+        
+        // Color functions
+        function amplitudeColor(amp, phase) {
+            const h = 35 + amp * 20;
+            const s = 40 + amp * 30;
+            const l = amp * 50;
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+        
+        function phaseColor(phase, amp) {
+            const h = ((phase % (2 * Math.PI)) / (2 * Math.PI)) * 360;
+            if (h < 0) h += 360;
+            const s = 60;
+            const l = 20 + amp * 40;
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+        
+        function vorticityColor(vort, amp) {
+            const absVort = Math.abs(vort);
+            if (absVort < 0.1) {
+                const l = amp * 15;
+                return `hsl(220, 20%, ${l}%)`;
+            }
+            const h = vort > 0 ? 180 : 300;
+            const s = 70;
+            const l = 15 + absVort * 60;
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+        
+        function breathColor(amp, vel) {
+            const tideFactor = Math.sin(globalBreathPhase);
+            const localBreath = Math.tanh(vel * 5);
+            const combined = tideFactor * 0.6 + localBreath * 0.4;
+            
+            if (combined < 0) {
+                const intensity = Math.abs(combined);
+                const l = 8 + intensity * amp * 45;
+                const h = 220 + intensity * 40;
+                return `hsl(${h}, 65%, ${l}%)`;
+            } else {
+                const intensity = combined;
+                const l = 8 + intensity * amp * 45;
+                const h = 35 + intensity * 15;
+                return `hsl(${h}, 75%, ${l}%)`;
+            }
+        }
+        
+        // Render
+        function render() {
+            ctx.fillStyle = '#050507';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let y = 0; y < GRID_H; y++) {
+                for (let x = 0; x < GRID_W; x++) {
+                    const amp = field.amplitude[y][x];
+                    const phase = field.phase[y][x];
+                    const vort = field.vorticity[y][x];
+                    const vel = field.velocity[y][x];
+                    
+                    let color;
+                    switch (vizMode) {
+                        case 'amplitude': color = amplitudeColor(amp, phase); break;
+                        case 'phase': color = phaseColor(phase, amp); break;
+                        case 'vorticity': color = vorticityColor(vort, amp); break;
+                        case 'breath': color = breathColor(amp, vel); break;
+                    }
+                    
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x * CELL_W, y * CELL_H, CELL_W + 0.5, CELL_H + 0.5);
+                }
+            }
+            
+            // Highlight vortices
+            if (vizMode !== 'vorticity') {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                
+                for (let y = 2; y < GRID_H - 2; y++) {
+                    for (let x = 2; x < GRID_W - 2; x++) {
+                        const vort = Math.abs(field.vorticity[y][x]);
+                        if (vort > 0.4) {
+                            const cx = (x + 0.5) * CELL_W;
+                            const cy = (y + 0.5) * CELL_H;
+                            const r = vort * 8;
+                            
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Metrics
+        function computeMetrics() {
+            let vortexCount = 0;
+            let totalEnergy = 0;
+            let sumCos = 0, sumSin = 0;
+            
+            for (let y = 0; y < GRID_H; y++) {
+                for (let x = 0; x < GRID_W; x++) {
+                    const amp = field.amplitude[y][x];
+                    const vel = field.velocity[y][x];
+                    const vort = Math.abs(field.vorticity[y][x]);
+                    const phase = field.phase[y][x];
+                    
+                    totalEnergy += 0.5 * vel * vel + 0.5 * amp * amp;
+                    if (vort > 0.5) vortexCount++;
+                    
+                    sumCos += Math.cos(phase);
+                    sumSin += Math.sin(phase);
+                }
+            }
+            
+            const n = GRID_W * GRID_H;
+            const phaseCoherence = Math.sqrt(sumCos * sumCos + sumSin * sumSin) / n;
+            
+            document.getElementById('vortex-count').textContent = vortexCount;
+            document.getElementById('total-energy').textContent = totalEnergy.toFixed(1);
+            document.getElementById('avg-phase').textContent = phaseCoherence.toFixed(3);
+            document.getElementById('tick').textContent = tick;
+            
+            const breathTide = Math.sin(globalBreathPhase);
+            document.getElementById('breath-phase').textContent = breathTide > 0 ? '↑ exhale' : '↓ inhale';
+        }
+        
+        // Perturbation
+        function addPerturbation() {
+            const cx = Math.floor(Math.random() * GRID_W);
+            const cy = Math.floor(Math.random() * GRID_H);
+            const radius = 10 + Math.random() * 15;
+            const strength = (Math.random() - 0.5) * 3;
+            
+            for (let y = 0; y < GRID_H; y++) {
+                for (let x = 0; x < GRID_W; x++) {
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < radius) {
+                        const falloff = Math.cos((dist / radius) * Math.PI / 2);
+                        field.velocity[y][x] += strength * falloff;
+                        field.amplitude[y][x] += Math.abs(strength) * 0.1 * falloff;
+                    }
+                }
+            }
+        }
+        
+        // Seed vortex
+        function seedVortex() {
+            const cx = Math.floor(GRID_W * 0.3 + Math.random() * GRID_W * 0.4);
+            const cy = Math.floor(GRID_H * 0.3 + Math.random() * GRID_H * 0.4);
+            const sign = Math.random() > 0.5 ? 1 : -1;
+            const radius = 8 + Math.random() * 8;
+            
+            for (let y = 0; y < GRID_H; y++) {
+                for (let x = 0; x < GRID_W; x++) {
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < radius && dist > 0) {
+                        const angle = Math.atan2(dy, dx);
+                        const falloff = 1 - dist / radius;
+                        field.phase[y][x] += sign * angle * falloff;
+                        field.amplitude[y][x] += 0.3 * falloff;
+                    }
+                }
+            }
+        }
+        
+        // Probe
+        function updateProbe(x, y) {
+            if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H) return;
+            
+            const amp = field.amplitude[y][x];
+            const phase = field.phase[y][x];
+            const vel = field.velocity[y][x];
+            const vort = field.vorticity[y][x];
+            
+            let phaseDeg = ((phase % (2 * Math.PI)) / (2 * Math.PI)) * 360;
+            if (phaseDeg < 0) phaseDeg += 360;
+            
+            let state = 'stable';
+            if (Math.abs(vort) > 0.5) state = vort > 0 ? 'vortex +' : 'vortex −';
+            else if (Math.abs(vel) > 0.3) state = vel > 0 ? 'exhaling' : 'inhaling';
+            else if (amp > 0.6) state = 'tensed';
+            else if (amp < 0.15) state = 'relaxed';
+            
+            document.getElementById('probe-amp').textContent = amp.toFixed(4);
+            document.getElementById('probe-phase').textContent = phaseDeg.toFixed(1) + '°';
+            document.getElementById('probe-vel').textContent = vel.toFixed(4);
+            document.getElementById('probe-vort').textContent = vort.toFixed(4);
+            document.getElementById('probe-state').textContent = state;
+            document.getElementById('probe-coords').textContent = `[${x}, ${y}]`;
+            
+            document.getElementById('probe-panel').classList.add('active');
+        }
+        
+        // Animation loop
+        function animate() {
+            if (running) {
+                updateField();
+            }
+            render();
+            computeMetrics();
+            requestAnimationFrame(animate);
+        }
+        
+        // Event listeners
+        document.getElementById('breath-rate').addEventListener('input', e => {
+            params.breathRate = parseFloat(e.target.value);
+        });
+        
+        document.getElementById('coupling').addEventListener('input', e => {
+            params.coupling = parseFloat(e.target.value);
+        });
+        
+        document.getElementById('twist').addEventListener('input', e => {
+            params.initialTwist = parseFloat(e.target.value);
+        });
+        
+        document.getElementById('damping').addEventListener('input', e => {
+            params.damping = parseFloat(e.target.value);
+        });
+        
+        document.getElementById('pause-btn').addEventListener('click', e => {
+            running = !running;
+            e.target.textContent = running ? 'Pause' : 'Resume';
+            e.target.classList.toggle('active', !running);
+        });
+        
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            initField();
+        });
+        
+        document.getElementById('perturb-btn').addEventListener('click', addPerturbation);
+        document.getElementById('vortex-btn').addEventListener('click', seedVortex);
+        
+        document.getElementById('export-btn').addEventListener('click', () => {
+            // Pause during export
+            const wasRunning = running;
+            running = false;
+            
+            // Compact export - no pretty printing, arrays instead of objects
+            const data = {
+                tick: tick,
+                breathPhase: globalBreathPhase,
+                params: { ...params },
+                dimensions: { width: GRID_W, height: GRID_H },
+                // Format: flat arrays for efficiency
+                amplitude: [],
+                phase: [],
+                velocity: [],
+                vorticity: []
+            };
+            
+            for (let y = 0; y < GRID_H; y++) {
+                for (let x = 0; x < GRID_W; x++) {
+                    data.amplitude.push(+field.amplitude[y][x].toFixed(4));
+                    data.phase.push(+field.phase[y][x].toFixed(4));
+                    data.velocity.push(+field.velocity[y][x].toFixed(4));
+                    data.vorticity.push(+field.vorticity[y][x].toFixed(4));
+                }
+            }
+            
+            // No pretty print - compact JSON
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `breath-field-${tick}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            // Resume if was running
+            if (wasRunning) running = true;
+        });
+        
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                vizMode = e.target.dataset.mode;
+            });
+        });
+        
+        canvas.addEventListener('click', e => {
+            const rect = canvas.getBoundingClientRect();
+            const cx = Math.floor((e.clientX - rect.left) / CELL_W);
+            const cy = Math.floor((e.clientY - rect.top) / CELL_H);
+            
+            if (e.shiftKey) {
+                const radius = 12;
+                const strength = 2;
+                
+                for (let y = 0; y < GRID_H; y++) {
+                    for (let x = 0; x < GRID_W; x++) {
+                        const dx = x - cx;
+                        const dy = y - cy;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < radius) {
+                            const falloff = Math.cos((dist / radius) * Math.PI / 2);
+                            field.velocity[y][x] += strength * falloff;
+                        }
+                    }
+                }
+            }
+            
+            updateProbe(cx, cy);
+        });
+        
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            const cx = Math.floor((e.clientX - rect.left) / CELL_W);
+            const cy = Math.floor((e.clientY - rect.top) / CELL_H);
+            
+            if (cx >= 0 && cx < GRID_W && cy >= 0 && cy < GRID_H) {
+                updateProbe(cx, cy);
+            }
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            document.getElementById('probe-coords').textContent = 'Hover over field';
+        });
+        
+        // Start
+        initField();
+        animate();
+    </script>
+</body>
+</html>
