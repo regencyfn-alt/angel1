@@ -18,11 +18,15 @@
         }
         
         header {
+            position: sticky;
+            top: 0;
+            z-index: 200;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: #0a0a0c;
         }
         
         .logo {
@@ -259,7 +263,8 @@
         <nav>
             <a href="index.html">Classic</a>
             <a href="torsion-field.html">Torsion Field</a>
-            <a href="breath-field.html" class="active">Breath Field</a>
+            <a href="breath-field.html">Breath</a>
+            <a href="breath-field-sound.html" class="active">Breath+Sound</a>
             <a href="chronos.html">Chronos</a>
         </nav>
     </header>
@@ -315,6 +320,31 @@
                 <label>Damping</label>
                 <input type="range" id="damping" min="0.99" max="1" step="0.001" value="0.997">
             </div>
+            <div class="control-group">
+                <label>Color Theme</label>
+                <select id="color-theme" style="background: #1a1a1c; color: #e8e4dc; border: 1px solid rgba(255,255,255,0.15); padding: 0.3rem; font-family: 'Space Mono', monospace; font-size: 0.65rem;">
+                    <option value="gold">Gold/Amber</option>
+                    <option value="ocean">Ocean Blue</option>
+                    <option value="forest">Forest Green</option>
+                    <option value="violet">Violet</option>
+                    <option value="fire">Fire</option>
+                    <option value="thermal">Thermal</option>
+                    <option value="mono">Monochrome</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Grid Scale</label>
+                <select id="grid-scale" style="background: #1a1a1c; color: #e8e4dc; border: 1px solid rgba(255,255,255,0.15); padding: 0.3rem; font-family: 'Space Mono', monospace; font-size: 0.65rem;">
+                    <option value="1">1x (180×120)</option>
+                    <option value="2">2x (360×240)</option>
+                    <option value="3">3x (540×360)</option>
+                    <option value="4">4x (720×480)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Zoom</label>
+                <input type="range" id="zoom" min="0.5" max="2" step="0.1" value="1">
+            </div>
         </div>
         
         <div class="control-row">
@@ -324,6 +354,7 @@
             <button id="vortex-btn">Seed Vortex</button>
             <button id="sound-btn">🔇 Enable Sound</button>
             <button id="export-btn">Export Data</button>
+            <button id="record-btn">⏺ Record Session</button>
         </div>
         
         <div class="sound-controls" id="sound-controls" style="display: none;">
@@ -377,6 +408,10 @@
                 <span class="metric-value" id="breath-phase">—</span>
                 <span class="metric-label">Breath</span>
             </div>
+            <div class="metric" id="recording-indicator" style="display: none;">
+                <span class="metric-value" style="color: #ef4444;">●</span>
+                <span class="metric-label">REC</span>
+            </div>
         </div>
     </main>
     
@@ -389,11 +424,29 @@
         const canvas = document.getElementById('field-canvas');
         const ctx = canvas.getContext('2d');
         
-        // Field dimensions
-        const GRID_W = 180;
-        const GRID_H = 120;
-        const CELL_W = canvas.width / GRID_W;
-        const CELL_H = canvas.height / GRID_H;
+        // Field dimensions (mutable for grid scaling)
+        let GRID_W = 180;
+        let GRID_H = 120;
+        let CELL_W = canvas.width / GRID_W;
+        let CELL_H = canvas.height / GRID_H;
+        let gridScale = 1;
+        let zoom = 1;
+        
+        // Metrics history - flight recorder
+        const metricsHistory = [];
+        const MAX_HISTORY = 2000; // Keep last 2000 ticks
+        
+        // Long-duration recording
+        let recording = false;
+        let recordingData = {
+            startTime: null,
+            params: null,
+            soundParams: null,
+            events: [],           // perturbations, vortex seeds, param changes
+            metrics: [],          // every tick: compact [tick, vortices, energy, coherence, amp, breathTide]
+            snapshots: []         // every N ticks: full field state
+        };
+        const SNAPSHOT_INTERVAL = 500; // Full snapshot every 500 ticks
         
         // Field state
         let field = {
@@ -421,6 +474,18 @@
         
         // Previous vortex count for detecting new vortices
         let prevVortexPositions = new Set();
+        
+        // Color themes
+        const themes = {
+            gold:    { primary: 35,  secondary: 45,  accent: 55,  sat: 70 },
+            ocean:   { primary: 200, secondary: 220, accent: 180, sat: 65 },
+            forest:  { primary: 120, secondary: 90,  accent: 150, sat: 50 },
+            violet:  { primary: 280, secondary: 260, accent: 300, sat: 60 },
+            fire:    { primary: 15,  secondary: 30,  accent: 0,   sat: 80 },
+            thermal: { primary: 240, secondary: 0,   accent: 60,  sat: 75 },
+            mono:    { primary: 0,   secondary: 0,   accent: 0,   sat: 0 }
+        };
+        let currentTheme = 'gold';
         
         // ========================================
         // SOUND SYSTEM - 432Hz Tuning
@@ -655,7 +720,19 @@
         // FIELD SIMULATION
         // ========================================
         
+        function updateCanvasSize() {
+            GRID_W = 180 * gridScale;
+            GRID_H = 120 * gridScale;
+            canvas.width = 900 * zoom;
+            canvas.height = 600 * zoom;
+            CELL_W = canvas.width / GRID_W;
+            CELL_H = canvas.height / GRID_H;
+        }
+        
         function initField() {
+            updateCanvasSize();
+            metricsHistory.length = 0; // Clear history on reset
+            
             field.amplitude = [];
             field.phase = [];
             field.velocity = [];
@@ -835,49 +912,56 @@
             tick++;
         }
         
-        // Color functions
+        // Color functions with theme support
         function amplitudeColor(amp, phase) {
-            const h = 35 + amp * 20;
-            const s = 40 + amp * 30;
+            const t = themes[currentTheme];
+            const h = t.primary + amp * 20;
+            const s = t.sat > 0 ? (40 + amp * 30) : 0;
             const l = amp * 50;
             return `hsl(${h}, ${s}%, ${l}%)`;
         }
         
         function phaseColor(phase, amp) {
+            const t = themes[currentTheme];
             let h = ((phase % (2 * Math.PI)) / (2 * Math.PI)) * 360;
             if (h < 0) h += 360;
-            const s = 60;
+            const s = t.sat > 0 ? 60 : 0;
             const l = 20 + amp * 40;
             return `hsl(${h}, ${s}%, ${l}%)`;
         }
         
         function vorticityColor(vort, amp) {
+            const t = themes[currentTheme];
             const absVort = Math.abs(vort);
             if (absVort < 0.1) {
                 const l = amp * 15;
-                return `hsl(220, 20%, ${l}%)`;
+                return `hsl(${t.secondary}, ${t.sat > 0 ? 20 : 0}%, ${l}%)`;
             }
-            const h = vort > 0 ? 180 : 300;
-            const s = 70;
+            // Positive = accent hue, negative = secondary hue
+            const h = vort > 0 ? t.accent : t.secondary;
+            const s = t.sat > 0 ? 70 : 0;
             const l = 15 + absVort * 60;
             return `hsl(${h}, ${s}%, ${l}%)`;
         }
         
         function breathColor(amp, vel) {
+            const t = themes[currentTheme];
             const tideFactor = Math.sin(globalBreathPhase);
             const localBreath = Math.tanh(vel * 5);
             const combined = tideFactor * 0.6 + localBreath * 0.4;
             
             if (combined < 0) {
+                // Inhale - use secondary/cooler hue
                 const intensity = Math.abs(combined);
                 const l = 8 + intensity * amp * 45;
-                const h = 220 + intensity * 40;
-                return `hsl(${h}, 65%, ${l}%)`;
+                const h = t.secondary;
+                return `hsl(${h}, ${t.sat > 0 ? 65 : 0}%, ${l}%)`;
             } else {
+                // Exhale - use primary/warmer hue
                 const intensity = combined;
                 const l = 8 + intensity * amp * 45;
-                const h = 35 + intensity * 15;
-                return `hsl(${h}, 75%, ${l}%)`;
+                const h = t.primary;
+                return `hsl(${h}, ${t.sat > 0 ? 75 : 0}%, ${l}%)`;
             }
         }
         
@@ -907,7 +991,7 @@
             
             if (vizMode !== 'vorticity') {
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 1 * zoom;
                 
                 for (let y = 2; y < GRID_H - 2; y++) {
                     for (let x = 2; x < GRID_W - 2; x++) {
@@ -915,7 +999,7 @@
                         if (vort > 0.4) {
                             const cx = (x + 0.5) * CELL_W;
                             const cy = (y + 0.5) * CELL_H;
-                            const r = vort * 6;
+                            const r = vort * 6 * zoom;
                             
                             ctx.beginPath();
                             ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -959,6 +1043,51 @@
             document.getElementById('tick').textContent = tick;
             document.getElementById('breath-phase').textContent = breathTide > 0 ? '↑' : '↓';
             
+            // Log to history (flight recorder)
+            metricsHistory.push({
+                tick: tick,
+                vortexCount: vortexCount,
+                energy: totalEnergy,
+                coherence: phaseCoherence,
+                avgAmplitude: avgAmp,
+                breathTide: breathTide
+            });
+            
+            // Trim history if too long
+            if (metricsHistory.length > MAX_HISTORY) {
+                metricsHistory.shift();
+            }
+            
+            // Long-duration recording
+            if (recording) {
+                // Compact metrics every tick: [tick, vortices, energy, coherence, amp, breathTide]
+                recordingData.metrics.push([
+                    tick,
+                    vortexCount,
+                    +totalEnergy.toFixed(1),
+                    +phaseCoherence.toFixed(4),
+                    +avgAmp.toFixed(4),
+                    +breathTide.toFixed(3)
+                ]);
+                
+                // Full snapshot every N ticks
+                if (tick % SNAPSHOT_INTERVAL === 0) {
+                    const snapshot = {
+                        tick: tick,
+                        amplitude: [],
+                        vorticity: []
+                    };
+                    // Store only amplitude and vorticity (phase/velocity can be inferred)
+                    for (let y = 0; y < GRID_H; y++) {
+                        for (let x = 0; x < GRID_W; x++) {
+                            snapshot.amplitude.push(+field.amplitude[y][x].toFixed(3));
+                            snapshot.vorticity.push(+field.vorticity[y][x].toFixed(3));
+                        }
+                    }
+                    recordingData.snapshots.push(snapshot);
+                }
+            }
+            
             // Update sound
             updateSound(avgAmp, phaseCoherence, vortexCount, breathTide);
         }
@@ -966,8 +1095,19 @@
         function addPerturbation() {
             const cx = Math.floor(Math.random() * GRID_W);
             const cy = Math.floor(Math.random() * GRID_H);
-            const radius = 10 + Math.random() * 15;
+            const radius = (10 + Math.random() * 15) * gridScale;
             const strength = (Math.random() - 0.5) * 3;
+            
+            // Log event
+            if (recording) {
+                recordingData.events.push({
+                    type: 'perturbation',
+                    tick: tick,
+                    x: cx, y: cy,
+                    radius: +radius.toFixed(1),
+                    strength: +strength.toFixed(2)
+                });
+            }
             
             for (let y = 0; y < GRID_H; y++) {
                 for (let x = 0; x < GRID_W; x++) {
@@ -988,7 +1128,18 @@
             const cx = Math.floor(GRID_W * 0.2 + Math.random() * GRID_W * 0.6);
             const cy = Math.floor(GRID_H * 0.2 + Math.random() * GRID_H * 0.6);
             const sign = Math.random() > 0.5 ? 1 : -1;
-            const radius = 8 + Math.random() * 8;
+            const radius = (8 + Math.random() * 8) * gridScale;
+            
+            // Log event
+            if (recording) {
+                recordingData.events.push({
+                    type: 'vortex_seed',
+                    tick: tick,
+                    x: cx, y: cy,
+                    chirality: sign,
+                    radius: +radius.toFixed(1)
+                });
+            }
             
             for (let y = 0; y < GRID_H; y++) {
                 for (let x = 0; x < GRID_W; x++) {
@@ -1059,6 +1210,67 @@
             params.damping = parseFloat(e.target.value);
         });
         
+        document.getElementById('color-theme').addEventListener('change', e => {
+            currentTheme = e.target.value;
+        });
+        
+        document.getElementById('grid-scale').addEventListener('change', e => {
+            gridScale = parseInt(e.target.value);
+            initField();
+        });
+        
+        document.getElementById('zoom').addEventListener('input', e => {
+            zoom = parseFloat(e.target.value);
+            updateCanvasSize();
+        });
+        
+        document.getElementById('record-btn').addEventListener('click', () => {
+            recording = !recording;
+            const btn = document.getElementById('record-btn');
+            
+            if (recording) {
+                // Start new recording
+                recordingData = {
+                    startTime: new Date().toISOString(),
+                    startTick: tick,
+                    params: { ...params },
+                    soundParams: { ...soundParams },
+                    soundEnabled: soundEnabled,
+                    gridScale: gridScale,
+                    dimensions: { width: GRID_W, height: GRID_H },
+                    events: [],
+                    metrics: [],
+                    snapshots: []
+                };
+                btn.textContent = '⏹ Stop & Save';
+                btn.classList.add('active');
+                btn.style.background = 'rgba(239, 68, 68, 0.3)';
+                btn.style.borderColor = '#ef4444';
+                btn.style.color = '#ef4444';
+                document.getElementById('recording-indicator').style.display = 'flex';
+            } else {
+                // Stop and download
+                recordingData.endTime = new Date().toISOString();
+                recordingData.endTick = tick;
+                recordingData.duration = tick - recordingData.startTick;
+                
+                const blob = new Blob([JSON.stringify(recordingData)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `breath-session-${recordingData.startTick}-${tick}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                btn.textContent = '⏺ Record Session';
+                btn.classList.remove('active');
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+                document.getElementById('recording-indicator').style.display = 'none';
+            }
+        });
+        
         document.getElementById('pause-btn').addEventListener('click', e => {
             running = !running;
             e.target.textContent = running ? 'Pause' : 'Resume';
@@ -1081,7 +1293,13 @@
                 params: { ...params },
                 soundParams: { ...soundParams },
                 soundEnabled: soundEnabled,
+                currentTheme: currentTheme,
+                gridScale: gridScale,
+                zoom: zoom,
                 dimensions: { width: GRID_W, height: GRID_H },
+                // Full metrics history (flight recorder)
+                history: metricsHistory.slice(),
+                // Current field state
                 amplitude: [],
                 phase: [],
                 velocity: [],
@@ -1144,7 +1362,7 @@
             const cy = Math.floor((e.clientY - rect.top) / CELL_H);
             
             if (e.shiftKey) {
-                const radius = 12;
+                const radius = 12 * gridScale;
                 const strength = 2;
                 
                 for (let y = 0; y < GRID_H; y++) {
