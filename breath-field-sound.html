@@ -270,7 +270,8 @@
     </header>
     
     <div class="epigraph">
-        The field breathes. Heat falls into cool. The vortex is the stable form that persists.
+        The field breathes. Genesis photons, run out of curve, vibrate as the pre-twisted substrate.<br>
+        <em>Load CMB to seed with real cosmic data.</em>
     </div>
     
     <div class="probe-panel" id="probe-panel">
@@ -355,6 +356,8 @@
             <button id="sound-btn">🔇 Enable Sound</button>
             <button id="export-btn">Export Data</button>
             <button id="record-btn">⏺ Record Session</button>
+            <input type="file" id="cmb-input" accept="image/*" style="display: none;">
+            <button id="cmb-btn">Load CMB</button>
         </div>
         
         <div class="sound-controls" id="sound-controls" style="display: none;">
@@ -447,6 +450,10 @@
             snapshots: []         // every N ticks: full field state
         };
         const SNAPSHOT_INTERVAL = 500; // Full snapshot every 500 ticks
+        
+        // CMB data storage
+        let cmbData = null;
+        let cmbLoaded = false;
         
         // Field state
         let field = {
@@ -729,7 +736,92 @@
             CELL_H = canvas.height / GRID_H;
         }
         
+        // Load CMB image and extract temperature data
+        function loadCMBFromImage(img) {
+            const offscreen = document.createElement('canvas');
+            offscreen.width = GRID_W;
+            offscreen.height = GRID_H;
+            const offCtx = offscreen.getContext('2d');
+            
+            // Draw image scaled to grid size
+            offCtx.drawImage(img, 0, 0, GRID_W, GRID_H);
+            const imageData = offCtx.getImageData(0, 0, GRID_W, GRID_H);
+            const pixels = imageData.data;
+            
+            // Extract temperature as grayscale, normalize to phase range
+            cmbData = [];
+            for (let y = 0; y < GRID_H; y++) {
+                cmbData[y] = [];
+                for (let x = 0; x < GRID_W; x++) {
+                    const i = (y * GRID_W + x) * 4;
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
+                    // Convert to grayscale, then to phase range (-π to π)
+                    const gray = (r + g + b) / 3 / 255;
+                    cmbData[y][x] = (gray - 0.5) * 2 * Math.PI * params.initialTwist;
+                }
+            }
+            
+            cmbLoaded = true;
+            document.getElementById('cmb-btn').textContent = 'CMB Loaded ✓';
+            document.getElementById('cmb-btn').classList.add('active');
+            
+            // Reinitialize field with CMB data
+            initFieldFromCMB();
+        }
+        
+        // Initialize field using CMB temperature as pre-twist
+        function initFieldFromCMB() {
+            if (!cmbLoaded || !cmbData) return;
+            
+            updateCanvasSize();
+            metricsHistory.length = 0;
+            
+            field.amplitude = [];
+            field.phase = [];
+            field.velocity = [];
+            field.vorticity = [];
+            
+            for (let y = 0; y < GRID_H; y++) {
+                field.amplitude[y] = [];
+                field.phase[y] = [];
+                field.velocity[y] = [];
+                field.vorticity[y] = [];
+                
+                for (let x = 0; x < GRID_W; x++) {
+                    // Use CMB data as the pre-twist
+                    const cmbPhase = cmbData[y] ? cmbData[y][x] || 0 : 0;
+                    const noise = (Math.random() - 0.5) * 0.1;
+                    
+                    field.amplitude[y][x] = REST_AMPLITUDE + (Math.random() - 0.5) * 0.02;
+                    field.phase[y][x] = cmbPhase + noise;
+                    field.velocity[y][x] = (Math.random() - 0.5) * 0.02;
+                    field.vorticity[y][x] = 0;
+                }
+            }
+            
+            tick = 0;
+            globalBreathPhase = 0;
+            prevVortexPositions.clear();
+            
+            // Log event
+            if (recording) {
+                recordingData.events.push({
+                    type: 'cmb_loaded',
+                    tick: 0,
+                    source: 'user_image'
+                });
+            }
+        }
+        
         function initField() {
+            // If CMB data is loaded, use that instead
+            if (cmbLoaded && cmbData) {
+                initFieldFromCMB();
+                return;
+            }
+            
             updateCanvasSize();
             metricsHistory.length = 0; // Clear history on reset
             
@@ -1216,6 +1308,13 @@
         
         document.getElementById('grid-scale').addEventListener('change', e => {
             gridScale = parseInt(e.target.value);
+            // If CMB was loaded, need to clear it since grid size changed
+            if (cmbLoaded) {
+                cmbLoaded = false;
+                cmbData = null;
+                document.getElementById('cmb-btn').textContent = 'Load CMB';
+                document.getElementById('cmb-btn').classList.remove('active');
+            }
             initField();
         });
         
@@ -1269,6 +1368,26 @@
                 btn.style.color = '';
                 document.getElementById('recording-indicator').style.display = 'none';
             }
+        });
+        
+        // CMB loading
+        document.getElementById('cmb-btn').addEventListener('click', () => {
+            document.getElementById('cmb-input').click();
+        });
+        
+        document.getElementById('cmb-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    loadCMBFromImage(img);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
         });
         
         document.getElementById('pause-btn').addEventListener('click', e => {
