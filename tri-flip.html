@@ -302,6 +302,7 @@ canvas {
       <button class="btn shape-btn" id="shapeRect">RECT</button>
     </div>
     <button class="btn" id="rebuildBtn">Rebuild Mesh</button>
+    <button class="btn" id="carveAllBtn">Carve All</button>
   </div>
   
   <div class="control-section">
@@ -593,16 +594,16 @@ function render() {
   
   // Draw triangles
   triangles.forEach(tri => {
-    // Show removed triangles very faintly (for restoration)
+    // Show removed triangles as visible ghosts (for restoration)
     if (tri._removed) {
       ctx.beginPath();
       ctx.moveTo(tri.vertices[0].x, tri.vertices[0].y);
       ctx.lineTo(tri.vertices[1].x, tri.vertices[1].y);
       ctx.lineTo(tri.vertices[2].x, tri.vertices[2].y);
       ctx.closePath();
-      ctx.fillStyle = 'rgba(30, 35, 40, 0.3)';
+      ctx.fillStyle = 'rgba(40, 50, 60, 0.5)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(60, 70, 80, 0.2)';
+      ctx.strokeStyle = 'rgba(100, 120, 140, 0.6)';
       ctx.lineWidth = 1;
       ctx.stroke();
       return;
@@ -1233,6 +1234,16 @@ document.getElementById('rebuildBtn').addEventListener('click', () => {
   numRings = parseInt(document.getElementById('ringsSlider').value);
   contactCount = 0;
   buildMesh();
+});
+
+document.getElementById('carveAllBtn').addEventListener('click', () => {
+  triangles.forEach(tri => {
+    tri._removed = true;
+    tri.state = DORMANT;
+  });
+  updateMetrics();
+  render();
+  logEvent('Carved all triangles — use Build Mode to create shape');
 });
 
 // Shape buttons
