@@ -571,6 +571,16 @@
                 <button onclick="copyForAcademy()">Copy Academy Prompt</button>
             </div>
             
+            <div class="academy-upload" style="margin-top: 1rem; padding: 1rem; background: rgba(201, 165, 90, 0.05); border: 1px solid rgba(201, 165, 90, 0.2); border-radius: 4px;">
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <label style="font-family: 'Space Mono', monospace; font-size: 0.65rem; color: #c9a55a;">Academy URL:</label>
+                    <input type="text" id="academy-url" value="https://clubhouse.vouch4us.workers.dev" 
+                           style="flex: 1; min-width: 200px; padding: 0.4rem 0.6rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #e8e4dc; font-family: 'Space Mono', monospace; font-size: 0.65rem;">
+                    <button onclick="sendToAcademy()" style="background: rgba(201, 165, 90, 0.15); border-color: #c9a55a; color: #c9a55a;">Send to Screening Room</button>
+                </div>
+                <div id="upload-status" style="margin-top: 0.5rem; font-family: 'Space Mono', monospace; font-size: 0.6rem; color: #666;"></div>
+            </div>
+            
             <div class="manifest-preview" id="manifest-preview"></div>
         </div>
     </main>
@@ -1025,6 +1035,64 @@ Request specific frames by index, or ask for a level's keyframes to be displayed
             navigator.clipboard.writeText(prompt).then(() => {
                 updateStatus('Copied to clipboard!');
             });
+        }
+        
+        // Send screening package to Academy
+        async function sendToAcademy() {
+            const academyUrl = document.getElementById('academy-url').value.trim();
+            const uploadStatus = document.getElementById('upload-status');
+            
+            if (!academyUrl) {
+                uploadStatus.textContent = 'Please enter Academy URL';
+                uploadStatus.style.color = '#ef4444';
+                return;
+            }
+            
+            if (!manifest || hierarchy.length === 0) {
+                uploadStatus.textContent = 'No video processed yet';
+                uploadStatus.style.color = '#ef4444';
+                return;
+            }
+            
+            uploadStatus.textContent = 'Preparing package...';
+            uploadStatus.style.color = '#c9a55a';
+            
+            try {
+                // Get Arc level keyframes (primary level for agents)
+                const arcFrames = hierarchy[0].frames.map(idx => ({
+                    index: idx,
+                    time: frames[idx].time,
+                    timeFormatted: frames[idx].timeFormatted,
+                    image: frames[idx].dataUrl
+                }));
+                
+                uploadStatus.textContent = `Uploading ${arcFrames.length} keyframes...`;
+                
+                const response = await fetch(`${academyUrl}/api/screening/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        manifest: manifest,
+                        keyframes: arcFrames
+                    }),
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    uploadStatus.textContent = `✓ Uploaded! ID: ${result.id}, ${result.frameCount} frames`;
+                    uploadStatus.style.color = '#10b981';
+                } else {
+                    uploadStatus.textContent = `Error: ${result.error || 'Upload failed'}`;
+                    uploadStatus.style.color = '#ef4444';
+                }
+            } catch (err) {
+                uploadStatus.textContent = `Error: ${err.message}`;
+                uploadStatus.style.color = '#ef4444';
+            }
         }
         
         // Update stats display
