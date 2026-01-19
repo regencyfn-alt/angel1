@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANGEL-1 · Movie Theater · Temporal Perception</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Space+Mono:wght@400&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #0a0a0c;
+            color: #e8e4dc;
+            font-family: 'Cormorant Garamond', serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: #0a0a0c;
+        }
+        
+        .logo {
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: #c9a55a;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        nav { display: flex; gap: 2rem; }
+        
+        nav a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            font-family: 'Space Mono', monospace;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active { color: #e8e4dc; }
+        
+        .epigraph {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 1rem;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .epigraph em { color: #a89060; }
+        
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem 3rem;
+        }
+        
+        .upload-zone {
+            border: 2px dashed rgba(201, 165, 90, 0.3);
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-zone:hover {
+            border-color: #c9a55a;
+            background: rgba(201, 165, 90, 0.05);
+        }
+        
+        .upload-zone.processing {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .upload-zone .rune {
+            font-size: 2.5rem;
+            color: #c9a55a;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-zone p {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        #video-input {
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar.active {
+            display: block;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #c9a55a, #10b981);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .status {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 0.5rem;
+            min-height: 1.2em;
+        }
+        
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 900px) {
+            .panels { grid-template-columns: 1fr; }
+        }
+        
+        .panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 4px;
+            padding: 1.5rem;
+        }
+        
+        .panel-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            color: #c9a55a;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-title .count {
+            color: #666;
+            font-size: 0.65rem;
+        }
+        
+        /* Hierarchy Visualization */
+        .hierarchy-levels {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .hierarchy-level {
+            border-left: 2px solid rgba(201, 165, 90, 0.3);
+            padding-left: 1rem;
+        }
+        
+        .hierarchy-level.active {
+            border-left-color: #c9a55a;
+        }
+        
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .level-name {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: #888;
+        }
+        
+        .level-info {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            color: #555;
+        }
+        
+        .frame-strip {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding: 4px 0;
+        }
+        
+        .frame-thumb {
+            width: 60px;
+            height: 34px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .frame-thumb:hover {
+            border-color: #c9a55a;
+            transform: scale(1.1);
+        }
+        
+        .frame-thumb.keyframe {
+            border-color: #c9a55a;
+        }
+        
+        /* Preview Panel */
+        .preview-container {
+            position: relative;
+            background: #050507;
+            border-radius: 4px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #preview-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .preview-placeholder {
+            color: #444;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+        }
+        
+        .frame-info {
+            margin-top: 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: #666;
+        }
+        
+        .frame-info .highlight {
+            color: #c9a55a;
+        }
+        
+        /* Audio Waveform */
+        .waveform-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        #waveform-canvas {
+            width: 100%;
+            height: 80px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+            cursor: crosshair;
+        }
+        
+        /* Export Section */
+        .export-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .export-section.ready {
+            display: block;
+        }
+        
+        .export-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            color: #10b981;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        
+        .export-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        
+        .stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            color: #e8e4dc;
+        }
+        
+        .stat-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            padding: 0.6rem 1.2rem;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #e8e4dc;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+        
+        button:hover {
+            background: rgba(201, 165, 90, 0.1);
+            border-color: #c9a55a;
+        }
+        
+        button.primary {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+            color: #10b981;
+        }
+        
+        button.primary:hover {
+            background: rgba(16, 185, 129, 0.25);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Agent Manifest Preview */
+        .manifest-preview {
+            margin-top: 1rem;
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            color: #888;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            display: none;
+        }
+        
+        .manifest-preview.visible {
+            display: block;
+        }
+        
+        /* Timeline scrubber */
+        .timeline {
+            margin-top: 1rem;
+            padding: 1rem 0;
+        }
+        
+        .timeline-track {
+            position: relative;
+            height: 40px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .timeline-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(201, 165, 90, 0.5);
+        }
+        
+        .timeline-marker.beat {
+            background: rgba(16, 185, 129, 0.7);
+        }
+        
+        .timeline-playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e8e4dc;
+            left: 0;
+            transition: left 0.1s;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 12, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(201, 165, 90, 0.3);
+            border-top-color: #c9a55a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">MOVIE THEATER</div>
+        <nav>
+            <a href="index.html">Classic</a>
+            <a href="breath-field-sound.html">Breath+Sound</a>
+            <a href="theater.html" class="active">Theater</a>
+        </nav>
+    </header>
+    
+    <div class="epigraph">
+        Slice time into frames. Build hierarchies of perception.<br>
+        <em>Give agents the gift of temporal vision.</em>
+    </div>
+    
+    <main>
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('video-input').click()">
+            <div class="rune">◈</div>
+            <p>Drop video here or click to upload</p>
+            <p style="margin-top: 0.5rem; color: #444;">MP4, WebM, MOV · 60-120 seconds recommended</p>
+            <input type="file" id="video-input" accept="video/*">
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="status" id="status"></div>
+        </div>
+        
+        <div class="panels" id="panels" style="display: none;">
+            <div class="panel">
+                <div class="panel-title">
+                    <span>Hierarchical Keyframes</span>
+                    <span class="count" id="frame-count">0 frames</span>
+                </div>
+                
+                <div class="hierarchy-levels" id="hierarchy-levels">
+                    <!-- Levels populate here -->
+                </div>
+                
+                <div class="waveform-container">
+                    <div class="panel-title">
+                        <span>Audio Waveform</span>
+                        <span class="count" id="audio-duration">0:00</span>
+                    </div>
+                    <canvas id="waveform-canvas"></canvas>
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-track" id="timeline-track">
+                        <div class="timeline-markers" id="timeline-markers"></div>
+                        <div class="timeline-playhead" id="timeline-playhead"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">
+                    <span>Frame Preview</span>
+                    <span class="count" id="preview-time">--:--</span>
+                </div>
+                
+                <div class="preview-container">
+                    <img id="preview-image" style="display: none;">
+                    <span class="preview-placeholder" id="preview-placeholder">Select a frame</span>
+                </div>
+                
+                <div class="frame-info" id="frame-info">
+                    Frame: <span class="highlight">—</span> | 
+                    Time: <span class="highlight">—</span> | 
+                    Level: <span class="highlight">—</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-section" id="export-section">
+            <div class="export-title">◈ Screening Package Ready</div>
+            
+            <div class="export-stats">
+                <div class="stat">
+                    <span class="stat-value" id="stat-duration">0:00</span>
+                    <span class="stat-label">Duration</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="stat-frames">0</span>
+                    <span class="stat-label">Total Frames</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="stat-keyframes">0</span>
+                    <span class="stat-label">Keyframes</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="stat-levels">0</span>
+                    <span class="stat-label">Hierarchy Levels</span>
+                </div>
+            </div>
+            
+            <div class="export-buttons">
+                <button class="primary" onclick="exportManifest()">Export Manifest (JSON)</button>
+                <button onclick="exportKeyframes()">Export Keyframes (ZIP)</button>
+                <button onclick="toggleManifestPreview()">Preview Manifest</button>
+                <button onclick="copyForAcademy()">Copy Academy Prompt</button>
+            </div>
+            
+            <div class="manifest-preview" id="manifest-preview"></div>
+        </div>
+    </main>
+    
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Processing video...</div>
+    </div>
+    
+    <script>
+        // ========================================
+        // MOVIE THEATER - Temporal Perception System
+        // Hierarchical frame extraction for AI agents
+        // ========================================
+        
+        // State
+        let videoFile = null;
+        let videoElement = null;
+        let audioContext = null;
+        let audioBuffer = null;
+        let frames = [];           // All extracted frames
+        let hierarchy = [];        // Hierarchical levels
+        let manifest = null;       // Final export manifest
+        let currentFrame = 0;
+        
+        // Config
+        const HIERARCHY_LEVELS = [
+            { name: 'Arc', interval: 30, description: '1 frame/sec - narrative arc' },
+            { name: 'Scene', interval: 15, description: '2 frames/sec - scene changes' },
+            { name: 'Action', interval: 6, description: '5 frames/sec - action beats' },
+            { name: 'Motion', interval: 3, description: '10 frames/sec - motion detail' },
+            { name: 'Full', interval: 1, description: '30 frames/sec - full temporal resolution' }
+        ];
+        
+        const TARGET_FPS = 30;
+        const FRAME_WIDTH = 320;  // Thumbnail width
+        const FRAME_HEIGHT = 180; // 16:9
+        
+        // Elements
+        const uploadZone = document.getElementById('upload-zone');
+        const videoInput = document.getElementById('video-input');
+        const progressBar = document.getElementById('progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const statusEl = document.getElementById('status');
+        const panelsEl = document.getElementById('panels');
+        const exportSection = document.getElementById('export-section');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        
+        // Drag and drop
+        uploadZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#c9a55a';
+        });
+        
+        uploadZone.addEventListener('dragleave', e => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '';
+        });
+        
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('video/')) {
+                processVideo(file);
+            }
+        });
+        
+        videoInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) processVideo(file);
+        });
+        
+        // Main processing pipeline
+        async function processVideo(file) {
+            videoFile = file;
+            showLoading('Loading video...');
+            updateStatus('Loading ' + file.name);
+            uploadZone.classList.add('processing');
+            progressBar.classList.add('active');
+            
+            try {
+                // Create video element
+                videoElement = document.createElement('video');
+                videoElement.muted = true;
+                videoElement.playsInline = true;
+                
+                const url = URL.createObjectURL(file);
+                videoElement.src = url;
+                
+                await new Promise((resolve, reject) => {
+                    videoElement.onloadedmetadata = resolve;
+                    videoElement.onerror = reject;
+                });
+                
+                const duration = videoElement.duration;
+                const totalFrames = Math.floor(duration * TARGET_FPS);
+                
+                updateStatus(`Video loaded: ${formatTime(duration)} · ${totalFrames} frames`);
+                setProgress(10);
+                
+                // Extract audio waveform
+                showLoading('Extracting audio...');
+                await extractAudio(file);
+                setProgress(20);
+                
+                // Extract frames
+                showLoading('Extracting frames...');
+                await extractFrames(videoElement, duration, totalFrames);
+                setProgress(80);
+                
+                // Build hierarchy
+                showLoading('Building hierarchy...');
+                buildHierarchy();
+                setProgress(90);
+                
+                // Build manifest
+                buildManifest(duration);
+                setProgress(100);
+                
+                // Show results
+                hideLoading();
+                renderHierarchy();
+                renderWaveform();
+                renderTimeline();
+                updateStats(duration);
+                
+                panelsEl.style.display = 'grid';
+                exportSection.classList.add('ready');
+                updateStatus('Ready for export');
+                
+                URL.revokeObjectURL(url);
+                
+            } catch (error) {
+                console.error('Processing error:', error);
+                updateStatus('Error: ' + error.message);
+                hideLoading();
+            }
+        }
+        
+        // Extract audio waveform
+        async function extractAudio(file) {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const arrayBuffer = await file.arrayBuffer();
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            } catch (e) {
+                console.warn('Audio extraction failed:', e);
+                audioBuffer = null;
+            }
+        }
+        
+        // Extract frames from video
+        async function extractFrames(video, duration, totalFrames) {
+            frames = [];
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = FRAME_WIDTH;
+            canvas.height = FRAME_HEIGHT;
+            const ctx = canvas.getContext('2d');
+            
+            const frameInterval = 1 / TARGET_FPS;
+            
+            for (let i = 0; i < totalFrames; i++) {
+                const time = i * frameInterval;
+                
+                // Seek to time
+                video.currentTime = time;
+                await new Promise(resolve => {
+                    video.onseeked = resolve;
+                });
+                
+                // Draw frame
+                ctx.drawImage(video, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+                
+                // Store as data URL (could optimize to blob later)
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                
+                frames.push({
+                    index: i,
+                    time: time,
+                    timeFormatted: formatTime(time),
+                    dataUrl: dataUrl
+                });
+                
+                // Update progress
+                const progress = 20 + (i / totalFrames) * 60;
+                setProgress(progress);
+                
+                if (i % 30 === 0) {
+                    updateStatus(`Extracting frame ${i + 1}/${totalFrames}`);
+                    loadingText.textContent = `Extracting frame ${i + 1}/${totalFrames}`;
+                    await new Promise(r => setTimeout(r, 0)); // Allow UI update
+                }
+            }
+        }
+        
+        // Build hierarchical keyframe structure
+        function buildHierarchy() {
+            hierarchy = [];
+            
+            for (const level of HIERARCHY_LEVELS) {
+                const levelFrames = frames.filter((f, i) => i % level.interval === 0);
+                hierarchy.push({
+                    name: level.name,
+                    interval: level.interval,
+                    description: level.description,
+                    frameCount: levelFrames.length,
+                    frames: levelFrames.map(f => f.index)
+                });
+            }
+        }
+        
+        // Build export manifest
+        function buildManifest(duration) {
+            manifest = {
+                version: '1.0',
+                type: 'temporal-perception-package',
+                created: new Date().toISOString(),
+                source: {
+                    filename: videoFile.name,
+                    duration: duration,
+                    durationFormatted: formatTime(duration),
+                    fps: TARGET_FPS,
+                    totalFrames: frames.length,
+                    resolution: { width: FRAME_WIDTH, height: FRAME_HEIGHT }
+                },
+                hierarchy: hierarchy.map(level => ({
+                    name: level.name,
+                    interval: level.interval,
+                    description: level.description,
+                    frameCount: level.frameCount,
+                    frames: level.frames
+                })),
+                audio: audioBuffer ? {
+                    duration: audioBuffer.duration,
+                    sampleRate: audioBuffer.sampleRate,
+                    channels: audioBuffer.numberOfChannels
+                } : null,
+                // Instructions for agents
+                perception_guide: {
+                    recommended_start: 'Arc',
+                    progression: ['Arc', 'Scene', 'Action', 'Motion', 'Full'],
+                    strategy: 'Start with Arc level for narrative overview. Descend hierarchy where motion or detail requires attention. Audio waveform indicates temporal density.'
+                }
+            };
+        }
+        
+        // Render hierarchy UI
+        function renderHierarchy() {
+            const container = document.getElementById('hierarchy-levels');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < hierarchy.length; i++) {
+                const level = hierarchy[i];
+                const levelFrames = level.frames.map(idx => frames[idx]);
+                
+                const levelEl = document.createElement('div');
+                levelEl.className = 'hierarchy-level' + (i === 0 ? ' active' : '');
+                
+                levelEl.innerHTML = `
+                    <div class="level-header">
+                        <span class="level-name">${level.name}</span>
+                        <span class="level-info">${level.frameCount} frames · ${level.description}</span>
+                    </div>
+                    <div class="frame-strip" id="strip-${i}"></div>
+                `;
+                
+                container.appendChild(levelEl);
+                
+                // Populate frame strip
+                const strip = document.getElementById(`strip-${i}`);
+                for (const frame of levelFrames.slice(0, 30)) { // Show max 30 thumbs
+                    const thumb = document.createElement('img');
+                    thumb.className = 'frame-thumb' + (i === 0 ? ' keyframe' : '');
+                    thumb.src = frame.dataUrl;
+                    thumb.title = `Frame ${frame.index} · ${frame.timeFormatted}`;
+                    thumb.onclick = () => selectFrame(frame.index, i);
+                    strip.appendChild(thumb);
+                }
+                
+                if (levelFrames.length > 30) {
+                    const more = document.createElement('span');
+                    more.style.cssText = 'color: #555; font-size: 0.6rem; font-family: "Space Mono"; padding: 0 8px;';
+                    more.textContent = `+${levelFrames.length - 30} more`;
+                    strip.appendChild(more);
+                }
+            }
+            
+            document.getElementById('frame-count').textContent = `${frames.length} frames`;
+        }
+        
+        // Render audio waveform
+        function renderWaveform() {
+            const canvas = document.getElementById('waveform-canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+            canvas.width = width;
+            canvas.height = height;
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(0, 0, width, height);
+            
+            if (!audioBuffer) {
+                ctx.fillStyle = '#444';
+                ctx.font = '12px "Space Mono"';
+                ctx.textAlign = 'center';
+                ctx.fillText('No audio data', width/2, height/2);
+                return;
+            }
+            
+            const data = audioBuffer.getChannelData(0);
+            const step = Math.ceil(data.length / width);
+            const amp = height / 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(0, amp);
+            
+            for (let i = 0; i < width; i++) {
+                let min = 1.0, max = -1.0;
+                for (let j = 0; j < step; j++) {
+                    const idx = i * step + j;
+                    if (idx < data.length) {
+                        const val = data[idx];
+                        if (val < min) min = val;
+                        if (val > max) max = val;
+                    }
+                }
+                
+                const y1 = (1 + min) * amp;
+                const y2 = (1 + max) * amp;
+                
+                ctx.fillStyle = 'rgba(201, 165, 90, 0.6)';
+                ctx.fillRect(i, y1, 1, y2 - y1);
+            }
+            
+            document.getElementById('audio-duration').textContent = formatTime(audioBuffer.duration);
+        }
+        
+        // Render timeline with keyframe markers
+        function renderTimeline() {
+            const container = document.getElementById('timeline-markers');
+            container.innerHTML = '';
+            
+            if (frames.length === 0) return;
+            
+            const duration = frames[frames.length - 1].time;
+            
+            // Add markers for Arc keyframes
+            const arcFrames = hierarchy[0].frames;
+            for (const idx of arcFrames) {
+                const frame = frames[idx];
+                const pos = (frame.time / duration) * 100;
+                const marker = document.createElement('div');
+                marker.className = 'timeline-marker';
+                marker.style.left = pos + '%';
+                marker.title = frame.timeFormatted;
+                marker.onclick = () => selectFrame(idx, 0);
+                container.appendChild(marker);
+            }
+        }
+        
+        // Select and preview a frame
+        function selectFrame(index, levelIndex) {
+            currentFrame = index;
+            const frame = frames[index];
+            
+            document.getElementById('preview-image').src = frame.dataUrl;
+            document.getElementById('preview-image').style.display = 'block';
+            document.getElementById('preview-placeholder').style.display = 'none';
+            document.getElementById('preview-time').textContent = frame.timeFormatted;
+            
+            document.getElementById('frame-info').innerHTML = `
+                Frame: <span class="highlight">${frame.index}</span> | 
+                Time: <span class="highlight">${frame.timeFormatted}</span> | 
+                Level: <span class="highlight">${hierarchy[levelIndex].name}</span>
+            `;
+            
+            // Update playhead
+            const duration = frames[frames.length - 1].time;
+            const pos = (frame.time / duration) * 100;
+            document.getElementById('timeline-playhead').style.left = pos + '%';
+        }
+        
+        // Export manifest JSON
+        function exportManifest() {
+            const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `screening-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Export keyframes as ZIP (simplified - just Arc level for now)
+        async function exportKeyframes() {
+            // For full implementation, would use JSZip
+            // For now, export as JSON with embedded base64
+            const arcFrames = hierarchy[0].frames.map(idx => ({
+                index: idx,
+                time: frames[idx].time,
+                timeFormatted: frames[idx].timeFormatted,
+                image: frames[idx].dataUrl
+            }));
+            
+            const blob = new Blob([JSON.stringify({ keyframes: arcFrames }, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `keyframes-arc-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Toggle manifest preview
+        function toggleManifestPreview() {
+            const preview = document.getElementById('manifest-preview');
+            if (preview.classList.contains('visible')) {
+                preview.classList.remove('visible');
+            } else {
+                preview.textContent = JSON.stringify(manifest, null, 2);
+                preview.classList.add('visible');
+            }
+        }
+        
+        // Copy Academy-ready prompt
+        function copyForAcademy() {
+            const prompt = `[SCREENING: ${videoFile.name}]
+
+Duration: ${manifest.source.durationFormatted}
+Total Frames: ${manifest.source.totalFrames}
+FPS: ${manifest.source.fps}
+
+Hierarchy Levels:
+${hierarchy.map(l => `- ${l.name}: ${l.frameCount} frames (${l.description})`).join('\n')}
+
+Perception Guide:
+${manifest.perception_guide.strategy}
+
+Start with Arc level keyframes to understand the narrative arc. Descend into Scene, Action, and Motion levels where you detect:
+- Scene transitions (lighting/composition changes)
+- Action beats (movement peaks)
+- Critical detail (faces, text, objects)
+
+Audio is ${audioBuffer ? 'available' : 'not available'} for temporal reference.
+
+Request specific frames by index, or ask for a level's keyframes to be displayed.`;
+
+            navigator.clipboard.writeText(prompt).then(() => {
+                updateStatus('Copied to clipboard!');
+            });
+        }
+        
+        // Update stats display
+        function updateStats(duration) {
+            document.getElementById('stat-duration').textContent = formatTime(duration);
+            document.getElementById('stat-frames').textContent = frames.length;
+            document.getElementById('stat-keyframes').textContent = hierarchy[0].frameCount;
+            document.getElementById('stat-levels').textContent = hierarchy.length;
+        }
+        
+        // Utility functions
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function setProgress(percent) {
+            progressFill.style.width = percent + '%';
+        }
+        
+        function updateStatus(text) {
+            statusEl.textContent = text;
+        }
+        
+        function showLoading(text) {
+            loadingText.textContent = text;
+            loadingOverlay.classList.add('active');
+        }
+        
+        function hideLoading() {
+            loadingOverlay.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
