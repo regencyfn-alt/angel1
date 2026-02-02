@@ -15,6 +15,7 @@ body {
   font-family: 'Rajdhani', sans-serif;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
 }
 
 /* Main canvas area */
@@ -433,6 +434,58 @@ body {
   letter-spacing: 2px;
   margin-top: 4px;
 }
+
+/* Navigation */
+.nav {
+  background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
+  border-bottom: 2px solid rgba(106, 255, 216, 0.2);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-brand {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #6affd8;
+}
+
+.nav-links {
+  display: flex;
+  gap: 6px;
+}
+
+.nav-links a {
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #8a9bae;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.nav-links a:hover {
+  color: #6affd8;
+  background: rgba(106, 255, 216, 0.1);
+}
+
+.nav-links a.active {
+  color: #6affd8;
+  background: rgba(106, 255, 216, 0.15);
+  border-color: rgba(106, 255, 216, 0.4);
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
 </style>
   <link rel="stylesheet" href="shared.css">
 </head>
@@ -450,12 +503,7 @@ body {
   </div>
 </nav>
 
-
-<div class="main-title">
-  <h1>ANGEL-2</h1>
-  <div class="subtitle">C2 NETWORK PLAQUETTE DYNAMICS</div>
-</div>
-
+<div class="main-content">
 <div class="canvas-area">
   <div id="grid-container"></div>
 </div>
@@ -1374,5 +1422,6 @@ function updateResonanceVisualization() {
 init();
 </script>
 
+</div>
 </body>
 </html>
