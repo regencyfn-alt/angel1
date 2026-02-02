@@ -15,6 +15,7 @@ body {
   font-family: 'Rajdhani', sans-serif;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
 }
 
 .canvas-area {
@@ -213,26 +214,7 @@ canvas {
 .legend-dot.blue { background: rgba(80, 150, 255, 0.6); border: 1px solid #6af; }
 .legend-dot.gray { background: rgba(100, 110, 120, 0.6); border: 1px solid #888; }
 
-.main-title {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 100;
-}
 
-.main-title h1 {
-  font-family: 'Orbitron', monospace;
-  font-size: 20px;
-  color: #6affd8;
-  letter-spacing: 3px;
-}
-
-.main-title .subtitle {
-  font-size: 10px;
-  color: #8a9bae;
-  letter-spacing: 2px;
-  margin-top: 4px;
-}
 
 .event-log {
   position: fixed;
@@ -264,26 +246,64 @@ canvas {
   80% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* Navigation */
+.nav {
+  background: linear-gradient(135deg, #1a1f2e 0%, #0f1620 100%);
+  border-bottom: 2px solid rgba(106, 255, 216, 0.2);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-brand {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #6affd8;
+}
+
+.nav-links {
+  display: flex;
+  gap: 6px;
+}
+
+.nav-links a {
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #8a9bae;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.nav-links a:hover {
+  color: #6affd8;
+  background: rgba(106, 255, 216, 0.1);
+}
+
+.nav-links a.active {
+  color: #6affd8;
+  background: rgba(106, 255, 216, 0.15);
+  border-color: rgba(106, 255, 216, 0.4);
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
 </style>
   <link rel="stylesheet" href="shared.css">
 </head>
 <body>
 
-<div class="main-title">
-  <h1>ANGEL-2</h1>
-  <div class="subtitle">TRIANGULAR C2 NETWORK · 3-NEIGHBOR TOPOLOGY</div>
-</div>
-
-<div class="canvas-area">
-  <div id="mesh-container">
-    <canvas id="meshCanvas" width="800" height="700"></canvas>
-  </div>
-</div>
-
-    <link rel="stylesheet" href="shared.css">
-</head>
-<body>
-    <nav class="nav">
+<nav class="nav">
   <div class="nav-brand">MICHRON PHYSICS</div>
   <div class="nav-links">
     <a href="index.html">Classic</a>
@@ -295,6 +315,14 @@ canvas {
     <a href="orchestra.html">Orchestra</a>
   </div>
 </nav>
+
+<div class="main-content">
+<div class="canvas-area">
+  <div id="mesh-container">
+    <canvas id="meshCanvas" width="800" height="700"></canvas>
+  </div>
+</div>
+
 
 <div class="control-panel">
   <div class="panel-title">NETWORK CONTROLS</div>
@@ -1602,5 +1630,7 @@ tick = function() {
 };
 </script>
 
+</div>
 </body>
 </html>
+
