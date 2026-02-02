@@ -385,6 +385,26 @@ canvas {
       </div>
     </div>
   </div>
+  
+  <div class="control-section">
+    <div class="section-title">Recording</div>
+    <button class="btn" id="recordBtn">⏺ Record</button>
+    <button class="btn" id="playBtn" disabled>▶ Play</button>
+    <button class="btn" id="stopPlaybackBtn" disabled>⏹ Stop</button>
+    <div class="btn-row">
+      <button class="btn" id="exportBtn" disabled>💾 Export</button>
+      <button class="btn" id="importBtn">📂 Import</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+    <div class="metric-row" style="margin-top:8px">
+      <span class="metric-label">Frames</span>
+      <span class="metric-value" id="frameCount">0</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Status</span>
+      <span class="metric-value" id="recorderStatus">IDLE</span>
+    </div>
+  </div>
 </div>
 
 <div class="event-log" id="eventLog"></div>
@@ -425,6 +445,15 @@ let speedMultiplier = 1;
 let paused = false;
 let contactCount = 0;
 let tickTimer = null;
+
+// === RECORDER STATE ===
+let recorder = {
+  frames: [],
+  recording: false,
+  playing: false,
+  playIndex: 0,
+  playbackTimer: null
+};
 
 // Neutrino trail system
 let neutrinos = []; // Active neutrino particles
@@ -1393,6 +1422,180 @@ function pointInTriangle(px, py, vertices) {
 // === INIT ===
 buildMesh();
 startSimulation();
+
+// === RECORDER FUNCTIONS ===
+function captureFrame() {
+  return {
+    timestamp: Date.now(),
+    triangles: triangles.map(t => ({
+      id: t.id,
+      state: t.state,
+      phase: t.phase,
+      polarity: t.polarity,
+      removed: t._removed || false
+    })),
+    contacts: contactCount
+  };
+}
+
+function applyFrame(frame) {
+  frame.triangles.forEach(f => {
+    const tri = triangles.find(t => t.id === f.id);
+    if (tri) {
+      tri.state = f.state;
+      tri.phase = f.phase;
+      tri.polarity = f.polarity;
+      tri._removed = f.removed;
+    }
+  });
+  if (frame.contacts !== undefined) {
+    contactCount = frame.contacts;
+  }
+  updateMetrics();
+  render();
+}
+
+function startRecording() {
+  recorder.frames = [];
+  recorder.recording = true;
+  document.getElementById('recordBtn').textContent = '⏹ Stop';
+  document.getElementById('recorderStatus').textContent = 'RECORDING';
+  document.getElementById('recorderStatus').style.color = '#f66';
+  logEvent('Recording started', '');
+}
+
+function stopRecording() {
+  recorder.recording = false;
+  document.getElementById('recordBtn').textContent = '⏺ Record';
+  document.getElementById('recorderStatus').textContent = 'IDLE';
+  document.getElementById('recorderStatus').style.color = '';
+  document.getElementById('playBtn').disabled = recorder.frames.length === 0;
+  document.getElementById('exportBtn').disabled = recorder.frames.length === 0;
+  logEvent(`Recording stopped: ${recorder.frames.length} frames`, '');
+}
+
+function startPlayback() {
+  if (recorder.frames.length === 0) return;
+  recorder.playing = true;
+  recorder.playIndex = 0;
+  paused = true;
+  document.getElementById('pauseBtn').textContent = 'Resume';
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('stopPlaybackBtn').disabled = false;
+  document.getElementById('recorderStatus').textContent = 'PLAYING';
+  document.getElementById('recorderStatus').style.color = '#6af';
+  logEvent('Playback started', '');
+  
+  recorder.playbackTimer = setInterval(() => {
+    if (recorder.playIndex >= recorder.frames.length) {
+      stopPlayback();
+      return;
+    }
+    applyFrame(recorder.frames[recorder.playIndex]);
+    document.getElementById('frameCount').textContent = 
+      `${recorder.playIndex + 1}/${recorder.frames.length}`;
+    recorder.playIndex++;
+  }, TICK_INTERVAL / speedMultiplier);
+}
+
+function stopPlayback() {
+  recorder.playing = false;
+  if (recorder.playbackTimer) {
+    clearInterval(recorder.playbackTimer);
+    recorder.playbackTimer = null;
+  }
+  document.getElementById('playBtn').disabled = false;
+  document.getElementById('stopPlaybackBtn').disabled = true;
+  document.getElementById('recorderStatus').textContent = 'IDLE';
+  document.getElementById('recorderStatus').style.color = '';
+  logEvent('Playback stopped', '');
+}
+
+function exportRecording() {
+  if (recorder.frames.length === 0) return;
+  const data = {
+    version: 1,
+    meshShape: meshShape,
+    numRings: numRings,
+    frameCount: recorder.frames.length,
+    frames: recorder.frames
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `angel2-recording-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  logEvent(`Exported ${recorder.frames.length} frames`, '');
+}
+
+function importRecording(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (Array.isArray(data)) {
+        recorder.frames = data;
+      } else if (data.frames) {
+        recorder.frames = data.frames;
+        if (data.meshShape && data.numRings) {
+          meshShape = data.meshShape;
+          numRings = data.numRings;
+          document.getElementById('ringsSlider').value = numRings;
+          document.getElementById('ringsValue').textContent = numRings;
+          document.querySelectorAll('.shape-btn').forEach(b => {
+            b.classList.toggle('active', b.id === 'shape' + meshShape.charAt(0).toUpperCase() + meshShape.slice(1));
+          });
+          buildMesh();
+        }
+      }
+      document.getElementById('frameCount').textContent = recorder.frames.length;
+      document.getElementById('playBtn').disabled = false;
+      document.getElementById('exportBtn').disabled = false;
+      logEvent(`Imported ${recorder.frames.length} frames`, '');
+    } catch (err) {
+      logEvent('Import failed: invalid JSON', '');
+      console.error('Import error:', err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// === RECORDER EVENT LISTENERS ===
+document.getElementById('recordBtn').addEventListener('click', () => {
+  if (recorder.recording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+});
+
+document.getElementById('playBtn').addEventListener('click', startPlayback);
+document.getElementById('stopPlaybackBtn').addEventListener('click', stopPlayback);
+document.getElementById('exportBtn').addEventListener('click', exportRecording);
+
+document.getElementById('importBtn').addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', (e) => {
+  if (e.target.files.length > 0) {
+    importRecording(e.target.files[0]);
+    e.target.value = '';
+  }
+});
+
+// === HOOK INTO TICK FOR RECORDING ===
+const _originalTick = tick;
+tick = function() {
+  _originalTick();
+  if (recorder.recording && !paused) {
+    recorder.frames.push(captureFrame());
+    document.getElementById('frameCount').textContent = recorder.frames.length;
+    document.getElementById('playBtn').disabled = false;
+    document.getElementById('exportBtn').disabled = false;
+  }
+};
 </script>
 
 </body>
