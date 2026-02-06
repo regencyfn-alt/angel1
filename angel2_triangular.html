@@ -16,6 +16,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .canvas-area {
@@ -43,9 +44,8 @@ canvas {
   border-left: 1px solid rgba(106, 255, 216, 0.2);
   padding: 20px;
   overflow-y: auto;
-  max-height: calc(100vh - 60px);
-  position: sticky;
-  top: 60px;
+  height: 100%;
+  flex-shrink: 0;
 }
 
 .panel-title {
@@ -299,6 +299,7 @@ canvas {
   display: flex;
   flex: 1;
   overflow: hidden;
+  height: calc(100vh - 60px);
 }
 
 </style>
