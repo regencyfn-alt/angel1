@@ -484,7 +484,8 @@ let recorder = {
   recording: false,
   playing: false,
   playIndex: 0,
-  playbackTimer: null
+  playbackTimer: null,
+  tickCount: 0
 };
 
 // Neutrino trail system
@@ -1457,13 +1458,42 @@ startSimulation();
 
 // === RECORDER FUNCTIONS ===
 function captureFrame() {
+  // Count states for metrics
+  let state1 = 0, state2 = 0, state3 = 0, active = 0, total = 0;
+  triangles.forEach(t => {
+    if (t._removed) return;
+    total++;
+    if (t.state > 0) active++;
+    if (t.state === 1) state1++;
+    if (t.state === 2) state2++;
+    if (t.state === 3) state3++;
+  });
+  
   return {
     timestamp: Date.now(),
+    tick: recorder.tickCount || 0,
+    params: {
+      speedMultiplier: speedMultiplier,
+      isolationDecay: isolationDecay,
+      meshShape: meshShape,
+      numRings: numRings,
+      tickInterval: TICK_INTERVAL
+    },
+    metrics: {
+      total: total,
+      active: active,
+      state1: state1,
+      state2: state2,
+      state3: state3,
+      contacts: contactCount
+    },
     triangles: triangles.map(t => ({
       id: t.id,
       state: t.state,
       phase: t.phase,
       polarity: t.polarity,
+      skipCount: t.skipCount || 0,
+      isolationCount: t._isolationCount || 0,
       removed: t._removed || false
     })),
     contacts: contactCount
@@ -1489,6 +1519,7 @@ function applyFrame(frame) {
 
 function startRecording() {
   recorder.frames = [];
+  recorder.tickCount = 0;
   recorder.recording = true;
   document.getElementById('recordBtn').textContent = '⏹ Stop';
   document.getElementById('recorderStatus').textContent = 'RECORDING';
@@ -1546,13 +1577,38 @@ function stopPlayback() {
 function exportRecording() {
   if (recorder.frames.length === 0) return;
   const data = {
-    version: 1,
-    meshShape: meshShape,
-    numRings: numRings,
+    version: 2,
+    spec: 'ANGEL-2 Triangular C2 Network',
+    exported: new Date().toISOString(),
+    config: {
+      meshShape: meshShape,
+      numRings: numRings,
+      tickInterval: TICK_INTERVAL,
+      triSize: TRI_SIZE,
+      speedMultiplier: speedMultiplier,
+      isolationDecay: isolationDecay
+    },
+    constants: {
+      DORMANT: 0,
+      STATE_1: 1,
+      STATE_2: 2,
+      STATE_3: 3,
+      skipThreshold: 2,
+      isolationEquilibriumTicks: 3,
+      isolationDormantTicks: 5
+    },
     frameCount: recorder.frames.length,
+    totalTicks: recorder.tickCount,
     frames: recorder.frames
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `angel2-recording-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  logEvent(`Exported ${recorder.frames.length} frames`, '');
+}
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `angel2-recording-${Date.now()}.json`;
@@ -1622,6 +1678,7 @@ const _originalTick = tick;
 tick = function() {
   _originalTick();
   if (recorder.recording && !paused) {
+    recorder.tickCount++;
     recorder.frames.push(captureFrame());
     document.getElementById('frameCount').textContent = recorder.frames.length;
     document.getElementById('playBtn').disabled = false;
