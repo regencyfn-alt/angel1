@@ -1609,13 +1609,6 @@ function exportRecording() {
   URL.revokeObjectURL(a.href);
   logEvent(`Exported ${recorder.frames.length} frames`, '');
 }
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `angel2-recording-${Date.now()}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  logEvent(`Exported ${recorder.frames.length} frames`, '');
-}
 
 function importRecording(file) {
   const reader = new FileReader();
