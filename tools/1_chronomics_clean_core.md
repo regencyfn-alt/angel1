@@ -306,6 +306,12 @@ What is the smallest subgraph where every node achieves mutual Δ→0 with all n
 
 ---
 
+## SESSION 62 — CORE HYGIENE RULE
+
+[meta-rule] Minimality scoping: Minimality claims must be scoped by **property** AND **branch**. Different minimality questions answer different problems (closure motif, anti-symmetric oscillation motif, enclosed persistence motif). Canon entries asserting minimality MUST tag both the property under minimisation and the branch within which the claim holds. Cross-branch import of minimality results without re-derivation is structurally invalid. This is hygiene, not physics — but its absence has been the source of repeated category errors (e.g. C4_graph = enclosed persistence, Session 61 contamination register). — Session 62.
+
+---
+
 ## CORE PRINCIPLE
 
 Reality is a locally-updating discrete system where:

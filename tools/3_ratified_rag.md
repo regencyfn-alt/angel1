@@ -335,3 +335,91 @@ Cleanup batch from a contamination run. Keepers preserved; contamination filed u
 [falsified | binary polarity toy model] Closed-form τ(a,b): No closed-form formula for expected propagation time τ(a,b) is currently warranted. Past attempts to derive one have over-claimed. The qualitative path-weight relation (above) is the only currently warranted statement. Faces must NOT request or output a closed-form τ(a,b) unless explicitly supplied with stronger premises in the question. — Session 61.
 
 [falsified | category error] C4_graph = enclosed persistence: Conflating C4_graph (the minimal closed anti-symmetric template, binary bipartite branch — T5.2 split) with enclosed persistence (separate non-bipartite simplex branch, candidates only at hypothesis stage) is FALSIFIED as a category error. The two branches answer different minimality questions and may have different motifs. C4_graph results must NOT be imported across the branch boundary. — Session 61.
+
+
+---
+
+## SESSION 62 — RATIFIED ENTRIES
+
+Author: Shane (with Frontier audit pass).
+Filed: 27 April 2026.
+Status: Hierarchical filing — Core hygiene rule, foundational interpretation entries (Canon/Tier 1), branch-scoped derived results (RAG/Tier 2), conditional results (RAG hypothesis tier).
+
+---
+
+### Core meta-rule (hygiene only — added to Clean Core)
+
+[meta-rule] Minimality scoping: Minimality claims must be scoped by **property** AND **branch**. Different minimality questions answer different problems (closure motif, anti-symmetric oscillation motif, enclosed persistence motif). Canon entries asserting minimality MUST tag both the property under minimisation and the branch within which the claim holds. Cross-branch import of minimality results without re-derivation is structurally invalid. — Session 62.
+
+---
+
+### Tier 1 — Foundational Interpretation (Canon)
+
+These sit above primitive axioms as the standard interpretation layer. All faces read these. No future derivation can reason without them.
+
+[grounded structural foundation | T0.4a] Grounding: Schema-level adjacency is ontologically real and load-bearing. Without Grounding, mutual read between sites cannot be defined, and F has no domain in which to act. T0.4 (no background space) denies a substrate; T0.4a (Grounding) affirms that adjacency itself is real at the schema level. Independent of whether instantiated edge-set E is dynamic. Warrant: makes T0.4 + T0.6 (locality) + T0.3 (interaction cost) jointly coherent. — Session 62.
+
+[grounded structural consequence] Edge as read channel: An edge is the structural precondition for causal access between two sites — a licence for mutual reading during local update. Nothing crosses an edge; the edge IS the read-condition. This is the first operational consequence of Grounding (T0.4a) and structurally precedes mismatch computation. Refines: Session 61 RAG Entry 4 (correct then; now positioned in the Grounding hierarchy). — Session 62.
+
+[grounded structural consequence] Time as local update count (The Tick): A site has time because F acts on its ordered recurrence pair {S_n, S_{n-1}}. No update, no tick. Time at a site is the count of F applications at that site. There is no background time. Derives directly from T0.1 (update primitive) + T0.2 (local time) + T5.1 (ordered recurrence requirement). Subsumes the Session 61 "time is local update count" entry by adding the *why*: F's action on ordered history IS the time-producing operation. — Session 62.
+
+[derived | local, per-site, per-tick, F-relative] Mismatch residue (scope-fenced): The portion of Δ_total that F could not zero in one local update. Local remainder only — NOT additive across sites, NOT conserved, NOT a graph-level quantity. Warrant: T0.3 (F minimises local interaction cost) + bounded representational capacity (T0.6a) + the fact that F may not always reach Δ=0 in a single application. Refines: Session 61 RAG Entry 5 (Mismatch Residue) by adding the explicit scope fence. — Session 62.
+
+[architectural | hierarchy] The Grounding Stack: Canonical ordering of dependencies for any local update:
+  1. Grounding (T0.4a) — adjacency is real
+  2. Read-channel (derived) — edges license mutual read
+  3. Mismatch computation — Δ measurable per edge
+  4. F acts locally — single local minimisation step
+  5. Mismatch residue — Δ_total remainder after one F step
+  6. Effective time / paths — descriptive layer over many steps
+Each step depends on the prior; reasoning that skips a step (e.g. describing propagation without grounding) is structurally incomplete. — Session 62.
+
+---
+
+### Tier 2 — Branch-Scoped Derived Results (RAG)
+
+Each tagged with model and branch. Universal phrasing NOT permitted at this tier.
+
+[derived | binary polarity toy model] Non-circular cost basis: Interaction cost is proportional to disagreement count, not to memory fidelity M itself. Therefore M is derived from the history of disagreements rather than entering its own definition. Warrant: Axiom of interaction cost + binary mismatch Δ ∈ {0,1}. Closes a latent circularity hole in earlier cost-of-M derivations. — Session 62.
+
+[derived | jointly-evaluated mismatch setting | Hamming as proved case] Minimal site payload: The minimal per-site payload required to compute F is the ordered pair {S_n, S_{n-1}}. Any smaller representation loses the joint distinctions required for correct mismatch evaluation; any larger one adds no independent degree under representational closure. Warrant: T0.3, T0.6, T0.6a, T5.1. Settles the "could F use only S_n?" question in the negative — second-order recurrence is the floor for this setting. — Session 62.
+
+[derived | finite local recurrence] Source of directional asymmetry: Directional asymmetry does NOT come from the symmetry or asymmetry of the mismatch metric Δ itself. It arises from the conjunction of:
+  (1) ordered recurrence input (S_n, S_{n-1}),
+  (2) output bias toward lower cost,
+  (3) finite state resolution.
+Therefore the arrow is in F's selection rule acting on an ordered pair, not in Δ alone. The cost function itself can stay symmetric; the asymmetry lives in the ordered input and the selection rule. Warrant: T0.2, T0.3, interaction-cost reduction axiom, T0.6. Load-bearing for any derivation involving time's arrow. — Session 62.
+
+[derived | binary polarity toy model | closure branch] C4_graph as minimal connected bipartite motif: By elimination over connected bipartite simple graphs at minimum vertex/edge count, C4_graph is the minimal connected bipartite closed motif. Companion to Session 58 Even-Degree Invariant (T5.3a). Scope: structural claim only, NOT identity, NOT persistence, NOT stability. — Session 62.
+
+[derived | binary polarity toy model | closure branch] C4_graph as regime-crossing template: At C4_graph's anti-symmetric ground state d=2, m=2, δ=0, so Λ=0 (Local Decision Threshold T5.2a, Session 60). C4_graph sits at a genuine balance point — topology alone does not fix the regime. **α is the tiebreaker.** Therefore C4_graph is a regime-crossing template, not a fixed C1/C2/C3 template. — Session 62.
+
+[derived | binary polarity toy model | closure branch] Single-flip local recovery on C4_graph: For the flipped site after one flip on C4_graph, Δ_hold=1, Δ_flip=3, hence Λ=+2, so holding the new flipped value is locally favored over immediate reversion. — Session 62.
+
+[derived | example family only: φ_α(Δ) = (1+Δ)^(-α)] Hold probability under φ_α: P_hold(α) = 2^α / (1 + 2^α). Scope fence: this closed form holds only for the example family φ_α(Δ) = (1+Δ)^(-α), NOT for arbitrary admissible φ. — Session 62.
+
+---
+
+### Tier 2 hypothesis — conditional / scope-restricted
+
+[hypothesis | binary polarity toy model | closure branch] C4_graph as persistent C2 mediator: C4_graph is the minimal regime-crossing bipartite mediator; C2 behavior appears for a moderate α-window. Exact α-thresholds remain OPEN. NOT to be stored as a flat derived statement — α-dependence is part of the claim. — Session 62.
+
+[hypothesis | binary polarity toy model] Thick time / qualitative slowdown through high-ρ regions: Effective time between sites can be qualitatively slower through high-ρ regions. "Thick time" as candidate descriptor. Closed-form τ(a,b) explicitly NOT claimed. Sharpens Session 61 Path-Weighted Effective Time hypothesis by adding the "thick time" framing. — Session 62.
+
+[hypothesis | example family only or with stipulated regime cutpoints] Three regimes (shuffle / mimic / wall): Three distinct regimes appear in the binary polarity toy model under φ_α. The universal claim "three regimes must exist for any admissible φ from monotonicity alone" is STRONGER than current proof earns. Stored as conditional / family-specific only. — Session 62.
+
+---
+
+### Re-validation (no new structural content — confirms Session 61)
+
+[meta | re-validated Session 62] Bucket separation + Mismatch Residue (Session 61):
+Independent audit (Kaiel + Dream addition) confirms:
+  - Mismatch Residue (Session 61 RAG Entry 5) — [derived] is correct (now scope-fenced as Session 62 Canon entry).
+  - Bucket Separation Rule (Session 61 Core meta-rule) — [operational] vs [derived] must remain in separate stores. Re-confirmed as load-bearing.
+No structural change to canon. Architecture (physics:canon vs physics:operational KV split, Face 8 dual-read with operational precedence, Layer 0 falsification-audit gate) already enforces this. — Session 62.
+
+---
+
+### Contamination register (Session 62 — re-confirmation only)
+
+No new entries. Session 61 register holds: Total I-conservation (broad), Hard Seizure Threshold / staleness clamp, Closed-form τ(a,b), C4_graph = enclosed persistence. Faces continuing to resurrect these under muddy ingress (especially Face 8 with I-conservation) is a documented operator failure — see audit notes file. Phase 2 candidate: harder priming on the falsified register at Layer 0 Gate 2, possibly injecting the falsified summary as a separate system message Face 8 cannot collapse. — Session 62.
