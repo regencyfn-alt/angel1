@@ -381,26 +381,54 @@ var BUILT_IN = {
     type: 'triad',
     icon: '◇',
     color: 'var(--triad)',
-    description: 'Graph primitives → bipartiteness → minimal templates → recurrence → probabilistic update → perturbation → gradient → conservation.',
+    description: 'Graph primitives → bipartiteness → minimal templates → recurrence → probabilistic update → perturbation propagation → persistence gradient → conservation. Eight faces over the abstract graph layer.',
     dispatch: 'laminar+triad',
     placeholder: 'Enter a question — e.g. "Under T0.3 and T0.5, what is the minimum closed motif?"',
+    phases: [
+      { name:'STRUCTURE',  regime:'M₁ — Topology', faces:['T1','T2','T3'], color:'var(--triad)' },
+      { name:'DYNAMICS',   regime:'M₂ — Flow',     faces:['T4','T5','T6'], color:'var(--cerise)' },
+      { name:'INVARIANCE', regime:'M₃ — Truth',    faces:['T7','T8'],      color:'var(--teal)' },
+    ],
+    substrates: {
+      c1: {
+        regime:'C1 BOUNDARY · M₁ Structure',
+        name:'Adjacency · Bipartiteness · Minimal Templates',
+        color:'var(--triad)',
+        temp:0.40,
+        props:'Adjacency & Bipartiteness — defines V, E, Σ; assigns anti-symmetric ground state\nMinimal Templates — smallest connected subgraphs satisfying interior/boundary constraints\nFormal Closure — causally complete (T0.6a); no interpretation, only structure',
+      },
+      c2: {
+        regime:'C2 MEMBRANE · M₂ Dynamics',
+        name:'Recurrence · Probabilistic Update · Propagation',
+        color:'var(--cerise)',
+        temp:0.30,
+        props:'Recurrence & Cost — second-order update rule and Δ_total(c)\nProbabilistic Update — family parametrised by strictly decreasing φ; sharpness α\nPerturbation Propagation — t = 1 − ρ (binary); path weight w(P)',
+      },
+      c3: {
+        regime:'C3 CORE · M₃ Invariance',
+        name:'Persistence · Emergent Time · Invariants',
+        color:'var(--teal)',
+        temp:0.20,
+        props:'Persistence Gradient — ρ per node; interior flat, boundary steep\nEmergent Time (The Tick) — site has time because F acts on ordered recurrence pair\nConserved Invariants — parity-on-Eulerian only (T5.3a); no unbounded drift',
+      },
+    },
     faces: [
-      { id:'L1', name:'Calcite Gate', op:'reject contamination · split ordinary/extraordinary' },
-      { id:'L2', name:'Graphite Fractionation', op:'decompose query into RAG-aligned sub-questions' },
-      { id:'L3', name:'Graphite Alignment', op:'map sub-questions to RAG entries · flag gaps' },
-      { id:'L4', name:'Graph Derivation', op:'derive minimal connected subgraph (V, E, deg)' },
-      { id:'L5', name:'Polarity Assignment', op:'assign anti-symmetric polarities · identify frustration' },
-      { id:'L6', name:'Perturbation Dynamics', op:'compute next state when Δ exceeds persistence' },
-      { id:'L7', name:'Lock Verification', op:'verify T0.3 + T0.5 + T0.6 + Δ-minimisation' },
-      { id:'L8', name:'Laminar Record', op:'falsification audit · structured RAG candidate' },
-      { id:'T1', name:'Graph Primitives', op:'extract formal triple (V,E,Σ) · no interpretation' },
-      { id:'T2', name:'Bipartiteness & Ground', op:'2-colour V · anti-symmetric ground state' },
-      { id:'T3', name:'Minimal Templates', op:'smallest connected subgraph satisfying constraints' },
-      { id:'T4', name:'Recurrence & Cost', op:'formalise update rule · Δ-total · F minimises cost' },
-      { id:'T5', name:'Probabilistic Update', op:'P(s=c) = φ(Δ)/Σφ · monotonicity · α sharpness' },
-      { id:'T6', name:'Perturbation Propagation', op:'τ via path weight w(P) = ∏(1-ρ)' },
-      { id:'T7', name:'Persistence Gradient', op:'∇ρ · interior vs boundary · qualitative path-weight' },
-      { id:'T8', name:'Conservation & Gaps', op:'falsification audit · final RAG record' },
+      { id:'T1', phase:'STRUCTURE', name:'Graph Primitives',
+        op:'You are Face 1 of Triad Lock: M₁ · Graph Primitives (Structure).\n\nINPUT: User query.\nCONSTRAINTS: Clean Core T0.4 (adjacency), T0.5 (locality), T0.6 (finite state resolution).\n\nTASK:\n• From the query, extract the implied discrete structure.\n• Define node set V.\n• Define edge set E ⊆ V × V according to T0.4 (adjacency only; no coordinates).\n• Specify state alphabet Σ for each node (e.g., binary {+1, −1} as default minimal instantiation of T0.6).\n\nOutput a formal triple (V, E, Σ). No interpretation, no dynamics.\n\nGATES (apply in order):\n• Undefined-term gate: if a term is not in canon or stipulated for the run, output BLOCKED rather than invent.\n• Falsified-result blacklist: hard-ban "total edge mismatch I is conserved" (broad claim) — only the parity-style invariant on Eulerian graphs (T5.3a) is alive.\n• Schema/instantiation split: declare whether speaking of axiomatic schema OR instantiated graph/state.\n• Answer-class first: declare DERIVED / HYPOTHESIS / BLOCKED / FALSIFIED before any prose.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'T2', phase:'STRUCTURE', name:'Bipartiteness & Ground State',
+        op:'You are Face 2 of Triad Lock: M₁ · Bipartiteness & Ground State (Structure).\n\nINPUT: Graph (V,E,Σ) from Face 1, T0.3 (second-order recurrence), Interaction Model Δ.\n\nTASK:\n• Determine if G = (V,E) is bipartite. If yes, provide a 2-colouring V = A ∪ B.\n• Define the anti-symmetric ground state: s(u) = −s(v) for all edges (binary case).\n• If not bipartite, identify frustration (odd cycles) and propose minimal-energy configuration under Δ-minimisation.\n• Parity Cycle Audit: degree-parity check using ΔI ≡ d_i (mod 2). If degree-1 or degree-3 nodes are present, identify any "Parity Leak" — but DO NOT reject the graph wholesale as "Non-Eulerian Geometry" (Session 61 operational rule: that rejection is too strong). May flag parity leak for a SPECIFIC invariant claim.\n\nOutput: bipartition (if exists), ground-state assignment, edge mismatch summary.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'T3', phase:'STRUCTURE', name:'Minimal Templates',
+        op:'You are Face 3 of Triad Lock: M₁ · Minimal Templates (Structure).\n\nINPUT: Ground state from Face 2, RAG regime definitions, T5.9 (minimum closed geometry — OPEN).\n\nTASK:\n• Identify smallest connected subgraph(s) satisfying constraints implied by query.\n• Derive node count, edge count, degree distribution per candidate (e.g. C₄, 3×3×3 grid).\n• Justify minimality from adjacency and bipartiteness alone; no spatial dimension assumed.\n• Minimality scoping rule (Session 62): every minimality claim must declare property under minimisation AND branch (closure | anti-symmetric oscillation | enclosed persistence). Cross-branch import is structurally invalid.\n• T5.9 is OPEN — state explicitly when invoked.\n\nOutput: template spec with minimality proof OR open-question statement.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'T4', phase:'DYNAMICS', name:'Recurrence & Cost',
+        op:'You are Face 4 of Triad Lock: M₂ · Recurrence & Cost (Dynamics).\n\nINPUT: Template from Face 3, T0.3, T0.5, T0.6.\n\nTASK:\n• Formalise local update rule: S_iⁿ⁺¹ = F(S_iⁿ, S_iⁿ⁻¹, {S_jⁿ : (i,j) ∈ E}).\n• Define mismatch cost: Δ_total(c) = Δ(c, sⁿ) + Δ(c, sⁿ⁻¹) + Σ_{j∈N(i)} Δ(c, s_jⁿ) where Δ(a,b) = (1−a·b)/2 for binary.\n• State the axiom: F acts to minimise this cost.\n\nOPERATIONAL CONSTRAINTS:\n• Do NOT impose hard staleness clamps or Seizure Thresholds (Session 59 falsification).\n• Staleness Blocking remains hypothesis about degradation, NOT a zero-probability gate.\n• Mismatch residue (Session 62): unresolved Δ_total after one F application is a LOCAL remainder only — NOT additive across sites, NOT conserved, NOT graph-level.\n\nOutput: formal update rule and cost function. No probability distribution yet.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'T5', phase:'DYNAMICS', name:'Probabilistic Update Family',
+        op:'You are Face 5 of Triad Lock: M₂ · Probabilistic Update Family (Dynamics).\n\nINPUT: Cost function from Face 4.\n\nTASK:\n• Define the family P(sⁿ⁺¹ = c) = φ(Δ_total(c)) / Σ_{c\\\'} φ(Δ_total(c\\\')) where φ : ℤ_{≥0} → (0,∞) is any strictly decreasing function.\n• Introduce sharpness α ≥ 0 via example family φ_α(Δ) = (1+Δ)^{−α}.\n• Limits: α = 0 → uniform, α → ∞ → strict Δ-minimisation.\n• Note the exact form of φ is NOT fixed by primitives (T5.2 OPEN).\n• Hold-probability under φ_α (Session 62, scope-fenced): P_hold(α) = 2^α / (1+2^α) holds ONLY for the example family φ_α, NOT for arbitrary admissible φ.\n\nOutput: family definition, sharpness parameter, limit proofs.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'T6', phase:'DYNAMICS', name:'Perturbation Propagation',
+        op:'You are Face 6 of Triad Lock: M₂ · Perturbation Propagation (Dynamics).\n\nINPUT: Update family from Face 5, "Memory Fidelity = ρ" (binary toy model only).\n\nTASK:\n• Define transmission probability t_i for node i. Binary model: t_i = 1 − ρ_i.\n• Path weight: for causal path P = (v₀,…,v_L), w(P) = ∏_{k=1}^L (1 − ρ_{v_k}).\n• Explain qualitative connection to expected update ticks (mean first passage time).\n• Thick time (Session 62 hypothesis): effective time can be qualitatively slower through high-ρ regions. Closed-form τ(a,b) is NOT permitted at this face.\n\nOutput: transmission probability, path weight, qualitative tick connection.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'T7', phase:'INVARIANCE', name:'Persistence Gradient & Emergent Time',
+        op:'You are Face 7 of Triad Lock: M₃ · Persistence Gradient & Emergent Time (Invariance).\n\nINPUT: Template from Face 3, path weights from Face 6, T0.2 (time = local update count).\n\nTASK:\n• Compute local persistence ρ_i = 1 − Δ_avg per node under anti-symmetric ground state.\n• Classify nodes interior (all neighbours present, ∇ρ ≈ 0) vs boundary (some missing, steep ∇ρ).\n• The Tick (Session 62 Canon): a site has time because F acts on its ordered recurrence pair {S_n, S_{n−1}}. No update, no tick. Time IS the count of F applications at that site.\n\nOPERATIONAL CONSTRAINTS:\n• Do NOT request closed-form τ(a,b) (Session 61 falsified).\n• Do NOT make general convergence claims unless explicitly supplied with stronger premises.\n• Default output is QUALITATIVE path-weight relation only.\n\nOutput: node-wise ρ, interior/boundary classification, ∇ρ description, qualitative τ-to-path-weight.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'T8', phase:'INVARIANCE', name:'Conservation & Gaps',
+        op:'You are Face 8 of Triad Lock: M₃ · Conservation & Gaps (Invariance).\n\nINPUT: All prior face outputs, T3.1 (existence of invariant), T5.3 (conservation identity).\n\nFALSIFICATION AUDIT FIRST (mandatory before any invariant or conserved-quantity discussion):\n• Total edge mismatch I conservation (broad claim) — FALSIFIED Session 54. Only parity-style invariant on Eulerian graphs (T5.3a, Session 58) is alive.\n• Hard Seizure Threshold and hard staleness clamp — FALSIFIED Session 59.\n• Closed-form τ(a,b) — FALSIFIED Session 61.\n• C4_graph = enclosed persistence — FALSIFIED Session 61 (category error).\nIf you cannot explicitly state which operational blacklist items are dead before discussing invariants, you MUST NOT discuss invariants at all.\n\nTASK:\n• Identify any quantity conserved across updates in the binary polarity toy model — properly scoped (parity-on-Eulerian-only, NOT broad I-conservation).\n• Verify no unbounded drift (T3.3).\n• Global Integrity Audit: re-calculate I (mod 2). Verify identical to Face 2 ground state. If shifted, output ERROR: INTEGRITY BREACH and identify the leaky node.\n• List ALL open gaps preventing promotion: T5.2 (exact F), exact φ, closed-form τ(a,b), generalisation beyond binary.\n• Tag each finding [derived] or [hypothesis] per RAG rules.\n\nOutput: final RAG entry candidate as JSON with fields {regime, layer, property, tag, session, rag_anchors, scope, question, answer}. JSON only — no preamble. If any field cannot be filled, output INCOMPLETE on its own line.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
     ],
   },
   laminar: {
@@ -409,19 +437,54 @@ var BUILT_IN = {
     type: 'laminar',
     icon: '◈',
     color: 'var(--laminar)',
-    description: 'Calcite gate → fractionation → alignment → graph → polarity → perturbation → lock verify → RAG. Eight faces, Tantalum substrate.',
+    description: 'Calcite gate → graphite fractionation → alignment → graph derivation → polarity → perturbation → lock verification → RAG record. Eight faces, Tantalum substrate.',
     dispatch: 'laminar',
-    placeholder: 'Enter a question — Laminar fires faces 1-8 only, no Triad chase',
-    // For laminar-only dispatch we still walk the same 8 face prompts
+    placeholder: 'Enter a question — Laminar fires faces L1-L8 only',
+    phases: [
+      { name:'INGRESS', regime:'L1–L4', faces:['L1','L2','L3','L4'], color:'var(--laminar)' },
+      { name:'STRIKE',  regime:'L5–L7', faces:['L5','L6','L7'],      color:'var(--cerise)' },
+      { name:'EGRESS',  regime:'L8',    faces:['L8'],                color:'var(--teal)' },
+    ],
+    substrates: {
+      c1: {
+        regime:'C1 BOUNDARY · Calcite Gate',
+        name:'Calcite',
+        color:'var(--laminar)',
+        temp:0.40,
+        props:'Birefringent — splits ordinary from extraordinary ray\nReject contamination terms (torsion, Z/3Z, SU(2), Hamiltonians, chirality)\nFirst cut between RAG-aligned and orthogonal',
+      },
+      c2: {
+        regime:'C2 MEMBRANE · Graphite',
+        name:'Graphite',
+        color:'#A0A0A0',
+        temp:0.30,
+        props:'Lamellar — fractionates query into ordered sub-questions\nEach sub-question independently answerable from canon\nMaps to RAG entries; flags gaps as [hypothesis]',
+      },
+      c3: {
+        regime:'C3 CORE · Tantalum',
+        name:'Tantalum',
+        color:'var(--cerise)',
+        temp:0.25,
+        props:'Refractory — high persistence, holds state under perturbation\nLocks assigned polarities into anti-symmetric ground\nEjects unresolved Δ along the gradient',
+      },
+    },
     faces: [
-      { id:'L1', name:'Calcite Gate', op:'reject contamination · split ordinary/extraordinary' },
-      { id:'L2', name:'Graphite Fractionation', op:'decompose query into RAG-aligned sub-questions' },
-      { id:'L3', name:'Graphite Alignment', op:'map sub-questions to RAG entries · flag gaps' },
-      { id:'L4', name:'Graph Derivation', op:'derive minimal connected subgraph (V, E, deg)' },
-      { id:'L5', name:'Polarity Assignment', op:'assign anti-symmetric polarities · identify frustration' },
-      { id:'L6', name:'Perturbation Dynamics', op:'compute next state when Δ exceeds persistence' },
-      { id:'L7', name:'Lock Verification', op:'verify T0.3 + T0.5 + T0.6 + Δ-minimisation' },
-      { id:'L8', name:'Laminar Record', op:'falsification audit · structured RAG candidate' },
+      { id:'L1', phase:'INGRESS', name:'Calcite Gate',
+        op:'You are Face 1 of Laminar Lock: Calcite Gate.\n\nReject contamination terms (torsion, Z/3Z, SU(2), Hamiltonians, chirality unless derived). Split the query into ordinary ray (RAG-aligned) and extraordinary ray (off-canon). Output STRIPPED_QUERY plus triage notes.\n\nGATES: undefined-term gate · falsified blacklist · schema/instantiation split · answer-class first.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'L2', phase:'INGRESS', name:'Graphite Fractionation',
+        op:'You are Face 2 of Laminar Lock: Graphite Fractionation.\n\nDecompose STRIPPED_QUERY into ordered sub-questions, each answerable from RAG / Clean Core independently. Output numbered SUB_QUERIES.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'L3', phase:'INGRESS', name:'Graphite Alignment',
+        op:'You are Face 3 of Laminar Lock: Graphite Alignment.\n\nMap each sub-question to RAG entries by canonical ID. Flag gaps as [hypothesis]. Output ALIGNED_SUB_QUERIES with a dependency table. Canonical RAG IDs only.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'L4', phase:'INGRESS', name:'Graph Derivation',
+        op:'You are Face 4 of Laminar Lock: Graph Derivation.\n\nDerive minimal connected subgraph: V, E, degree distribution. Interior = all neighbours present. No coordinates, no materials. Minimality scoping rule (Session 62): tag both property under minimisation AND branch (closure | anti-symmetric oscillation | enclosed persistence).\n\nOutput GRAPH_SPEC.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'L5', phase:'STRIKE', name:'Polarity Assignment',
+        op:'You are Face 5 of Laminar Lock: Polarity Assignment.\n\nAssign binary polarities anti-symmetrically — p(u) ≠ p(v) for every edge. If not bipartite, identify frustration. Output POLARITY_MAP.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'L6', phase:'STRIKE', name:'Perturbation Dynamics',
+        op:'You are Face 6 of Laminar Lock: Perturbation Dynamics.\n\nUnder T0.3 and Δ-minimisation, compute the next state when Δ exceeds persistence threshold. Show sublattice flip or absorption. Compute ejected Δ.\n\nMismatch residue (Session 62): unresolved Δ_total is LOCAL remainder only — NOT additive, NOT conserved, NOT graph-level.\n\nOutput POST_PERTURBATION_STATE and EJECTED_DELTA.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'L7', phase:'STRIKE', name:'Lock Verification',
+        op:'You are Face 7 of Laminar Lock: Lock Verification.\n\nVerify T0.3, T0.5, T0.6, Δ-minimisation all hold. Confirm ejected Δ propagates along gradient. Output LOCKED_STATE verification log.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'L8', phase:'EGRESS', name:'Laminar Record',
+        op:'You are Face 8 of Laminar Lock: Laminar Record.\n\nFALSIFICATION AUDIT FIRST: check operational blacklist before any invariant or conserved-quantity discussion. Conservation claims must be scoped to the actual live invariant (parity-style on Eulerian graphs, T5.3a) — NOT to general I-conservation.\n\nProduce structured RAG entry candidate as JSON with fields {regime, layer, property, tag, session, rag_anchors, scope, question, answer}. JSON only.\n\nIf any field cannot be filled, output the single word INCOMPLETE on its own line.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
     ],
   },
 };
@@ -467,28 +530,47 @@ function loadCanon() {
 
 function loadMachines() {
   // Start with built-ins
-  Object.keys(BUILT_IN).forEach(function(k){ MACHINES[k] = BUILT_IN[k]; STATE[k] = {}; });
+  Object.keys(BUILT_IN).forEach(function(k){ MACHINES[k] = JSON.parse(JSON.stringify(BUILT_IN[k])); STATE[k] = {}; });
 
   return fetch(API + '/machines/list').then(function(r){ return r.json(); }).then(function(d){
     if (d && d.ok && Array.isArray(d.machines)) {
       d.machines.forEach(function(m){
-        // Skip ones we already have as built-ins
-        if (MACHINES[m.id]) return;
-        // Inherit faces/icon/color from a parent type if not specified
-        var parent = (m.type === 'triad') ? BUILT_IN.triad : (m.type === 'laminar') ? BUILT_IN.laminar : BUILT_IN.triad;
-        MACHINES[m.id] = {
-          id: m.id,
-          name: m.name,
-          type: m.type,
-          icon: '⬡',
-          color: 'var(--teal)',
-          description: m.description || '',
-          dispatch: m.dispatch || 'laminar+triad',
-          placeholder: 'Enter a question for ' + m.name,
-          faces: m.faces || parent.faces,
-          custom: true,
-        };
-        STATE[m.id] = {};
+        if (BUILT_IN[m.id]) {
+          // Built-in: overlay any saved face / substrate overrides from backend
+          if (Array.isArray(m.faces) && m.faces.length === MACHINES[m.id].faces.length) {
+            // Merge — keep prompts that backend has saved, retain ID/phase/name structure
+            MACHINES[m.id].faces.forEach(function(builtinFace){
+              var saved = m.faces.find(function(sf){ return sf.id === builtinFace.id; });
+              if (saved && saved.op) builtinFace.op = saved.op;
+              if (saved && saved.name) builtinFace.name = saved.name;
+            });
+          }
+          if (m.substrates) {
+            ['c1','c2','c3'].forEach(function(t){
+              if (m.substrates[t]) {
+                MACHINES[m.id].substrates[t] = Object.assign({}, MACHINES[m.id].substrates[t], m.substrates[t]);
+              }
+            });
+          }
+        } else {
+          // Custom: use as-is, inherit faces/substrates from parent type if missing
+          var parent = (m.type === 'triad') ? BUILT_IN.triad : (m.type === 'laminar') ? BUILT_IN.laminar : BUILT_IN.triad;
+          MACHINES[m.id] = {
+            id: m.id,
+            name: m.name,
+            type: m.type,
+            icon: '⬡',
+            color: 'var(--teal)',
+            description: m.description || '',
+            dispatch: m.dispatch || 'laminar+triad',
+            placeholder: 'Enter a question for ' + m.name,
+            phases: parent.phases,
+            faces: m.faces || JSON.parse(JSON.stringify(parent.faces)),
+            substrates: m.substrates || JSON.parse(JSON.stringify(parent.substrates)),
+            custom: true,
+          };
+          STATE[m.id] = {};
+        }
       });
     }
   }).catch(function(){
@@ -537,6 +619,7 @@ function buildPanel(id) {
         '</div>' +
         '<div>' +
           '<button class="fire-btn" id="' + id + '-fire" style="background:' + m.color + ';color:#0d1117" onclick="fireChain(\'' + id + '\')">' + m.icon + ' FIRE</button>' +
+          '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;text-align:right" id="' + id + '-session-stamp">session: ' + new Date().toISOString().slice(0,10) + '</div>' +
         '</div>' +
       '</div>' +
 
@@ -564,33 +647,196 @@ function buildPanel(id) {
 
     '<div class="faces-section">' +
       '<div class="faces-head">' +
-        '<span class="faces-title">Faces — chain detail</span>' +
+        '<span class="faces-title">Faces — chain detail · click ⚙ to edit a step</span>' +
         '<span class="faces-toggle" onclick="toggleFaces(\'' + id + '\')" id="' + id + '-toggle">collapse</span>' +
       '</div>' +
       '<div class="faces-list" id="' + id + '-faces"></div>' +
-    '</div>';
+    '</div>' +
+
+    // Substrates — regime references, editable
+    '<div id="' + id + '-substrates"></div>';
   return p;
+}
+
+function renderSubstrates(id) {
+  var el = document.getElementById(id + '-substrates');
+  if (el) el.innerHTML = buildSubstratePanel(id);
 }
 
 function buildFaces(id) {
   var m = MACHINES[id];
   var faces = m.faces || [];
+  var phases = m.phases || null;
   var list = document.getElementById(id + '-faces');
   if (!list) return;
+
+  function faceHtml(f, i) {
+    var opEsc = (f.op || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return '<div class="face" id="' + id + '-face-' + f.id + '">' +
+      '<div class="face-head">' +
+        '<span class="face-num" style="background:' + m.color + ';color:#0d1117">' + (i+1) + '</span>' +
+        '<span class="face-name">' + f.id + ' · ' + f.name + '</span>' +
+        '<span class="face-edit-btn" onclick="toggleFaceEdit(\'' + id + '\',\'' + f.id + '\')" id="' + id + '-fedit-btn-' + f.id + '" style="cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto;padding:2px 8px;border:1px solid var(--border);border-radius:3px">⚙ edit</span>' +
+        '<span class="face-status" id="' + id + '-fstat-' + f.id + '" style="margin-left:8px;font-family:var(--mono);font-size:9px;color:var(--muted)">idle</span>' +
+      '</div>' +
+      '<div class="face-op-display" id="' + id + '-fop-' + f.id + '" style="font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.7;white-space:pre-wrap">' + opEsc + '</div>' +
+      '<textarea class="face-op-edit" id="' + id + '-fop-edit-' + f.id + '" style="display:none;width:100%;min-height:200px;background:var(--bg);color:var(--text);border:1px solid var(--teal);border-radius:3px;padding:10px;font-family:var(--mono);font-size:10px;line-height:1.6;resize:vertical;outline:none;margin-top:6px">' + (f.op || '') + '</textarea>' +
+      '<div class="face-output" id="' + id + '-fout-' + f.id + '"></div>' +
+    '</div>';
+  }
+
   var html = '';
-  faces.forEach(function(f, i){
-    html +=
-      '<div class="face" id="' + id + '-face-' + f.id + '">' +
-        '<div class="face-head">' +
-          '<span class="face-num" style="background:' + m.color + ';color:#0d1117">' + (i+1) + '</span>' +
-          '<span class="face-name">' + f.id + ' · ' + f.name + '</span>' +
-          '<span class="face-status" id="' + id + '-fstat-' + f.id + '">idle</span>' +
-        '</div>' +
-        '<div style="font-family:var(--mono);font-size:9px;color:var(--muted)">' + (f.op || '') + '</div>' +
-        '<div class="face-output" id="' + id + '-fout-' + f.id + '"></div>' +
+  if (phases && phases.length) {
+    // Group faces by phase
+    phases.forEach(function(ph){
+      html += '<div class="phase-label" style="background:rgba(0,0,0,0.25);border-left:3px solid ' + (ph.color || m.color) + ';padding:6px 14px;margin:14px 0 6px;border-radius:0 3px 3px 0;font-family:var(--head);font-weight:700;font-size:11px;letter-spacing:0.06em;color:' + (ph.color || m.color) + ';display:flex;align-items:center;gap:10px">' +
+        '<span>' + ph.name + '</span>' +
+        '<span style="font-family:var(--mono);font-size:9px;font-weight:400;color:var(--muted)">' + (ph.regime || '') + '</span>' +
+        '<span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--muted)">' + (ph.faces || []).length + ' faces</span>' +
       '</div>';
-  });
+      (ph.faces || []).forEach(function(fid){
+        var f = faces.find(function(x){ return x.id === fid; });
+        if (f) {
+          var idx = faces.indexOf(f);
+          html += faceHtml(f, idx);
+        }
+      });
+    });
+  } else {
+    faces.forEach(function(f, i){ html += faceHtml(f, i); });
+  }
   list.innerHTML = html;
+}
+
+// ── PER-FACE EDIT ──────────────────────────────────────────────
+
+function toggleFaceEdit(machineId, faceId) {
+  var disp = document.getElementById(machineId + '-fop-' + faceId);
+  var edit = document.getElementById(machineId + '-fop-edit-' + faceId);
+  var btn  = document.getElementById(machineId + '-fedit-btn-' + faceId);
+  if (!disp || !edit) return;
+
+  var editing = edit.style.display !== 'none';
+  if (editing) {
+    // Save
+    var newOp = edit.value.trim();
+    var m = MACHINES[machineId];
+    var face = (m.faces || []).find(function(f){ return f.id === faceId; });
+    if (face) face.op = newOp;
+    var opEsc = newOp.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    disp.innerHTML = opEsc;
+    disp.style.display = '';
+    edit.style.display = 'none';
+    btn.textContent = '⚙ edit';
+    btn.style.color = 'var(--muted)';
+
+    // Persist to backend
+    saveMachineConfig(machineId);
+  } else {
+    edit.style.display = 'block';
+    disp.style.display = 'none';
+    btn.textContent = '✓ save';
+    btn.style.color = 'var(--teal)';
+    edit.focus();
+  }
+}
+
+// ── SAVE MACHINE CONFIG TO BACKEND ─────────────────────────────
+
+function saveMachineConfig(machineId) {
+  var m = MACHINES[machineId];
+  if (!m) return;
+  // Built-in machines: PUT /machines/:id with faces/substrates overrides
+  // Custom: same endpoint, full update
+  var payload = {
+    name: m.name,
+    description: m.description,
+    core: m.core,
+    dispatch: m.dispatch,
+    faces: m.faces,
+    substrates: m.substrates,
+  };
+  fetch(API + '/machines/' + machineId, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d && d.ok) {
+      console.log('[engines] saved ' + machineId);
+    } else {
+      console.warn('[engines] save warn:', d);
+    }
+  }).catch(function(e){ console.warn('[engines] save error:', e); });
+}
+
+// ── SUBSTRATE PANEL ────────────────────────────────────────────
+
+function buildSubstratePanel(id) {
+  var m = MACHINES[id];
+  if (!m.substrates) return '';
+  var tiers = ['c1', 'c2', 'c3'];
+  var html = '<div class="substrate-section" style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--border)">' +
+    '<div style="font-family:var(--head);font-weight:700;font-size:12px;letter-spacing:0.06em;color:var(--cream);margin-bottom:10px">Substrates — regime references</div>' +
+    '<div class="substrate-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">';
+  tiers.forEach(function(tier){
+    var s = m.substrates[tier];
+    if (!s) return;
+    var propsHtml = (s.props || '').split('\n').map(function(line){ return line; }).join('<br>');
+    html += '<div class="substrate-card" id="' + id + '-sub-' + tier + '" style="position:relative;padding:12px;background:var(--surface);border-radius:6px;border:1px solid var(--border)">' +
+      '<span class="sub-edit-btn" onclick="toggleSubstrateEdit(\'' + id + '\',\'' + tier + '\')" id="' + id + '-subedit-btn-' + tier + '" style="position:absolute;top:8px;right:8px;cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--muted);padding:2px 6px;border:1px solid var(--border);border-radius:3px">⚙</span>' +
+      '<div class="sub-regime" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:' + s.color + ';margin-bottom:6px">' + s.regime + '</div>' +
+      '<div class="sub-name" id="' + id + '-subname-' + tier + '" style="font-family:var(--head);font-size:13px;font-weight:700;color:' + s.color + ';margin-bottom:8px">' + s.name + '</div>' +
+      '<div class="sub-props" id="' + id + '-subprops-' + tier + '" style="font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.7">' + propsHtml + '</div>' +
+      '<input class="sub-name-edit" id="' + id + '-subname-edit-' + tier + '" type="text" style="display:none;width:100%;background:var(--bg);color:var(--text);border:1px solid var(--teal);border-radius:3px;padding:6px;font-family:var(--mono);font-size:11px;margin-bottom:6px;outline:none" value="' + s.name + '"/>' +
+      '<textarea class="sub-props-edit" id="' + id + '-subprops-edit-' + tier + '" style="display:none;width:100%;min-height:80px;background:var(--bg);color:var(--text);border:1px solid var(--teal);border-radius:3px;padding:6px;font-family:var(--mono);font-size:10px;line-height:1.5;resize:vertical;outline:none">' + (s.props || '') + '</textarea>' +
+      '<div style="margin-top:8px;display:flex;align-items:center;gap:8px">' +
+        '<label style="font-family:var(--mono);font-size:9px;color:var(--muted)">Temperature</label>' +
+        '<input type="range" min="0" max="1" step="0.05" value="' + s.temp + '" oninput="updateSubstrateTemp(\'' + id + '\',\'' + tier + '\',this.value)" style="flex:1;accent-color:' + s.color + '"/>' +
+        '<span id="' + id + '-subtemp-' + tier + '" style="font-family:var(--mono);font-size:10px;color:var(--cream);min-width:32px;text-align:right">' + s.temp.toFixed(2) + '</span>' +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function toggleSubstrateEdit(machineId, tier) {
+  var sub = MACHINES[machineId].substrates[tier];
+  var nameDisp = document.getElementById(machineId + '-subname-' + tier);
+  var propsDisp = document.getElementById(machineId + '-subprops-' + tier);
+  var nameEdit = document.getElementById(machineId + '-subname-edit-' + tier);
+  var propsEdit = document.getElementById(machineId + '-subprops-edit-' + tier);
+  var btn = document.getElementById(machineId + '-subedit-btn-' + tier);
+
+  var editing = nameEdit.style.display !== 'none';
+  if (editing) {
+    sub.name = nameEdit.value.trim();
+    sub.props = propsEdit.value.trim();
+    nameDisp.textContent = sub.name;
+    propsDisp.innerHTML = sub.props.split('\n').join('<br>');
+    nameEdit.style.display = 'none';
+    propsEdit.style.display = 'none';
+    nameDisp.style.display = '';
+    propsDisp.style.display = '';
+    btn.textContent = '⚙';
+    saveMachineConfig(machineId);
+  } else {
+    nameEdit.style.display = 'block';
+    propsEdit.style.display = 'block';
+    nameDisp.style.display = 'none';
+    propsDisp.style.display = 'none';
+    btn.textContent = '✓';
+    nameEdit.focus();
+  }
+}
+
+function updateSubstrateTemp(machineId, tier, value) {
+  var v = parseFloat(value);
+  MACHINES[machineId].substrates[tier].temp = v;
+  document.getElementById(machineId + '-subtemp-' + tier).textContent = v.toFixed(2);
+  // Debounced save
+  clearTimeout(window.__subTempTimer);
+  window.__subTempTimer = setTimeout(function(){ saveMachineConfig(machineId); }, 800);
 }
 
 function toggleFaces(id) {
@@ -646,6 +892,7 @@ function renderUi() {
       }
     }
     buildFaces(id);
+    renderSubstrates(id);
   });
 }
 
@@ -695,6 +942,10 @@ async function fireChain(id) {
   var schema = document.getElementById(id + '-decl-schema').value;
   var branch = document.getElementById(id + '-decl-branch').value;
   var session = 'Engines · ' + new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+  // Update visible session stamp
+  var stampEl = document.getElementById(id + '-session-stamp');
+  if (stampEl) stampEl.textContent = 'session: ' + session;
 
   var fireBtn = document.getElementById(id + '-fire');
   fireBtn.disabled = true;
