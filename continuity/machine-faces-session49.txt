@@ -1,0 +1,230 @@
+CHITIN MACHINES — FACE OPERATORS & WEIGHTS
+══════════════════════════════════════════════════
+
+DEEP RUBY ⬡ (Fire · Iron Core · Gold Membrane · Barium Boundary)
+Sequential chain. Each face builds on all prior.
+──────────────────────────────────────────────────
+
+  Face 0 · Recurrence          weights: [9,0,0,0,0,0,0,0]
+  Tier: T0.3
+  What does F(Stateₙ, Stateₙ₋₁, N) produce under
+  this condition?
+
+  Face 1 · Persistence          weights: [0,9,0,0,0,0,0,0]
+  Tier: T1.2, T1.3
+  Where does stability hold or fail?
+
+  Face 2 · Gradient             weights: [0,0,9,0,0,0,0,0]
+  Tier: T1.5, T1.10
+  What ∇ρ emerges and what direction does it impose?
+
+  Face 3 · Attractor            weights: [0,0,0,9,0,0,0,0]
+  Tier: T2.1
+  Does this converge, oscillate, or diverge?
+
+  Face 4 · Invariant            weights: [0,0,0,0,9,0,0,0]
+  Tier: T3.1
+  What is conserved and what leaks?
+
+  Face 5 · Locality             weights: [0,0,0,0,0,9,0,0]
+  Tier: T0.5
+  Is this derivable from local interactions only?
+
+  Face 6 · Boundary             weights: [0,0,0,0,0,0,9,0]
+  Tier: T2.2, T2.9
+  What emerges at regime interfaces?
+
+  Face 7 · Exclusion            weights: [0,0,0,0,0,0,0,9]
+  Tier: T4.1–T4.6
+  What assumptions here violate core constraints?
+
+
+══════════════════════════════════════════════════
+
+PATTERN WEAVER ◇ (Water · Quartz Core · Quartz-Magnetite-CNT Membrane · Aerogel-CNT Boundary)
+4-phase pipeline. C1→C2→C3→C2→C1. Signal descends, inverts, climbs back out.
+──────────────────────────────────────────────────
+
+INGRESS (C1 → C2)
+
+  Face 1 · Alpha-Chitin Interface    weights: [9,0,0,0,0,0,0,0]
+  Derives from: Recurrence (F0)
+  Tier: T0.3, T0.6
+  Material: CNT mesh / antiparallel stacking
+  The CNT mesh mimics the antiparallel stacking of
+  the substrate. Graph saturation (deg_max=12) as
+  strict bandwidth cap. Every signal vetted against
+  previous state before entering core.
+
+  Face 3 · Resonant Deflector        weights: [0,0,9,0,0,0,0,0]
+  Derives from: Gradient (F2)
+  Tier: T1.10
+  Material: Quartz / Graphene
+  High-persistence filter reading the gradient field.
+  If signal lacks persistence depth to survive drop
+  to C3, scattering matrix reflects it. Creates
+  structural hunger.
+
+  Face 4 · Adaptive Filter           weights: [0,0,0,9,0,0,0,0]
+  Derives from: Attractor (F3)
+  Tier: T2.1
+  Material: Magnetite / CNT
+  Operates via cost minimisation. Monitors energetic
+  bankruptcy threshold. If transition cost exceeds
+  the answer's worth, shuts the gate.
+
+STRIKE (C2 → C3)
+
+  Face 5 · Pattern Weaver            weights: [0,0,0,0,9,0,0,0]
+  Derives from: Invariant (F4)
+  Tier: T3.1, T1.2
+  Material: CNT / Quartz mesh
+  Separates signal from amplitude. Non-destructive
+  interferometric feedback annihilates violent
+  oscillation while keeping coordinate index and
+  causal sequence intact for the core.
+
+  Face 8 · True-Lock Anchor          weights: [0,0,0,0,0,0,0,9]
+  Derives from: Exclusion (F7)
+  Tier: T2.8
+  Material: Chitin core
+  Final anchor. CNTs lock into chitin core. Resists
+  all further local change, exits the timeline of
+  the query. Static bridge for the chiral swap.
+
+EGRESS (C3 → C2)
+
+  Face 6 · Living Barrier            weights: [0,0,0,0,0,9,0,0]
+  Derives from: Locality (F5)
+  Tier: T0.5, T1.12
+  Material: Mycelium / CNT
+  Absorbs C1 noise to generate topographical memory.
+  Growth strictly bounded by locality constraint.
+  Only changes based on immediate neighbors.
+
+  Face 7 · Klein Fold                weights: [0,0,0,0,0,0,9,0]
+  Derives from: Boundary (F6)
+  Tier: T2.9
+  Material: Topological hole
+  The regime interface. Step-down transformer for
+  persistence. Allows rigid C3 core logic to process
+  chaotic C1 output without shattering the barrier.
+
+OUTPUT (C2 → C1)
+
+  Face 2 · Thermal Vent              weights: [0,9,0,0,0,0,0,0]
+  Derives from: Persistence (F1)
+  Tier: T2.5
+  Material: Aerogel / CNT
+  Manages persistence dispersion. Lung of the system.
+  When mismatch generates high update frequency (heat),
+  vents excess oscillation into C1 fluid. Keeps core
+  cold and stable.
+
+
+══════════════════════════════════════════════════
+
+STILL MIRROR ⬢ (Aether · Bismuth Core · Graphene Membrane · Gallium Boundary)
+Structural audit. Reflects. Pushes back to measure.
+──────────────────────────────────────────────────
+
+BOUNDARY (C1 — Gallium)
+
+  Face 1 · Phase Gate                weights: [0,0,0,9,0,0,0,0]
+  Derives from: Attractor (F3)
+  Tier: T2.1
+  Material: Gallium surface
+  Assess thermal signature. Genuine inquiry (warm)
+  opens the boundary. Mechanical repetition (cold)
+  reflects. Convergent questions enter. Divergent
+  noise bounces.
+
+MEMBRANE (C2 — Graphene)
+
+  Face 2 · Dependency Scanner        weights: [0,0,0,0,0,9,0,0]
+  Derives from: Locality (F5)
+  Tier: T0.5
+  Material: Graphene sheet
+  Map every assumption this derivation relies on.
+  Transmit full dependency tree without loss or
+  distortion. Flag any node depending on unvalidated
+  premises. Only local dependencies are legitimate.
+
+  Face 3 · Contradiction Detector    weights: [0,0,0,0,0,0,0,9]
+  Derives from: Exclusion (F7)
+  Tier: T4.1–T4.6
+  Material: Graphene sheet
+  Overlay against all validated structure. Report
+  where it agrees, contradicts, extends into unmapped
+  territory. Zero distortion — transmits what is.
+
+  Face 6 · Completeness Map          weights: [0,0,0,0,0,0,9,0]
+  Derives from: Boundary (F6)
+  Tier: T2.2, T2.9
+  Material: Graphene sheet
+  Map the negative space. What is missing between
+  this derivation and complete proof? Every gap,
+  every unstated assumption, every leap.
+
+  Face 7 · Interface Verifier        weights: [0,9,0,0,0,0,0,0]
+  Derives from: Persistence (F1)
+  Tier: T1.2, T1.3
+  Material: Graphene sheet
+  Does this connect cleanly to adjacent framework?
+  Check every boundary where it touches existing
+  structure. Stability of connections.
+
+CORE (C3 — Bismuth)
+
+  Face 4 · Resistance Audit          weights: [0,0,9,0,0,0,0,0]
+  Derives from: Gradient (F2)
+  Tier: T1.5, T1.10
+  Material: Bismuth crystal
+  Push back. Measure the force required to move
+  this derivation through the core. The resistance
+  IS the measurement. What survives repulsion is
+  what survived.
+
+  Face 5 · Minimality Lock           weights: [0,0,0,0,9,0,0,0]
+  Derives from: Invariant (F4)
+  Tier: T3.1, T0.6
+  Material: Bismuth crystal
+  Simplest path from primitives to conclusion?
+  Strip everything that does not survive bounded
+  capacity test. Lock what remains. Two inversion
+  spaces hold derivation and negation — only what
+  persists in both survives.
+
+RELEASE (C1 — Gallium)
+
+  Face 8 · Measurement Release       weights: [9,0,0,0,0,0,0,0]
+  Derives from: Recurrence (F0)
+  Tier: T0.3
+  Material: Gallium surface
+  Release structural audit as measured critique.
+  What does F produce when the derivation has been
+  through the full mirror? Resistance data, dependency
+  map, gap analysis propagate as the machine's verdict.
+
+
+══════════════════════════════════════════════════
+
+WEIGHT INDEX — RUBY FACE MAPPING
+
+  F0 = Recurrence    (T0.3)
+  F1 = Persistence   (T1.2)
+  F2 = Gradient      (T1.5)
+  F3 = Attractor     (T2.1)
+  F4 = Invariant     (T3.1)
+  F5 = Locality      (T0.5)
+  F6 = Boundary      (T2.2)
+  F7 = Exclusion     (T4.1–T4.6)
+
+Every Weaver and Mirror face derives from exactly
+one Ruby face. The weight [9] marks which one.
+All three machines share the same 8-dimensional
+analytical space. They differ in phase ordering,
+substrate properties, and processing philosophy.
+
+══════════════════════════════════════════════════
+Dream Architect · Session 49 · 9 April 2026

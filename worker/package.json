@@ -1,0 +1,15 @@
+{
+  "name": "michronics-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "check": "tsc --noEmit",
+    "dev": "wrangler dev",
+    "tail": "wrangler tail --format pretty"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260426.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^3.78.0"
+  }
+}
