@@ -601,7 +601,7 @@ function buildPanel(id) {
     '</div>' +
 
     '<div class="ingress">' +
-      '<label>Question (raw — Layer 0 will reject statements)</label>' +
+      '<label>Question (raw)</label>' +
       '<textarea class="q-input" id="' + id + '-q" placeholder="' + m.placeholder + '"></textarea>' +
       '<div class="decl-row">' +
         '<div>' +
@@ -624,6 +624,10 @@ function buildPanel(id) {
         '<div>' +
           '<button class="fire-btn" id="' + id + '-fire" style="background:' + m.color + ';color:#0d1117" onclick="fireChain(\'' + id + '\')">' + m.icon + ' FIRE</button>' +
           '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;text-align:right" id="' + id + '-session-stamp">session: ' + new Date().toISOString().slice(0,10) + '</div>' +
+          '<label style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;cursor:pointer;justify-content:flex-end">' +
+            '<input type="checkbox" id="' + id + '-skip-l0" style="cursor:pointer;accent-color:var(--cerise)"/>' +
+            'skip layer 0' +
+          '</label>' +
         '</div>' +
       '</div>' +
 
@@ -969,38 +973,66 @@ async function fireChain(id) {
   STATE[id] = { question: question, faceOutputs: [], session: session };
 
   try {
-    // ── Step 1: Layer 0 ─────────────────────────────────────────
-    var l0Body = {
-      question: question,
-      session: session,
-      declarations: {},
-    };
-    if (schema) l0Body.declarations.schema_or_instantiation = schema;
-    if (branch) l0Body.declarations.branch = branch;
+    // ── Step 1: Layer 0 (or skip) ──────────────────────────────
+    var skipL0 = document.getElementById(id + '-skip-l0') && document.getElementById(id + '-skip-l0').checked;
+    var packet = null;
 
-    var l0 = await fetch(API + '/physics/layer-0', {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify(l0Body),
-    }).then(function(r){ return r.json(); });
+    if (skipL0) {
+      // User explicitly chose to bypass Layer 0
+      var l0el = document.getElementById(id + '-layer0');
+      if (l0el) {
+        l0el.classList.add('visible');
+        l0el.innerHTML = '<div class="l0-title" style="color:var(--coral)">Layer 0 — SKIPPED by user</div>' +
+          '<div class="l0-row"><span class="l0-key">note:</span> <span class="l0-val">faces will fire without falsification audit preload or schema/branch declaration. Use this only for exploratory probes.</span></div>';
+      }
+      // Build a minimal packet so faces still see SOME declarations if user picked them
+      packet = {
+        question: question,
+        session: session,
+        declarations: {
+          schema_or_instantiation: schema || 'unspecified',
+          branch: branch || null,
+          branch_applies: !!branch,
+        },
+        blacklist_summary: [],
+        audit: { canon_length: 'skipped', operational_length: 0, falsified_count: 0 },
+        expected_answer_classes: ['DERIVED','HYPOTHESIS','BLOCKED','FALSIFIED'],
+        allowed_to_fire: true,
+        timestamp: new Date().toISOString(),
+        skipped: true,
+      };
+    } else {
+      var l0Body = {
+        question: question,
+        session: session,
+        declarations: {},
+      };
+      if (schema) l0Body.declarations.schema_or_instantiation = schema;
+      if (branch) l0Body.declarations.branch = branch;
 
-    renderLayer0(id, l0);
+      var l0 = await fetch(API + '/physics/layer-0', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(l0Body),
+      }).then(function(r){ return r.json(); });
 
-    if (!l0.ok) {
-      // BLOCKED — surface reason, render BLOCKED class in d9 area, stop
-      var d9 = document.getElementById(id + '-d9');
-      var d9text = document.getElementById(id + '-d9-text');
-      var ac = document.getElementById(id + '-class');
-      ac.textContent = 'BLOCKED';
-      ac.className = 'answer-class ac-BLOCKED';
-      d9text.textContent = (l0.reason || '') + '\n\n' + (l0.hint || '');
-      d9.classList.add('visible');
-      fireBtn.disabled = false;
-      fireBtn.textContent = m.icon + ' FIRE';
-      return;
+      renderLayer0(id, l0);
+
+      if (!l0.ok) {
+        var d9 = document.getElementById(id + '-d9');
+        var d9text = document.getElementById(id + '-d9-text');
+        var ac = document.getElementById(id + '-class');
+        ac.textContent = 'BLOCKED';
+        ac.className = 'answer-class ac-BLOCKED';
+        d9text.textContent = (l0.reason || '') + '\n\n' + (l0.hint || '') + '\n\n(Tip: tick "skip layer 0" above if you want to bypass the audit and fire anyway.)';
+        d9.classList.add('visible');
+        fireBtn.disabled = false;
+        fireBtn.textContent = m.icon + ' FIRE';
+        return;
+      }
+
+      packet = l0.packet;
     }
-
-    var packet = l0.packet;
 
     // ── Step 2: Laminar 1-4 (skip if dispatch is triad-only) ───
     var dispatch = m.dispatch || 'laminar+triad';

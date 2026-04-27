@@ -68,23 +68,39 @@ function classifyInput(text: string): { kind: 'question' | 'statement' | 'packet
     return { kind: 'tagged_claim', reason: 'input begins with a tag prefix; appears to be a conclusion not a question' };
   }
 
-  // Question shape — ends with ?, or starts with question word, or imperative-derive
+  // Question shape — much more permissive heuristic.
+  //
+  // A real question has at least ONE of:
+  //   • Contains a `?` anywhere in the text (research-narrative questions
+  //     often have setup sentences before the actual question)
+  //   • Starts with an interrogative word
+  //   • Starts with an imperative-derive verb
+  //   • Contains an interrogative-or-request phrase anywhere (covers
+  //     "Could we ask X", "Can the machine derive Y", "Would it be
+  //     possible to Z" — research-narrative voice)
+  //
+  // We only reject as 'statement' if NONE of these are present AND the
+  // input is long-form prose (>300 chars). Short prose without a `?`
+  // gets a soft pass — better to let a borderline through than reject
+  // a legitimate research question.
   const startsWithInterrogative = /^(what|which|why|how|when|where|who|is|are|does|do|can|could|should|would|will)\s/i.test(t);
   const endsWithQuestionMark = /\?\s*$/.test(t);
-  const imperativeDerive = /^(derive|determine|show|prove|find|compute|identify|state|formalise|formalize|construct|enumerate|verify)\s/i.test(t);
+  const containsQuestionMark = /\?/.test(t);
+  const imperativeDerive = /^(derive|determine|show|prove|find|compute|identify|state|formalise|formalize|construct|enumerate|verify)\b/i.test(t);
+  const embeddedInterrogative = /(\bcould we\b|\bcan we\b|\bcan the machine\b|\bcan you\b|\bwould it be possible\b|\bis it possible\b|\bdoes the machine\b|\bdo we\b|\bshould we\b|\bask the machine to\b|\bcan it be shown\b|\bis there a\b|\bhow does\b|\bhow do\b|\bwhat does\b|\bwhat is\b|\bwhat are\b)/i.test(t);
 
-  if (endsWithQuestionMark || startsWithInterrogative || imperativeDerive) {
-    return { kind: 'question', reason: 'matches question shape' };
+  if (containsQuestionMark || endsWithQuestionMark || startsWithInterrogative || imperativeDerive || embeddedInterrogative) {
+    return { kind: 'question', reason: 'matches question shape (interrogative form, embedded question, or imperative-derive)' };
   }
 
-  // Fallback: short fragments without verbs are unlikely to be questions
-  // Long prose without question shape is almost certainly a statement
-  if (t.length > 200 && !endsWithQuestionMark && !startsWithInterrogative && !imperativeDerive) {
-    return { kind: 'statement', reason: 'long-form input without interrogative shape; appears to be a conclusion or synthesis' };
+  // Only reject if long prose AND none of the question signals fired.
+  // This catches pure declarative submissions ("X is Y. Z follows from W.") with no asking voice.
+  if (t.length > 300) {
+    return { kind: 'statement', reason: 'long-form input with no question mark, no interrogative word, no imperative-derive, no embedded ask phrase — appears to be a conclusion or synthesis' };
   }
 
-  // Soft pass — short, unclear shape. Let it through with a note.
-  return { kind: 'question', reason: 'short input, no strong shape signal — admitted by default' };
+  // Soft pass — short or borderline. Let it through.
+  return { kind: 'question', reason: 'no strong rejection signal — admitted by default' };
 }
 
 // ── Gate 2 — Falsification audit ───────────────────────────────────────
@@ -159,11 +175,15 @@ function schemaInstantiationGate(
     return { kind: 'schema', required: false, hint: 'inferred from schema signals; declare explicitly to override' };
   }
 
-  // Ambiguous — caller should declare
+  // Ambiguous — soft default to schema with a note.
+  // Schema is the safer default: most Chronomic derivations are about
+  // general structural properties unless the question names a specific
+  // graph or state. The packet records this as inferred so downstream
+  // can see the assumption.
   return {
-    kind: 'unspecified',
-    required: true,
-    hint: 'question does not clearly speak of schema (axiomatic) or instantiation (specific graph/state). Pass declarations.schema_or_instantiation in request body.',
+    kind: 'schema',
+    required: false,
+    hint: 'no clear schema/instantiation signal — defaulted to schema. Pass declarations.schema_or_instantiation explicitly to override.',
   };
 }
 
@@ -190,8 +210,9 @@ function branchScopingGate(
 
   return {
     applies: true,
-    required: true,
-    hint: 'question concerns minimality. Declare branch via declarations.branch — one of: closure | anti-symmetric oscillation | enclosed persistence',
+    branch: 'closure',
+    required: false,
+    hint: 'minimality question detected without explicit branch — defaulted to closure (the most common branch). Pass declarations.branch explicitly to override (closure | anti-symmetric oscillation | enclosed persistence).',
   };
 }
 
