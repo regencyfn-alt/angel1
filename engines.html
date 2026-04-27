@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Michronics — Engines</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Karla:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg:#0d1117; --surface:#161b22; --surface2:#1c2333; --border:#2a3444;
+    --cobalt:#1E3A5F; --cerise:#DE3163; --coral:#FF7F50; --teal:#2DD4BF;
+    --cream:#F5F1ED; --muted:#6B7B8D; --text:#E2DDD5; --white:#fff;
+    --mono:'JetBrains Mono',monospace; --head:'Montserrat',sans-serif; --body:'Karla',sans-serif;
+    --triad:#C4A7E7;       /* lavender — minimal, structural */
+    --laminar:#FFB347;     /* amber — calcite, refractive */
+    --derived:#2DD4BF;     /* teal */
+    --hypothesis:#FF7F50;  /* coral */
+    --blocked:#DE3163;     /* cerise */
+    --falsified:#8B0000;   /* dark red */
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--body); background:var(--bg); color:var(--text); min-height:100vh; }
+  a { color:var(--teal); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+
+  /* TOP NAV — michronics-native, not sanctuary */
+  #topnav {
+    display:flex; align-items:center; gap:14px; padding:12px 18px;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    font-family:var(--mono); font-size:10px; letter-spacing:0.06em;
+  }
+  #topnav .brand {
+    font-family:var(--head); font-weight:700; font-size:13px;
+    color:var(--cream); margin-right:auto; letter-spacing:0;
+  }
+  #topnav .brand .dot { color:var(--cerise); }
+  #topnav a { color:var(--muted); text-transform:uppercase; }
+  #topnav a:hover { color:var(--cream); text-decoration:none; }
+  #topnav a.active { color:var(--cream); border-bottom:1px solid var(--cerise); padding-bottom:2px; }
+
+  /* HEADER */
+  .header { padding:16px 18px; display:flex; align-items:baseline; gap:12px; border-bottom:1px solid var(--border); }
+  .header h1 { font-family:var(--head); font-size:20px; font-weight:700; color:var(--cream); }
+  .header .sub { font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:0.1em; }
+  .header .status { margin-left:auto; font-family:var(--mono); font-size:9px; padding:3px 8px; border-radius:3px; }
+  .status-ok  { background:#2DD4BF22; color:var(--teal); border:1px solid #2DD4BF44; }
+  .status-err { background:#DE316322; color:var(--cerise); border:1px solid #DE316344; }
+  .status-warn { background:#FFB34722; color:var(--laminar); border:1px solid #FFB34744; }
+
+  /* TABS */
+  .tabs { display:flex; flex-wrap:wrap; gap:0; border-bottom:1px solid var(--border); background:var(--surface); }
+  .tab {
+    padding:10px 22px; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:0.05em;
+    color:var(--muted); border-bottom:2px solid transparent; transition:all 0.15s; user-select:none;
+  }
+  .tab:hover { color:var(--text); }
+  .tab.active { color:var(--cream); border-bottom-color:var(--cerise); }
+  .tab .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+
+  /* MACHINE PANEL */
+  .panel { padding:18px; display:none; }
+  .panel.active { display:block; }
+
+  /* MACHINE HEAD */
+  .machine-head {
+    display:flex; align-items:center; gap:10px; padding-bottom:12px;
+    border-bottom:1px solid var(--border); margin-bottom:14px;
+  }
+  .machine-icon { font-size:18px; }
+  .machine-name { font-family:var(--head); font-weight:700; font-size:15px; letter-spacing:0.04em; }
+  .machine-desc { font-family:var(--mono); font-size:10px; color:var(--muted); margin-left:14px; }
+  .machine-actions { margin-left:auto; display:flex; gap:8px; }
+  .icon-btn {
+    background:transparent; border:1px solid var(--border); color:var(--muted); cursor:pointer;
+    font-size:10px; padding:3px 8px; border-radius:3px; font-family:var(--mono);
+  }
+  .icon-btn:hover { color:var(--cream); border-color:var(--muted); }
+
+  /* QUESTION + DECLARATIONS BLOCK (top, pinned) */
+  .ingress {
+    background:var(--surface); border:1px solid var(--border); border-radius:6px;
+    padding:14px; margin-bottom:14px;
+  }
+  .ingress label { display:block; font-family:var(--mono); font-size:9px; color:var(--muted);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px; }
+  .ingress .q-input {
+    width:100%; padding:10px 12px; background:var(--bg); border:1px solid var(--border);
+    border-radius:4px; color:var(--text); font-family:var(--body); font-size:13px;
+    outline:none; resize:vertical; min-height:48px; font-family:var(--mono); font-size:12px; line-height:1.5;
+  }
+  .ingress .q-input:focus { border-color:var(--teal); }
+
+  .decl-row { display:grid; grid-template-columns:1fr 1fr auto; gap:12px; margin-top:12px; align-items:end; }
+  .decl-row select {
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    padding:8px 10px; border-radius:4px; font-family:var(--mono); font-size:11px; outline:none;
+  }
+  .decl-row select:focus { border-color:var(--teal); }
+  .fire-btn {
+    padding:10px 22px; border:none; border-radius:4px; font-family:var(--head); font-weight:700;
+    font-size:12px; cursor:pointer; color:var(--white); transition:all 0.15s; letter-spacing:0.06em;
+  }
+  .fire-btn:disabled { opacity:0.45; cursor:not-allowed; }
+
+  /* LAYER 0 PANEL */
+  .layer0 {
+    margin-top:12px; padding:10px 14px;
+    background:rgba(196,167,231,0.06); border-left:2px solid var(--triad);
+    border-radius:0 4px 4px 0; font-family:var(--mono); font-size:11px;
+    color:var(--triad); display:none;
+  }
+  .layer0.visible { display:block; }
+  .layer0 .l0-title { font-weight:600; letter-spacing:0.06em; margin-bottom:6px; text-transform:uppercase; font-size:9px; }
+  .layer0 .l0-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:4px; }
+  .layer0 .l0-key { color:var(--muted); }
+  .layer0 .l0-val { color:var(--text); }
+  .layer0 .l0-val.pass { color:var(--derived); }
+  .layer0 .l0-val.fail { color:var(--blocked); }
+  .layer0 .l0-blacklist { margin-top:6px; padding:6px 10px; background:rgba(0,0,0,0.25); border-radius:3px;
+    font-size:10px; color:var(--muted); line-height:1.6; }
+
+  /* ANSWER CLASS BADGE */
+  .answer-class {
+    display:inline-block; padding:4px 12px; border-radius:3px;
+    font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase;
+  }
+  .ac-DERIVED    { background:#2DD4BF22; color:var(--derived);    border:1px solid #2DD4BF66; }
+  .ac-HYPOTHESIS { background:#FF7F5022; color:var(--hypothesis); border:1px solid #FF7F5066; }
+  .ac-BLOCKED    { background:#DE316322; color:var(--blocked);    border:1px solid #DE316366; }
+  .ac-FALSIFIED  { background:#8B000022; color:var(--falsified);  border:1px solid #8B000066; }
+
+  /* D9 OUTPUT */
+  .d9 { margin-top:14px; padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:6px;
+    display:none; }
+  .d9.visible { display:block; }
+  .d9-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .d9-label { font-family:var(--mono); font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); }
+  .d9-text { font-family:var(--mono); font-size:11px; color:var(--text); line-height:1.7; white-space:pre-wrap;
+    max-height:380px; overflow-y:auto; padding:8px; background:var(--bg); border-radius:3px; }
+  .d9-actions { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+  .dl-btn {
+    background:var(--surface2); border:1px solid var(--border); color:var(--teal);
+    font-family:var(--mono); font-size:10px; padding:6px 12px; border-radius:3px; cursor:pointer;
+  }
+  .dl-btn:hover { color:var(--cream); border-color:var(--teal); }
+
+  /* FACES */
+  .faces-section { margin-top:18px; }
+  .faces-head {
+    display:flex; align-items:center; gap:10px; margin-bottom:10px; padding-bottom:8px;
+    border-bottom:1px dashed var(--border);
+  }
+  .faces-title { font-family:var(--head); font-weight:700; font-size:12px; letter-spacing:0.06em; color:var(--cream); }
+  .faces-toggle { margin-left:auto; cursor:pointer; font-family:var(--mono); font-size:10px; color:var(--muted); }
+  .faces-toggle:hover { color:var(--cream); }
+
+  .face {
+    padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:4px;
+    margin-bottom:6px;
+  }
+  .face-head { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .face-num {
+    width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:700; font-family:var(--mono); color:var(--cream);
+  }
+  .face-name { font-family:var(--head); font-weight:600; font-size:12px; color:var(--cream); }
+  .face-status { margin-left:auto; font-family:var(--mono); font-size:9px; color:var(--muted); }
+  .face-output {
+    display:none; margin-top:6px; padding:8px; background:var(--bg); border-radius:3px;
+    font-family:var(--mono); font-size:10px; color:var(--text); line-height:1.6;
+    max-height:240px; overflow-y:auto; white-space:pre-wrap;
+  }
+  .face-output.visible { display:block; }
+  .face.running .face-num { animation:pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
+  .faces-list.collapsed .face-output { display:none !important; }
+
+  /* MACHINE FACTORY MODAL */
+  .modal-bg {
+    position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none;
+    align-items:center; justify-content:center; z-index:100;
+  }
+  .modal-bg.visible { display:flex; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:24px; max-width:520px; width:90%;
+  }
+  .modal h2 { font-family:var(--head); font-size:16px; color:var(--cream); margin-bottom:16px; }
+  .modal label { display:block; font-family:var(--mono); font-size:10px; color:var(--muted);
+    letter-spacing:0.06em; margin-bottom:6px; margin-top:12px; text-transform:uppercase; }
+  .modal input, .modal textarea, .modal select {
+    width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--border);
+    color:var(--text); font-family:var(--mono); font-size:11px; border-radius:3px; outline:none;
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus { border-color:var(--teal); }
+  .modal textarea { min-height:60px; resize:vertical; }
+  .modal-actions { margin-top:18px; display:flex; gap:10px; justify-content:flex-end; }
+  .btn { padding:8px 18px; border:none; border-radius:4px; font-family:var(--head); font-weight:600;
+    font-size:11px; cursor:pointer; letter-spacing:0.04em; }
+  .btn-primary { background:var(--teal); color:var(--bg); }
+  .btn-primary:hover { background:var(--cream); }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); }
+  .btn-ghost:hover { color:var(--cream); border-color:var(--muted); }
+
+  /* RAG PANEL */
+  .rag-pre {
+    padding:16px; background:var(--bg); border-radius:4px; border:1px solid var(--border);
+    font-size:10px; font-family:var(--mono); color:var(--text); line-height:1.7;
+    white-space:pre-wrap; max-height:75vh; overflow-y:auto;
+  }
+  .rag-meta { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .pill {
+    display:inline-block; padding:2px 8px; border-radius:3px; font-size:9px; font-family:var(--mono);
+    background:#2DD4BF22; color:var(--teal); border:1px solid #2DD4BF44;
+  }
+  .pill.op { background:#C4A7E722; color:var(--triad); border-color:#C4A7E744; }
+</style>
+</head>
+<body>
+
+<div id="topnav">
+  <span class="brand">Michronics<span class="dot">.</span></span>
+  <a href="/index.html">SIMULATORS</a>
+  <a href="/engines.html" class="active">ENGINES</a>
+  <a href="https://api.michronics.com/health" target="_blank">API STATUS</a>
+</div>
+
+<div class="header">
+  <h1>ENGINES</h1>
+  <span class="sub">CHRONOMIC RECURRENCE FACTORY · TRIAD · LAMINAR · LAYER 0</span>
+  <span class="status" id="apiStatus">checking…</span>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-id="overview"><span class="dot" style="background:var(--cream)"></span>Overview</div>
+  <div class="tab" data-id="triad"><span class="dot" style="background:var(--triad)"></span>Triad Lock</div>
+  <div class="tab" data-id="laminar"><span class="dot" style="background:var(--laminar)"></span>Laminar Lock</div>
+  <div class="tab" data-id="canon"><span class="dot" style="background:var(--cerise)"></span>Canon</div>
+  <div class="tab" data-id="operational"><span class="dot" style="background:var(--triad)"></span>Operational</div>
+  <div class="tab" id="tab-add" style="color:var(--teal)">+ New Machine</div>
+</div>
+
+<!-- ================= OVERVIEW ================= -->
+<div class="panel active" id="panel-overview">
+
+  <div style="padding:14px;background:var(--surface);border-radius:6px;border:1px solid var(--border);margin-bottom:16px">
+    <div style="font-family:var(--head);font-size:13px;font-weight:700;color:var(--teal);margin-bottom:8px">⟁ Pipeline Architecture</div>
+    <div style="font-family:var(--mono);font-size:11px;line-height:1.8">
+      <span style="color:var(--cream)">Question</span>
+      → <span style="color:var(--triad)">Layer 0 audit</span> (5 gates)
+      → <span style="color:var(--laminar)">Laminar 1-4</span>
+      → <span style="color:var(--laminar)">Laminar 5-8</span> + RAG record
+      → <span style="color:var(--triad)">Triad 1-4</span>
+      → <span style="color:var(--triad)">Triad 5-8</span> + final RAG record
+      → <span style="color:var(--teal)">D9 synthesis</span> (Opus 4.6)
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px;line-height:1.7">
+      16 face firings via NVIDIA Nemotron 120B + 1 Opus synthesis. Question header re-prepended every iteration.<br>
+      Face 8 of each chain reads BOTH <span class="pill">physics:canon</span> and <span class="pill op">physics:operational</span> with explicit precedence.
+    </div>
+  </div>
+
+  <div style="padding:14px;background:var(--surface);border-radius:6px;border:1px solid var(--border);margin-bottom:16px">
+    <div style="font-family:var(--head);font-size:13px;font-weight:700;color:var(--triad);margin-bottom:10px">⬢ Layer 0 — Five Gates</div>
+    <div style="font-family:var(--mono);font-size:11px;line-height:2;color:var(--text)">
+      <strong>Gate 1</strong> — Input-type: rejects statements, syntheses, prepared answer packets<br>
+      <strong>Gate 2</strong> — Falsification audit: surfaces the contamination register before face firing<br>
+      <strong>Gate 3</strong> — Schema vs instantiation: declaration required<br>
+      <strong>Gate 4</strong> — Branch scoping: minimality questions need branch declared<br>
+      <strong>Gate 5</strong> — Answer-class: DERIVED / HYPOTHESIS / BLOCKED / FALSIFIED attached
+    </div>
+  </div>
+
+  <div style="padding:14px;background:var(--surface);border-radius:6px;border:1px solid var(--border)">
+    <div style="font-family:var(--head);font-size:13px;font-weight:700;color:var(--cobalt);margin-bottom:10px">⬡ The Quint</div>
+    <div style="font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--text)">
+      C3 core: 8 nodes · 12 edges · 6 faces (cube)<br>
+      At rest: every edge anti-symmetric — both nodes wind 180° · sum = 360° = standing wave<br>
+      <span style="color:var(--cream)">T3 = 720° (fermion) · T2 = 360° (boson) · T1 = metronome</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= MACHINE PANELS — generated dynamically ================= -->
+<div id="machine-panels"></div>
+
+<!-- ================= CANON PANEL ================= -->
+<div class="panel" id="panel-canon">
+  <div class="rag-meta">
+    <span style="font-family:var(--head);font-weight:700;font-size:14px;color:var(--cream)">Canon</span>
+    <span class="pill">physics:canon</span>
+    <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">KV · injected into every face</span>
+    <span class="status status-ok" id="canon-bytes" style="margin-left:auto">— bytes</span>
+  </div>
+  <pre id="canon-content" class="rag-pre">Loading…</pre>
+</div>
+
+<!-- ================= OPERATIONAL PANEL ================= -->
+<div class="panel" id="panel-operational">
+  <div class="rag-meta">
+    <span style="font-family:var(--head);font-weight:700;font-size:14px;color:var(--cream)">Operational</span>
+    <span class="pill op">physics:operational</span>
+    <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">KV · pipeline contracts · Face 8 + Layer 0 only</span>
+    <span class="status status-ok" id="operational-bytes" style="margin-left:auto">— bytes</span>
+  </div>
+  <pre id="operational-content" class="rag-pre">Loading…</pre>
+</div>
+
+<!-- ================= MACHINE FACTORY MODAL ================= -->
+<div class="modal-bg" id="factory-modal">
+  <div class="modal">
+    <h2>+ New Machine</h2>
+    <p style="font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.7;margin-bottom:8px">
+      Defines a new machine surface. Auto-wires to the canonical 4-call dispatch chain.<br>
+      Triad Lock and Laminar Lock are built-in and protected.
+    </p>
+
+    <label>Name</label>
+    <input id="f-name" placeholder="e.g. Citrine Lock" />
+
+    <label>Type</label>
+    <select id="f-type">
+      <option value="custom">custom</option>
+      <option value="triad">triad (uses Triad face prompts)</option>
+      <option value="laminar">laminar (uses Laminar face prompts)</option>
+    </select>
+
+    <label>Core / Substrate</label>
+    <input id="f-core" placeholder="e.g. Citrine" />
+
+    <label>Description</label>
+    <textarea id="f-desc" placeholder="One line of intent — what this machine is for"></textarea>
+
+    <label>Dispatch</label>
+    <select id="f-dispatch">
+      <option value="laminar+triad">laminar + triad (full 4-call chain)</option>
+      <option value="laminar">laminar only</option>
+      <option value="triad">triad only</option>
+      <option value="engine2">engine2 (single-face, legacy)</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeFactory()">Cancel</button>
+      <button class="btn btn-primary" onclick="createMachine()">Create</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONFIG ─────────────────────────────────────────────────────
+var API = 'https://api.michronics.com';
+
+// PHYSICS_KEY — held in browser memory only after first prompt; never persisted
+var physKey = sessionStorage.getItem('michron_phys_key') || '';
+
+function ensurePhysKey() {
+  if (!physKey) {
+    physKey = (prompt('Enter Michronics PHYSICS_KEY (held in session only):') || '').trim();
+    if (physKey) sessionStorage.setItem('michron_phys_key', physKey);
+  }
+  return physKey;
+}
+
+function authHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'X-Physics-Key': ensurePhysKey(),
+  };
+}
+
+// ── BUILT-IN MACHINES ──────────────────────────────────────────
+
+var BUILT_IN = {
+  triad: {
+    id: 'triad',
+    name: 'Triad Lock',
+    type: 'triad',
+    icon: '◇',
+    color: 'var(--triad)',
+    description: 'Graph primitives → bipartiteness → minimal templates → recurrence → probabilistic update → perturbation → gradient → conservation.',
+    dispatch: 'laminar+triad',
+    placeholder: 'Enter a question — e.g. "Under T0.3 and T0.5, what is the minimum closed motif?"',
+    faces: [
+      { id:'L1', name:'Calcite Gate', op:'reject contamination · split ordinary/extraordinary' },
+      { id:'L2', name:'Graphite Fractionation', op:'decompose query into RAG-aligned sub-questions' },
+      { id:'L3', name:'Graphite Alignment', op:'map sub-questions to RAG entries · flag gaps' },
+      { id:'L4', name:'Graph Derivation', op:'derive minimal connected subgraph (V, E, deg)' },
+      { id:'L5', name:'Polarity Assignment', op:'assign anti-symmetric polarities · identify frustration' },
+      { id:'L6', name:'Perturbation Dynamics', op:'compute next state when Δ exceeds persistence' },
+      { id:'L7', name:'Lock Verification', op:'verify T0.3 + T0.5 + T0.6 + Δ-minimisation' },
+      { id:'L8', name:'Laminar Record', op:'falsification audit · structured RAG candidate' },
+      { id:'T1', name:'Graph Primitives', op:'extract formal triple (V,E,Σ) · no interpretation' },
+      { id:'T2', name:'Bipartiteness & Ground', op:'2-colour V · anti-symmetric ground state' },
+      { id:'T3', name:'Minimal Templates', op:'smallest connected subgraph satisfying constraints' },
+      { id:'T4', name:'Recurrence & Cost', op:'formalise update rule · Δ-total · F minimises cost' },
+      { id:'T5', name:'Probabilistic Update', op:'P(s=c) = φ(Δ)/Σφ · monotonicity · α sharpness' },
+      { id:'T6', name:'Perturbation Propagation', op:'τ via path weight w(P) = ∏(1-ρ)' },
+      { id:'T7', name:'Persistence Gradient', op:'∇ρ · interior vs boundary · qualitative path-weight' },
+      { id:'T8', name:'Conservation & Gaps', op:'falsification audit · final RAG record' },
+    ],
+  },
+  laminar: {
+    id: 'laminar',
+    name: 'Laminar Lock',
+    type: 'laminar',
+    icon: '◈',
+    color: 'var(--laminar)',
+    description: 'Calcite gate → fractionation → alignment → graph → polarity → perturbation → lock verify → RAG. Eight faces, Tantalum substrate.',
+    dispatch: 'laminar',
+    placeholder: 'Enter a question — Laminar fires faces 1-8 only, no Triad chase',
+    // For laminar-only dispatch we still walk the same 8 face prompts
+    faces: [
+      { id:'L1', name:'Calcite Gate', op:'reject contamination · split ordinary/extraordinary' },
+      { id:'L2', name:'Graphite Fractionation', op:'decompose query into RAG-aligned sub-questions' },
+      { id:'L3', name:'Graphite Alignment', op:'map sub-questions to RAG entries · flag gaps' },
+      { id:'L4', name:'Graph Derivation', op:'derive minimal connected subgraph (V, E, deg)' },
+      { id:'L5', name:'Polarity Assignment', op:'assign anti-symmetric polarities · identify frustration' },
+      { id:'L6', name:'Perturbation Dynamics', op:'compute next state when Δ exceeds persistence' },
+      { id:'L7', name:'Lock Verification', op:'verify T0.3 + T0.5 + T0.6 + Δ-minimisation' },
+      { id:'L8', name:'Laminar Record', op:'falsification audit · structured RAG candidate' },
+    ],
+  },
+};
+
+var MACHINES = {};        // populated from BUILT_IN + custom from /machines/list
+var STATE = {};           // per-machine running state
+
+// ── HEALTH + CANON LOAD ────────────────────────────────────────
+
+function checkApi() {
+  fetch(API + '/health').then(function(r){ return r.json(); }).then(function(d){
+    var el = document.getElementById('apiStatus');
+    if (d && d.ok) {
+      el.textContent = 'API LIVE · ' + (d.canon_length || 0) + 'b canon';
+      el.className = 'status status-ok';
+    } else {
+      el.textContent = 'API DEGRADED';
+      el.className = 'status status-warn';
+    }
+  }).catch(function(){
+    document.getElementById('apiStatus').textContent = 'OFFLINE';
+    document.getElementById('apiStatus').className = 'status status-err';
+  });
+}
+
+function loadCanon() {
+  fetch(API + '/physics/canon').then(function(r){ return r.json(); }).then(function(d){
+    if (d && d.ok) {
+      document.getElementById('canon-content').textContent = d.text || '(empty)';
+      document.getElementById('canon-bytes').textContent = (d.length || 0) + ' bytes';
+    }
+  }).catch(function(){});
+
+  fetch(API + '/physics/operational').then(function(r){ return r.json(); }).then(function(d){
+    if (d && d.ok) {
+      document.getElementById('operational-content').textContent = d.text || '(empty)';
+      document.getElementById('operational-bytes').textContent = (d.length || 0) + ' bytes';
+    }
+  }).catch(function(){});
+}
+
+// ── MACHINE LIST LOAD ──────────────────────────────────────────
+
+function loadMachines() {
+  // Start with built-ins
+  Object.keys(BUILT_IN).forEach(function(k){ MACHINES[k] = BUILT_IN[k]; STATE[k] = {}; });
+
+  return fetch(API + '/machines/list').then(function(r){ return r.json(); }).then(function(d){
+    if (d && d.ok && Array.isArray(d.machines)) {
+      d.machines.forEach(function(m){
+        // Skip ones we already have as built-ins
+        if (MACHINES[m.id]) return;
+        // Inherit faces/icon/color from a parent type if not specified
+        var parent = (m.type === 'triad') ? BUILT_IN.triad : (m.type === 'laminar') ? BUILT_IN.laminar : BUILT_IN.triad;
+        MACHINES[m.id] = {
+          id: m.id,
+          name: m.name,
+          type: m.type,
+          icon: '⬡',
+          color: 'var(--teal)',
+          description: m.description || '',
+          dispatch: m.dispatch || 'laminar+triad',
+          placeholder: 'Enter a question for ' + m.name,
+          faces: m.faces || parent.faces,
+          custom: true,
+        };
+        STATE[m.id] = {};
+      });
+    }
+  }).catch(function(){
+    // Worker offline — keep built-ins only
+  });
+}
+
+// ── PANEL BUILDER ──────────────────────────────────────────────
+
+function buildPanel(id) {
+  var m = MACHINES[id];
+  if (!m) return '';
+  var p = document.createElement('div');
+  p.className = 'panel';
+  p.id = 'panel-' + id;
+  p.innerHTML =
+    '<div class="machine-head">' +
+      '<span class="machine-icon" style="color:' + m.color + '">' + m.icon + '</span>' +
+      '<span class="machine-name" style="color:' + m.color + '">' + m.name + '</span>' +
+      '<span class="machine-desc">' + (m.description || '') + '</span>' +
+      (m.custom
+        ? '<div class="machine-actions"><button class="icon-btn" onclick="deleteMachine(\'' + id + '\')">delete</button></div>'
+        : '<div class="machine-actions"><span class="icon-btn" style="cursor:default;color:var(--muted)">built-in</span></div>') +
+    '</div>' +
+
+    '<div class="ingress">' +
+      '<label>Question (raw — Layer 0 will reject statements)</label>' +
+      '<textarea class="q-input" id="' + id + '-q" placeholder="' + m.placeholder + '"></textarea>' +
+      '<div class="decl-row">' +
+        '<div>' +
+          '<label>Schema or Instantiation</label>' +
+          '<select id="' + id + '-decl-schema">' +
+            '<option value="">(let Layer 0 infer)</option>' +
+            '<option value="schema">schema (axiomatic)</option>' +
+            '<option value="instantiation">instantiation (specific graph/state)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label>Branch (only if minimality)</label>' +
+          '<select id="' + id + '-decl-branch">' +
+            '<option value="">(none / not minimality)</option>' +
+            '<option value="closure">closure</option>' +
+            '<option value="anti-symmetric oscillation">anti-symmetric oscillation</option>' +
+            '<option value="enclosed persistence">enclosed persistence</option>' +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<button class="fire-btn" id="' + id + '-fire" style="background:' + m.color + ';color:#0d1117" onclick="fireChain(\'' + id + '\')">' + m.icon + ' FIRE</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="layer0" id="' + id + '-layer0"></div>' +
+    '</div>' +
+
+    '<div class="d9" id="' + id + '-d9">' +
+      '<div class="d9-head">' +
+        '<span class="d9-label">D9 Synthesis · Opus 4.6</span>' +
+        '<span class="answer-class ac-DERIVED" id="' + id + '-class">DERIVED</span>' +
+      '</div>' +
+      '<div class="d9-text" id="' + id + '-d9-text"></div>' +
+      '<div class="d9-actions">' +
+        '<button class="dl-btn" onclick="downloadOutput(\'' + id + '\')">⬇ download .txt</button>' +
+        '<select class="dl-btn" id="' + id + '-tag">' +
+          '<option value="derived">derived</option>' +
+          '<option value="hypothesis">hypothesis</option>' +
+          '<option value="blocked">blocked</option>' +
+          '<option value="falsified">falsified</option>' +
+          '<option value="observation">observation</option>' +
+        '</select>' +
+        '<button class="dl-btn" style="background:#2DD4BF22;color:var(--teal);border-color:#2DD4BF66" onclick="bankRecord(\'' + id + '\')">✓ BANK to RAG</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="faces-section">' +
+      '<div class="faces-head">' +
+        '<span class="faces-title">Faces — chain detail</span>' +
+        '<span class="faces-toggle" onclick="toggleFaces(\'' + id + '\')" id="' + id + '-toggle">collapse</span>' +
+      '</div>' +
+      '<div class="faces-list" id="' + id + '-faces"></div>' +
+    '</div>';
+  return p;
+}
+
+function buildFaces(id) {
+  var m = MACHINES[id];
+  var faces = m.faces || [];
+  var list = document.getElementById(id + '-faces');
+  if (!list) return;
+  var html = '';
+  faces.forEach(function(f, i){
+    html +=
+      '<div class="face" id="' + id + '-face-' + f.id + '">' +
+        '<div class="face-head">' +
+          '<span class="face-num" style="background:' + m.color + ';color:#0d1117">' + (i+1) + '</span>' +
+          '<span class="face-name">' + f.id + ' · ' + f.name + '</span>' +
+          '<span class="face-status" id="' + id + '-fstat-' + f.id + '">idle</span>' +
+        '</div>' +
+        '<div style="font-family:var(--mono);font-size:9px;color:var(--muted)">' + (f.op || '') + '</div>' +
+        '<div class="face-output" id="' + id + '-fout-' + f.id + '"></div>' +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function toggleFaces(id) {
+  var list = document.getElementById(id + '-faces');
+  var toggle = document.getElementById(id + '-toggle');
+  if (list.classList.contains('collapsed')) {
+    list.classList.remove('collapsed');
+    toggle.textContent = 'collapse';
+  } else {
+    list.classList.add('collapsed');
+    toggle.textContent = 'expand';
+  }
+}
+
+// ── TAB SWITCHER ───────────────────────────────────────────────
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  var tab = document.querySelector('.tab[data-id="' + id + '"]');
+  if (tab) tab.classList.add('active');
+  var panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+}
+
+// ── RENDER UI FROM MACHINES ────────────────────────────────────
+
+function renderUi() {
+  // Populate panel container with machine panels for any that aren't there yet
+  var container = document.getElementById('machine-panels');
+  // Clear any stale custom machine tabs
+  document.querySelectorAll('.tab[data-custom]').forEach(function(t){ t.remove(); });
+  // Make sure built-in tabs exist (they do, in HTML)
+  Object.keys(MACHINES).forEach(function(id){
+    if (BUILT_IN[id]) {
+      // Built-in: panel may already exist; rebuild if missing
+      if (!document.getElementById('panel-' + id)) {
+        container.appendChild(buildPanel(id));
+      }
+    } else {
+      // Custom: add tab + panel
+      if (!document.querySelector('.tab[data-id="' + id + '"]')) {
+        var tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.setAttribute('data-id', id);
+        tab.setAttribute('data-custom', '1');
+        tab.innerHTML = '<span class="dot" style="background:var(--teal)"></span>' + MACHINES[id].name;
+        var addBtn = document.getElementById('tab-add');
+        addBtn.parentNode.insertBefore(tab, addBtn);
+      }
+      if (!document.getElementById('panel-' + id)) {
+        container.appendChild(buildPanel(id));
+      }
+    }
+    buildFaces(id);
+  });
+}
+
+// ── LAYER 0 RENDER ─────────────────────────────────────────────
+
+function renderLayer0(id, l0Result) {
+  var el = document.getElementById(id + '-layer0');
+  if (!el) return;
+  el.classList.add('visible');
+
+  if (!l0Result.ok) {
+    el.innerHTML =
+      '<div class="l0-title">Layer 0 — BLOCKED at ' + (l0Result.blocked_at || '?') + '</div>' +
+      '<div class="l0-row"><span class="l0-key">reason:</span> <span class="l0-val fail">' + (l0Result.reason || '') + '</span></div>' +
+      (l0Result.hint ? '<div class="l0-row"><span class="l0-key">hint:</span> <span class="l0-val">' + l0Result.hint + '</span></div>' : '');
+    return;
+  }
+
+  var g = l0Result.gates || {};
+  var p = l0Result.packet || {};
+  var bl = (p.blacklist_summary || []).slice(0, 6);
+  var html =
+    '<div class="l0-title">Layer 0 — passed all 5 gates</div>' +
+    '<div class="l0-row">' +
+      '<span><span class="l0-key">G1 input:</span> <span class="l0-val pass">' + (g.gate_1_input_type && g.gate_1_input_type.classified_as) + '</span></span>' +
+      '<span><span class="l0-key">G2 audit:</span> <span class="l0-val pass">' + (g.gate_2_falsification_audit && g.gate_2_falsification_audit.falsified_items) + ' falsified items</span></span>' +
+      '<span><span class="l0-key">G3 schema:</span> <span class="l0-val pass">' + (g.gate_3_schema_instantiation && g.gate_3_schema_instantiation.kind) + '</span></span>' +
+      '<span><span class="l0-key">G4 branch:</span> <span class="l0-val pass">' + ((g.gate_4_branch_scoping && g.gate_4_branch_scoping.applies) ? (g.gate_4_branch_scoping.branch || '(declared)') : 'n/a') + '</span></span>' +
+    '</div>';
+  if (bl.length) {
+    html += '<div class="l0-blacklist"><strong>Falsified register in scope:</strong><br>· ' + bl.join('<br>· ') + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// ── FIRE CHAIN ─────────────────────────────────────────────────
+
+async function fireChain(id) {
+  var m = MACHINES[id];
+  var qEl = document.getElementById(id + '-q');
+  var question = (qEl.value || '').trim();
+  if (!question) {
+    alert('Type a question first.');
+    return;
+  }
+
+  var schema = document.getElementById(id + '-decl-schema').value;
+  var branch = document.getElementById(id + '-decl-branch').value;
+  var session = 'Engines · ' + new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+  var fireBtn = document.getElementById(id + '-fire');
+  fireBtn.disabled = true;
+  fireBtn.textContent = '⏳ firing…';
+
+  // Reset face statuses
+  (m.faces || []).forEach(function(f){
+    var s = document.getElementById(id + '-fstat-' + f.id);
+    var o = document.getElementById(id + '-fout-' + f.id);
+    if (s) s.textContent = 'idle';
+    if (o) { o.textContent = ''; o.classList.remove('visible'); }
+    var faceEl = document.getElementById(id + '-face-' + f.id);
+    if (faceEl) faceEl.classList.remove('running', 'done');
+  });
+  document.getElementById(id + '-d9').classList.remove('visible');
+
+  STATE[id] = { question: question, faceOutputs: [], session: session };
+
+  try {
+    // ── Step 1: Layer 0 ─────────────────────────────────────────
+    var l0Body = {
+      question: question,
+      session: session,
+      declarations: {},
+    };
+    if (schema) l0Body.declarations.schema_or_instantiation = schema;
+    if (branch) l0Body.declarations.branch = branch;
+
+    var l0 = await fetch(API + '/physics/layer-0', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(l0Body),
+    }).then(function(r){ return r.json(); });
+
+    renderLayer0(id, l0);
+
+    if (!l0.ok) {
+      // BLOCKED — surface reason, render BLOCKED class in d9 area, stop
+      var d9 = document.getElementById(id + '-d9');
+      var d9text = document.getElementById(id + '-d9-text');
+      var ac = document.getElementById(id + '-class');
+      ac.textContent = 'BLOCKED';
+      ac.className = 'answer-class ac-BLOCKED';
+      d9text.textContent = (l0.reason || '') + '\n\n' + (l0.hint || '');
+      d9.classList.add('visible');
+      fireBtn.disabled = false;
+      fireBtn.textContent = m.icon + ' FIRE';
+      return;
+    }
+
+    var packet = l0.packet;
+
+    // ── Step 2: Laminar 1-4 (skip if dispatch is triad-only) ───
+    var dispatch = m.dispatch || 'laminar+triad';
+    var laminar14Output = '';
+    if (dispatch === 'laminar+triad' || dispatch === 'laminar') {
+      markFacesRunning(id, ['L1','L2','L3','L4']);
+      var l14 = await callPipeline('/physics/laminar/1-4', {
+        question: question,
+        session: session,
+        layer0_packet: packet,
+      });
+      laminar14Output = l14.output || '';
+      stampFaces(id, ['L1','L2','L3','L4'], laminar14Output);
+    }
+
+    // ── Step 3: Laminar 5-8 ────────────────────────────────────
+    var laminar58Output = '';
+    if (dispatch === 'laminar+triad' || dispatch === 'laminar') {
+      markFacesRunning(id, ['L5','L6','L7','L8']);
+      var l58 = await callPipeline('/physics/laminar/5-8', {
+        question: question,
+        session: session,
+        priorContext: laminar14Output,
+        layer0_packet: packet,
+      });
+      laminar58Output = l58.output || '';
+      stampFaces(id, ['L5','L6','L7','L8'], laminar58Output);
+    }
+
+    // ── Step 4: Triad 1-4 ──────────────────────────────────────
+    var triad14Output = '';
+    if (dispatch === 'laminar+triad' || dispatch === 'triad') {
+      markFacesRunning(id, ['T1','T2','T3','T4']);
+      // priorContext for triad/1-4 is laminar 5-8 if available, else laminar 1-4, else empty
+      var prior = laminar58Output || laminar14Output || '';
+      var t14 = await callPipeline('/physics/triad/1-4', {
+        question: question,
+        session: session,
+        priorContext: prior,
+        layer0_packet: packet,
+      });
+      triad14Output = t14.output || '';
+      stampFaces(id, ['T1','T2','T3','T4'], triad14Output);
+    }
+
+    // ── Step 5: Triad 5-8 (final RAG record) ───────────────────
+    var finalRecord = null;
+    if (dispatch === 'laminar+triad' || dispatch === 'triad') {
+      markFacesRunning(id, ['T5','T6','T7','T8']);
+      var t58 = await callPipeline('/physics/triad/5-8', {
+        question: question,
+        session: session,
+        priorContext: triad14Output,
+        layer0_packet: packet,
+      });
+      stampFaces(id, ['T5','T6','T7','T8'], JSON.stringify(t58.record || t58.face8 || t58, null, 2));
+      finalRecord = t58.record;
+    }
+
+    STATE[id].record = finalRecord;
+
+    // ── Step 6: D9 Synthesis ──────────────────────────────────
+    var faceOutputs = collectFaceOutputs(id);
+    var d9resp = await fetch(API + '/physics/d9', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ question: question, faces: faceOutputs }),
+    }).then(function(r){ return r.json(); });
+
+    var d9 = document.getElementById(id + '-d9');
+    var d9text = document.getElementById(id + '-d9-text');
+    var ac = document.getElementById(id + '-class');
+
+    var synth = (d9resp && d9resp.synthesis) || '(no synthesis returned)';
+    d9text.textContent = synth;
+    d9.classList.add('visible');
+
+    // Determine answer class from the RAG record tag if present, else infer from synth
+    var cls = 'DERIVED';
+    if (finalRecord && finalRecord.tag) {
+      var t = String(finalRecord.tag).toUpperCase();
+      if (t.indexOf('FALSIFIED') >= 0) cls = 'FALSIFIED';
+      else if (t.indexOf('HYPOTHESIS') >= 0) cls = 'HYPOTHESIS';
+      else if (t.indexOf('DERIVED') >= 0) cls = 'DERIVED';
+      else if (t.indexOf('BLOCKED') >= 0) cls = 'BLOCKED';
+    }
+    ac.textContent = cls;
+    ac.className = 'answer-class ac-' + cls;
+
+    STATE[id].synthesis = synth;
+    STATE[id].humanSummary = d9resp.humanSummary || '';
+    STATE[id].answerClass = cls;
+
+  } catch (err) {
+    var d9 = document.getElementById(id + '-d9');
+    var d9text = document.getElementById(id + '-d9-text');
+    var ac = document.getElementById(id + '-class');
+    ac.textContent = 'ERROR';
+    ac.className = 'answer-class ac-BLOCKED';
+    d9text.textContent = 'Pipeline error:\n\n' + (err.message || String(err));
+    d9.classList.add('visible');
+  }
+
+  fireBtn.disabled = false;
+  fireBtn.textContent = m.icon + ' FIRE';
+}
+
+async function callPipeline(path, body) {
+  var r = await fetch(API + path, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    var t = await r.text();
+    throw new Error(path + ' returned ' + r.status + ': ' + t.slice(0, 300));
+  }
+  return r.json();
+}
+
+function markFacesRunning(id, faceIds) {
+  faceIds.forEach(function(fid){
+    var faceEl = document.getElementById(id + '-face-' + fid);
+    var stat = document.getElementById(id + '-fstat-' + fid);
+    if (faceEl) faceEl.classList.add('running');
+    if (stat) stat.textContent = 'firing…';
+  });
+}
+
+function stampFaces(id, faceIds, fullOutput) {
+  faceIds.forEach(function(fid){
+    var faceEl = document.getElementById(id + '-face-' + fid);
+    var stat = document.getElementById(id + '-fstat-' + fid);
+    var out = document.getElementById(id + '-fout-' + fid);
+    if (faceEl) { faceEl.classList.remove('running'); faceEl.classList.add('done'); }
+    if (stat) stat.textContent = 'done';
+    if (out) {
+      // Try to extract this face's section from the chain output
+      var marker = '[' + fid;
+      var idx = fullOutput.indexOf(marker);
+      if (idx >= 0) {
+        var rest = fullOutput.slice(idx);
+        // Find next [X#] marker
+        var nextIdx = rest.indexOf('\n[', 1);
+        var section = nextIdx > 0 ? rest.slice(0, nextIdx) : rest;
+        out.textContent = section.trim().slice(0, 4000);
+      } else {
+        out.textContent = '(see chain output)';
+      }
+      out.classList.add('visible');
+    }
+  });
+}
+
+function collectFaceOutputs(id) {
+  var m = MACHINES[id];
+  var outputs = [];
+  (m.faces || []).forEach(function(f){
+    var out = document.getElementById(id + '-fout-' + f.id);
+    if (out && out.textContent) {
+      outputs.push({ face: f.id, output: out.textContent });
+    }
+  });
+  return outputs;
+}
+
+// ── DOWNLOAD + BANK ────────────────────────────────────────────
+
+function downloadOutput(id) {
+  var s = STATE[id] || {};
+  var blob = new Blob([
+    'Question: ' + (s.question || '') + '\n\n',
+    'Answer class: ' + (s.answerClass || '') + '\n\n',
+    'D9 Synthesis:\n' + (s.synthesis || '') + '\n\n',
+    'Human summary:\n' + (s.humanSummary || '') + '\n\n',
+    'Final RAG record:\n' + JSON.stringify(s.record || {}, null, 2),
+  ], { type: 'text/plain' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = id + '-' + Date.now() + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function bankRecord(id) {
+  var s = STATE[id] || {};
+  if (!s.record) {
+    alert('No final record to bank yet.');
+    return;
+  }
+  // The record already auto-persists to KV chr_pairs:{id} on triad/5-8 success.
+  // This button just shows confirmation.
+  var rid = s.record.id || '(unknown)';
+  alert('Record ' + rid + ' is already banked to chr_pairs:{id} in KV.\nTag: ' + (s.record.tag || '?'));
+}
+
+// ── MACHINE FACTORY ────────────────────────────────────────────
+
+function openFactory() {
+  document.getElementById('factory-modal').classList.add('visible');
+}
+function closeFactory() {
+  document.getElementById('factory-modal').classList.remove('visible');
+}
+
+async function createMachine() {
+  var name = document.getElementById('f-name').value.trim();
+  var type = document.getElementById('f-type').value;
+  var core = document.getElementById('f-core').value.trim();
+  var desc = document.getElementById('f-desc').value.trim();
+  var dispatch = document.getElementById('f-dispatch').value;
+  if (!name) { alert('Name is required.'); return; }
+
+  try {
+    var resp = await fetch(API + '/machines/factory', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        name: name,
+        type: type,
+        core: core,
+        description: desc,
+        dispatch: dispatch,
+      }),
+    }).then(function(r){ return r.json(); });
+
+    if (!resp.ok) { alert('Factory error: ' + (resp.error || 'unknown')); return; }
+
+    closeFactory();
+    // Reload machines, re-render
+    MACHINES = {};
+    Object.keys(BUILT_IN).forEach(function(k){ MACHINES[k] = BUILT_IN[k]; });
+    await loadMachines();
+    renderUi();
+    switchTab(resp.machine.id);
+  } catch (err) {
+    alert('Factory failed: ' + err.message);
+  }
+}
+
+async function deleteMachine(id) {
+  if (BUILT_IN[id]) {
+    alert('Built-in machines cannot be deleted.');
+    return;
+  }
+  if (!confirm('Delete machine "' + MACHINES[id].name + '"? This cannot be undone.')) return;
+
+  try {
+    await fetch(API + '/machines/' + id, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    delete MACHINES[id];
+    delete STATE[id];
+    var tab = document.querySelector('.tab[data-id="' + id + '"]');
+    if (tab) tab.remove();
+    var panel = document.getElementById('panel-' + id);
+    if (panel) panel.remove();
+    switchTab('overview');
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function(){
+  checkApi();
+  loadCanon();
+  loadMachines().then(function(){
+    renderUi();
+    // Default to Triad tab
+    switchTab('triad');
+  });
+
+  // Tab clicks
+  document.getElementById('tabs').addEventListener('click', function(e){
+    var tab = e.target.closest('.tab');
+    if (!tab) return;
+    if (tab.id === 'tab-add') {
+      openFactory();
+      return;
+    }
+    var id = tab.getAttribute('data-id');
+    if (id) switchTab(id);
+  });
+
+  // Modal background click closes
+  document.getElementById('factory-modal').addEventListener('click', function(e){
+    if (e.target.id === 'factory-modal') closeFactory();
+  });
+});
+</script>
+
+</body>
+</html>
