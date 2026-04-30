@@ -124,6 +124,23 @@
   .layer0 .l0-blacklist { margin-top:6px; padding:6px 10px; background:rgba(0,0,0,0.25); border-radius:3px;
     font-size:10px; color:var(--muted); line-height:1.6; }
 
+  /* LAYER 0 MASTER TOGGLE */
+  body.l0-disabled .l0-control { display:none !important; }
+  .l0-master {
+    display:flex; align-items:center; gap:12px;
+    padding:9px 14px; margin:14px 0;
+    background:rgba(196,167,231,0.04); border:1px solid var(--border); border-radius:6px;
+    font-family:var(--mono); font-size:11px;
+  }
+  .l0-master .lm-label { color:var(--muted); letter-spacing:0.04em; }
+  .l0-master .lm-pill {
+    padding:3px 12px; border-radius:20px; font-weight:700; cursor:pointer;
+    user-select:none; transition:all 0.15s; letter-spacing:0.08em; font-size:10px;
+  }
+  .l0-master .lm-pill.on  { background:var(--triad); color:#0d1117; }
+  .l0-master .lm-pill.off { background:var(--coral); color:#0d1117; }
+  .l0-master .lm-note { color:var(--muted); font-size:10px; margin-left:auto; opacity:0.85; }
+
   /* ANSWER CLASS BADGE */
   .answer-class {
     display:inline-block; padding:4px 12px; border-radius:3px;
@@ -243,6 +260,13 @@
   <div class="tab" data-id="canon"><span class="dot" style="background:var(--cerise)"></span>Canon</div>
   <div class="tab" data-id="operational"><span class="dot" style="background:var(--triad)"></span>Operational</div>
   <div class="tab" id="tab-add" style="color:var(--teal)">+ New Machine</div>
+</div>
+
+<!-- ================= LAYER 0 MASTER TOGGLE ================= -->
+<div class="l0-master">
+  <span class="lm-label">LAYER 0 REGION:</span>
+  <span class="lm-pill on" id="l0-master-pill" onclick="toggleLayer0Master()">ON</span>
+  <span class="lm-note" id="l0-master-note">five gates active · pre-flight + schema/branch declarations enforced</span>
 </div>
 
 <!-- ================= OVERVIEW ================= -->
@@ -604,7 +628,7 @@ function buildPanel(id) {
       '<label>Question (raw)</label>' +
       '<textarea class="q-input" id="' + id + '-q" placeholder="' + m.placeholder + '"></textarea>' +
       '<div class="decl-row">' +
-        '<div>' +
+        '<div class="l0-control">' +
           '<label>Schema or Instantiation</label>' +
           '<select id="' + id + '-decl-schema">' +
             '<option value="">(let Layer 0 infer)</option>' +
@@ -612,7 +636,7 @@ function buildPanel(id) {
             '<option value="instantiation">instantiation (specific graph/state)</option>' +
           '</select>' +
         '</div>' +
-        '<div>' +
+        '<div class="l0-control">' +
           '<label>Branch (only if minimality)</label>' +
           '<select id="' + id + '-decl-branch">' +
             '<option value="">(none / not minimality)</option>' +
@@ -624,14 +648,14 @@ function buildPanel(id) {
         '<div>' +
           '<button class="fire-btn" id="' + id + '-fire" style="background:' + m.color + ';color:#0d1117" onclick="fireChain(\'' + id + '\')">' + m.icon + ' FIRE</button>' +
           '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;text-align:right" id="' + id + '-session-stamp">session: ' + new Date().toISOString().slice(0,10) + '</div>' +
-          '<label style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;cursor:pointer;justify-content:flex-end">' +
+          '<label class="l0-control" style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;cursor:pointer;justify-content:flex-end">' +
             '<input type="checkbox" id="' + id + '-skip-l0" style="cursor:pointer;accent-color:var(--cerise)"/>' +
             'skip layer 0' +
           '</label>' +
         '</div>' +
       '</div>' +
 
-      '<div class="layer0" id="' + id + '-layer0"></div>' +
+      '<div class="layer0 l0-control" id="' + id + '-layer0"></div>' +
     '</div>' +
 
     '<div class="d9" id="' + id + '-d9">' +
@@ -870,6 +894,39 @@ function switchTab(id) {
   if (panel) panel.classList.add('active');
 }
 
+// ── LAYER 0 MASTER TOGGLE ──────────────────────────────────────
+// Page-level switch to hide the Layer 0 region (schema/branch dropdowns,
+// skip checkbox, L0 panel) and bypass the /physics/layer-0 pre-flight
+// in fireChain. State persisted to localStorage.
+
+function applyLayer0MasterState(disabled) {
+  document.body.classList.toggle('l0-disabled', disabled);
+  var pill = document.getElementById('l0-master-pill');
+  var note = document.getElementById('l0-master-note');
+  if (pill) {
+    pill.textContent = disabled ? 'OFF' : 'ON';
+    pill.classList.toggle('on', !disabled);
+    pill.classList.toggle('off', disabled);
+  }
+  if (note) {
+    note.textContent = disabled
+      ? 'all gates bypassed · faces fire raw question · use for exploratory work'
+      : 'five gates active · pre-flight + schema/branch declarations enforced';
+  }
+}
+
+function toggleLayer0Master() {
+  var nowDisabled = !document.body.classList.contains('l0-disabled');
+  try { localStorage.setItem('l0-master-disabled', nowDisabled ? '1' : '0'); } catch(_){}
+  applyLayer0MasterState(nowDisabled);
+}
+
+(function initLayer0Master(){
+  var stored = '0';
+  try { stored = localStorage.getItem('l0-master-disabled') || '0'; } catch(_){}
+  applyLayer0MasterState(stored === '1');
+})();
+
 // ── RENDER UI FROM MACHINES ────────────────────────────────────
 
 function renderUi() {
@@ -974,13 +1031,17 @@ async function fireChain(id) {
 
   try {
     // ── Step 1: Layer 0 (or skip) ──────────────────────────────
-    var skipL0 = document.getElementById(id + '-skip-l0') && document.getElementById(id + '-skip-l0').checked;
+    var skipL0Checkbox = document.getElementById(id + '-skip-l0') && document.getElementById(id + '-skip-l0').checked;
+    var l0MasterDisabled = document.body.classList.contains('l0-disabled');
+    var skipL0 = skipL0Checkbox || l0MasterDisabled;
     var packet = null;
 
     if (skipL0) {
-      // User explicitly chose to bypass Layer 0
+      // User explicitly chose to bypass Layer 0 (master toggle OFF or per-fire skip)
       var l0el = document.getElementById(id + '-layer0');
-      if (l0el) {
+      if (l0el && !l0MasterDisabled) {
+        // Only show the SKIPPED banner when per-fire skip is the reason —
+        // master OFF hides the panel entirely so a banner there would be invisible.
         l0el.classList.add('visible');
         l0el.innerHTML = '<div class="l0-title" style="color:var(--coral)">Layer 0 — SKIPPED by user</div>' +
           '<div class="l0-row"><span class="l0-key">note:</span> <span class="l0-val">faces will fire without falsification audit preload or schema/branch declaration. Use this only for exploratory probes.</span></div>';
