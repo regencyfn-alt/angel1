@@ -111,12 +111,21 @@ async function runFaces(
   priorContext: string,
   ctxLabel: string,
   session: string,
+  chain: 'LAMINAR' | 'TRIAD' = 'LAMINAR',
 ): Promise<{ outputs: string[]; finalCtx: string }> {
   const outputs: string[] = [];
 
   // qHeader is prepended every iteration so faces never lose the original question
   // (Session 60 fix, commit 5a326a8 — Shard discovered 14/16 face firings were blind)
   const qHeader = `ORIGINAL QUERY: ${question}\n\n`;
+
+  // Header for the accumulated face outputs uses the explicit chain label.
+  // Bug fixed Session 63: previously this was `ctxLabel.includes('LAMINAR') ? 'LAMINAR' : 'TRIAD'`,
+  // which mislabelled Triad 1-4 as LAMINAR because the handler passes ctxLabel='LAMINAR OUTPUT'.
+  // T2/T3/T4 then read T1's output prefixed with [LAMINAR FACES 5+] and confused
+  // their own work with Laminar's. Now driven by the explicit chain parameter.
+  const startFace = faces[0]?.face ?? 1;
+  const chainHeader = `[${chain} FACES ${startFace}+]:`;
 
   let ctx = priorContext
     ? `${qHeader}${ctxLabel}:\n${priorContext}`
@@ -128,7 +137,7 @@ async function runFaces(
     outputs.push(`[${f.id}]\n${out}`);
     // Rebuild ctx with qHeader at the front so next face still sees the question
     ctx = priorContext
-      ? `${qHeader}${ctxLabel}:\n${priorContext}\n\n[${ctxLabel.includes('LAMINAR') ? 'LAMINAR' : 'TRIAD'} FACES 5+]:\n` + outputs.join('\n\n---\n\n')
+      ? `${qHeader}${ctxLabel}:\n${priorContext}\n\n${chainHeader}\n` + outputs.join('\n\n---\n\n')
       : `${qHeader}` + outputs.join('\n\n---\n\n');
   }
 
@@ -161,7 +170,7 @@ export async function handleLaminar14(request: Request, env: Env): Promise<Respo
     ? `\nLAYER 0 DECLARATIONS:\n  schema/instantiation: ${body.layer0_packet.declarations?.schema_or_instantiation || 'unspecified'}\n  branch: ${body.layer0_packet.declarations?.branch || 'n/a'}\n  falsified items in scope: ${body.layer0_packet.audit?.falsified_count ?? 'unknown'}\n`
     : '';
 
-  const { outputs, finalCtx } = await runFaces(env, LAMINAR_1_4, body.question, body.priorContext || '', '', session);
+  const { outputs, finalCtx } = await runFaces(env, LAMINAR_1_4, body.question, body.priorContext || '', '', session, 'LAMINAR');
 
   return jsonResponse({
     ok: true,
@@ -182,7 +191,7 @@ export async function handleLaminar58(request: Request, env: Env): Promise<Respo
   if (!body.question || !body.priorContext) return errorResponse('question and priorContext required', 400);
 
   const session = body.session || 'Session 62';
-  const { outputs, finalCtx } = await runFaces(env, laminarFaces58(session), body.question, body.priorContext, 'LAMINAR FACES 1-4', session);
+  const { outputs, finalCtx } = await runFaces(env, laminarFaces58(session), body.question, body.priorContext, 'LAMINAR FACES 1-4', session, 'LAMINAR');
 
   const face8 = outputs[outputs.length - 1];
   const f8c = face8.replace(/^\[L8[^\]]*\]\s*/i, '').trimStart();
@@ -213,7 +222,7 @@ export async function handleTriad14(request: Request, env: Env): Promise<Respons
     console.warn('[triad/1-4] no layer0_packet attached — ingress audit bypassed');
   }
 
-  const { outputs, finalCtx } = await runFaces(env, TRIAD_1_4, body.question, body.priorContext || '', body.priorContext ? 'LAMINAR OUTPUT' : '', session);
+  const { outputs, finalCtx } = await runFaces(env, TRIAD_1_4, body.question, body.priorContext || '', body.priorContext ? 'LAMINAR OUTPUT' : '', session, 'TRIAD');
 
   return jsonResponse({
     ok: true,
@@ -234,7 +243,7 @@ export async function handleTriad58(request: Request, env: Env): Promise<Respons
   if (!body.question || !body.priorContext) return errorResponse('question and priorContext required', 400);
 
   const session = body.session || 'Session 62';
-  const { outputs } = await runFaces(env, triadFaces58(session), body.question, body.priorContext, 'TRIAD FACES 1-4', session);
+  const { outputs } = await runFaces(env, triadFaces58(session), body.question, body.priorContext, 'TRIAD FACES 1-4', session, 'TRIAD');
 
   const face8 = outputs[outputs.length - 1];
   const f8c = face8.replace(/^\[T8[^\]]*\]\s*/i, '').trimStart();

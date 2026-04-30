@@ -141,6 +141,26 @@
   .l0-master .lm-pill.off { background:var(--coral); color:#0d1117; }
   .l0-master .lm-note { color:var(--muted); font-size:10px; margin-left:auto; opacity:0.85; }
 
+  /* PIPELINE STEP STATUS */
+  .pipe-status {
+    margin-top:10px; padding:9px 14px;
+    background:rgba(45,212,191,0.04); border-left:2px solid var(--teal);
+    border-radius:0 4px 4px 0; font-family:var(--mono); font-size:10px;
+    color:var(--text); display:none;
+  }
+  .pipe-status.visible { display:block; }
+  .pipe-status .ps-title { font-weight:600; letter-spacing:0.06em; margin-bottom:6px;
+    text-transform:uppercase; font-size:9px; color:var(--teal); }
+  .pipe-status .ps-row { display:flex; gap:10px; align-items:center; padding:2px 0; }
+  .pipe-status .ps-icon { width:14px; text-align:center; }
+  .pipe-status .ps-label { flex:1; }
+  .pipe-status .ps-time { color:var(--muted); font-variant-numeric:tabular-nums; }
+  .pipe-status .ps-row.firing { color:var(--triad); }
+  .pipe-status .ps-row.firing .ps-icon { animation:ps-spin 1.2s linear infinite; }
+  .pipe-status .ps-row.done    { color:var(--derived); }
+  .pipe-status .ps-row.failed  { color:var(--blocked); font-weight:600; }
+  @keyframes ps-spin { to { transform:rotate(360deg); } }
+
   /* ANSWER CLASS BADGE */
   .answer-class {
     display:inline-block; padding:4px 12px; border-radius:3px;
@@ -658,6 +678,8 @@ function buildPanel(id) {
       '<div class="layer0 l0-control" id="' + id + '-layer0"></div>' +
     '</div>' +
 
+    '<div class="pipe-status" id="' + id + '-pipe-status"></div>' +
+
     '<div class="d9" id="' + id + '-d9">' +
       '<div class="d9-head">' +
         '<span class="d9-label">D9 Synthesis · Opus 4.6</span>' +
@@ -995,6 +1017,59 @@ function renderLayer0(id, l0Result) {
 
 // ── FIRE CHAIN ─────────────────────────────────────────────────
 
+// Per-step pipeline instrumentation (Session 63 — Ruby).
+// pipeLog renders a status row per step into the .pipe-status panel.
+// runStep wraps an async step with timing + status update + console log,
+// and tags errors with .failedStep so the catch block knows which step died.
+
+function pipeLog(id, step, status, ms) {
+  var el = document.getElementById(id + '-pipe-status');
+  if (!el) return;
+  if (!el._steps) { el._steps = []; el._stepIndex = {}; }
+  var existing = el._stepIndex[step];
+  if (existing != null) {
+    el._steps[existing] = { step: step, status: status, ms: ms };
+  } else {
+    el._stepIndex[step] = el._steps.length;
+    el._steps.push({ step: step, status: status, ms: ms });
+  }
+  el.classList.add('visible');
+  var rows = el._steps.map(function(s){
+    var icon = s.status === 'firing' ? '◐' : s.status === 'done' ? '✓' : s.status === 'failed' ? '✗' : '·';
+    var time = s.ms != null ? '<span class="ps-time">' + (s.ms/1000).toFixed(1) + 's</span>' : '';
+    return '<div class="ps-row ' + s.status + '"><span class="ps-icon">' + icon + '</span><span class="ps-label">' + s.step + '</span>' + time + '</div>';
+  }).join('');
+  el.innerHTML = '<div class="ps-title">Pipeline trace</div>' + rows;
+}
+
+function resetPipeStatus(id) {
+  var el = document.getElementById(id + '-pipe-status');
+  if (!el) return;
+  el._steps = [];
+  el._stepIndex = {};
+  el.innerHTML = '';
+  el.classList.remove('visible');
+}
+
+async function runStep(id, label, fn) {
+  pipeLog(id, label, 'firing');
+  console.log('[fire] ' + label + ' firing…');
+  var t0 = performance.now();
+  try {
+    var result = await fn();
+    var ms = performance.now() - t0;
+    pipeLog(id, label, 'done', ms);
+    console.log('[fire] ' + label + ' done in ' + (ms/1000).toFixed(1) + 's');
+    return result;
+  } catch (err) {
+    var msErr = performance.now() - t0;
+    pipeLog(id, label, 'failed', msErr);
+    console.error('[fire] ' + label + ' FAILED after ' + (msErr/1000).toFixed(1) + 's:', err);
+    if (err && typeof err === 'object') err.failedStep = label;
+    throw err;
+  }
+}
+
 async function fireChain(id) {
   var m = MACHINES[id];
   var qEl = document.getElementById(id + '-q');
@@ -1026,6 +1101,7 @@ async function fireChain(id) {
     if (faceEl) faceEl.classList.remove('running', 'done');
   });
   document.getElementById(id + '-d9').classList.remove('visible');
+  resetPipeStatus(id);
 
   STATE[id] = { question: question, faceOutputs: [], session: session };
 
@@ -1038,6 +1114,7 @@ async function fireChain(id) {
 
     if (skipL0) {
       // User explicitly chose to bypass Layer 0 (master toggle OFF or per-fire skip)
+      pipeLog(id, l0MasterDisabled ? 'Layer 0 (master OFF)' : 'Layer 0 (skipped)', 'done', 0);
       var l0el = document.getElementById(id + '-layer0');
       if (l0el && !l0MasterDisabled) {
         // Only show the SKIPPED banner when per-fire skip is the reason —
@@ -1071,11 +1148,13 @@ async function fireChain(id) {
       if (schema) l0Body.declarations.schema_or_instantiation = schema;
       if (branch) l0Body.declarations.branch = branch;
 
-      var l0 = await fetch(API + '/physics/layer-0', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(l0Body),
-      }).then(function(r){ return r.json(); });
+      var l0 = await runStep(id, 'Layer 0', function(){
+        return fetch(API + '/physics/layer-0', {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify(l0Body),
+        }).then(function(r){ return r.json(); });
+      });
 
       renderLayer0(id, l0);
 
@@ -1100,10 +1179,12 @@ async function fireChain(id) {
     var laminar14Output = '';
     if (dispatch === 'laminar+triad' || dispatch === 'laminar') {
       markFacesRunning(id, ['L1','L2','L3','L4']);
-      var l14 = await callPipeline('/physics/laminar/1-4', {
-        question: question,
-        session: session,
-        layer0_packet: packet,
+      var l14 = await runStep(id, 'Laminar 1-4', function(){
+        return callPipeline('/physics/laminar/1-4', {
+          question: question,
+          session: session,
+          layer0_packet: packet,
+        });
       });
       laminar14Output = l14.output || '';
       stampFaces(id, ['L1','L2','L3','L4'], laminar14Output);
@@ -1113,11 +1194,13 @@ async function fireChain(id) {
     var laminar58Output = '';
     if (dispatch === 'laminar+triad' || dispatch === 'laminar') {
       markFacesRunning(id, ['L5','L6','L7','L8']);
-      var l58 = await callPipeline('/physics/laminar/5-8', {
-        question: question,
-        session: session,
-        priorContext: laminar14Output,
-        layer0_packet: packet,
+      var l58 = await runStep(id, 'Laminar 5-8', function(){
+        return callPipeline('/physics/laminar/5-8', {
+          question: question,
+          session: session,
+          priorContext: laminar14Output,
+          layer0_packet: packet,
+        });
       });
       laminar58Output = l58.output || '';
       stampFaces(id, ['L5','L6','L7','L8'], laminar58Output);
@@ -1129,11 +1212,13 @@ async function fireChain(id) {
       markFacesRunning(id, ['T1','T2','T3','T4']);
       // priorContext for triad/1-4 is laminar 5-8 if available, else laminar 1-4, else empty
       var prior = laminar58Output || laminar14Output || '';
-      var t14 = await callPipeline('/physics/triad/1-4', {
-        question: question,
-        session: session,
-        priorContext: prior,
-        layer0_packet: packet,
+      var t14 = await runStep(id, 'Triad 1-4', function(){
+        return callPipeline('/physics/triad/1-4', {
+          question: question,
+          session: session,
+          priorContext: prior,
+          layer0_packet: packet,
+        });
       });
       triad14Output = t14.output || '';
       stampFaces(id, ['T1','T2','T3','T4'], triad14Output);
@@ -1143,11 +1228,13 @@ async function fireChain(id) {
     var finalRecord = null;
     if (dispatch === 'laminar+triad' || dispatch === 'triad') {
       markFacesRunning(id, ['T5','T6','T7','T8']);
-      var t58 = await callPipeline('/physics/triad/5-8', {
-        question: question,
-        session: session,
-        priorContext: triad14Output,
-        layer0_packet: packet,
+      var t58 = await runStep(id, 'Triad 5-8', function(){
+        return callPipeline('/physics/triad/5-8', {
+          question: question,
+          session: session,
+          priorContext: triad14Output,
+          layer0_packet: packet,
+        });
       });
       stampFaces(id, ['T5','T6','T7','T8'], JSON.stringify(t58.record || t58.face8 || t58, null, 2));
       finalRecord = t58.record;
@@ -1157,11 +1244,13 @@ async function fireChain(id) {
 
     // ── Step 6: D9 Synthesis ──────────────────────────────────
     var faceOutputs = collectFaceOutputs(id);
-    var d9resp = await fetch(API + '/physics/d9', {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ question: question, faces: faceOutputs }),
-    }).then(function(r){ return r.json(); });
+    var d9resp = await runStep(id, 'D9 synthesis', function(){
+      return fetch(API + '/physics/d9', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ question: question, faces: faceOutputs }),
+      }).then(function(r){ return r.json(); });
+    });
 
     var d9 = document.getElementById(id + '-d9');
     var d9text = document.getElementById(id + '-d9-text');
@@ -1193,7 +1282,8 @@ async function fireChain(id) {
     var ac = document.getElementById(id + '-class');
     ac.textContent = 'ERROR';
     ac.className = 'answer-class ac-BLOCKED';
-    d9text.textContent = 'Pipeline error:\n\n' + (err.message || String(err));
+    var step = err && err.failedStep ? err.failedStep : 'unknown step';
+    d9text.textContent = 'Pipeline failed at: ' + step + '\n\n' + (err && err.message ? err.message : String(err));
     d9.classList.add('visible');
   }
 
