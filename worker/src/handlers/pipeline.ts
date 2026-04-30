@@ -22,7 +22,10 @@ const NVIDIA_BASE = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const NVIDIA_MODEL = 'nvidia/nemotron-3-super-120b-a12b';
 
 // ── NVIDIA call helper ─────────────────────────────────────────────────
-async function nCall(env: Env, sys: string, ctx: string, op: string, temp: number): Promise<string> {
+// maxTokens default 1200 is fine for Faces 1-7. Face 8 needs 4096 because
+// Nemotron-3-Super is a reasoning model — it writes thinking-prose before
+// JSON, and 1200 tokens gets cut mid-reasoning before structured output begins.
+async function nCall(env: Env, sys: string, ctx: string, op: string, temp: number, maxTokens: number = 1200): Promise<string> {
   const msgs: any[] = [{ role: 'system', content: sys }];
   if (ctx) {
     msgs.push({ role: 'user', content: ctx });
@@ -40,7 +43,7 @@ async function nCall(env: Env, sys: string, ctx: string, op: string, temp: numbe
       model: NVIDIA_MODEL,
       messages: msgs,
       temperature: temp,
-      max_tokens: 1200,
+      max_tokens: maxTokens,
     }),
   });
 
@@ -67,6 +70,14 @@ tag=plain string. [tag] prefix in answer text only. Session: ${session}`;
 // ── Face 8 RAG record schema (used by both Laminar and Triad) ──────────
 const FACE8_SCHEMA = `{"regime":"C1|C2|C3|CROSS","layer":"Core|Toy-Model|Interpretation|Contamination","property":"Adjacency & Bipartiteness|Minimal Templates|Formal Closure|Recurrence & Cost|Probabilistic Update Family|Perturbation Propagation|Persistence Gradient|Emergent Time|Conserved Invariants","tag":"derived|hypothesis|observed|axiom|falsified|rejected|open","session":"$SESSION","rag_anchors":["canonical IDs"],"scope":["all_models"],"question":"restated stripped query","answer":"[tag] derivation chain"}`;
 
+// Output contract for Face 8. Prepended to every Face 8 op string. Aggressive
+// because Nemotron-3-Super is a reasoning model and tends to write thinking
+// prose before JSON. The first character of its output MUST be "{".
+const FACE8_JSON_CONTRACT = `CRITICAL OUTPUT CONTRACT — READ FIRST:
+You MUST emit pure JSON only. No reasoning prose. No <think> blocks. No preamble. No explanation. No markdown fences. The first character of your response must be "{" and the last must be "}". If you write ANY text before "{" your output will be discarded as malformed and the run will fail. Do your reasoning silently inside the JSON's "answer" field.
+
+`;
+
 // ── Face prompts — Laminar 1-4 ─────────────────────────────────────────
 const LAMINAR_1_4 = [
   { id: 'L1', face: 1, op: 'You are Face 1 of Laminar Lock: Calcite Gate. Reject contamination terms (torsion,Z/3Z,SU(2),Hamiltonians,chirality). Split query into ordinary ray (RAG-aligned) and extraordinary ray. OUTPUT: STRIPPED_QUERY + triage.', temp: 0.3 },
@@ -81,7 +92,7 @@ function laminarFaces58(session: string) {
     { id: 'L5', face: 5, op: 'You are Face 5: Polarity Assignment. Assign binary polarities anti-symmetrically — p(u)!=p(v) for every edge. If not bipartite: identify frustration. OUTPUT: POLARITY_MAP.', temp: 0.3 },
     { id: 'L6', face: 6, op: 'You are Face 6: Perturbation Dynamics. Under T0.3 and delta-minimisation compute next state when delta exceeds persistence threshold. Show sublattice flip or absorption. Compute ejected delta. If perturbation tax invoked: tag [hypothesis], cite R3:PerturbationTax. OUTPUT: POST_PERTURBATION_STATE, EJECTED_DELTA.', temp: 0.35 },
     { id: 'L7', face: 7, op: 'You are Face 7: Lock Verification. Verify T0.3, T0.5, T0.6, delta-minimisation all hold. Confirm ejected delta propagates along gradient. OUTPUT: LOCKED_STATE verification log.', temp: 0.2 },
-    { id: 'L8', face: 8, op: `You are Face 8 of Laminar Lock. FALSIFICATION AUDIT: check operational blacklist before any invariant or conserved-quantity discussion. Conservation claims must be scoped to the actual live invariant (parity-style on Eulerian graphs, T5.3a), not to general I-conservation. Produce RAG entry candidate. Output JSON with ALL fields — if any field is missing output only the word INCOMPLETE on its own line:\n${FACE8_SCHEMA.replace('$SESSION', session)}\nJSON only. No preamble.`, temp: 0.15 },
+    { id: 'L8', face: 8, op: `${FACE8_JSON_CONTRACT}You are Face 8 of Laminar Lock. FALSIFICATION AUDIT: check operational blacklist before any invariant or conserved-quantity discussion. Conservation claims must be scoped to the actual live invariant (parity-style on Eulerian graphs, T5.3a), not to general I-conservation. Produce RAG entry candidate. Output JSON with ALL fields — if any field is missing output only the word INCOMPLETE on its own line:\n${FACE8_SCHEMA.replace('$SESSION', session)}\nJSON only. No preamble.`, temp: 0.15 },
   ];
 }
 
@@ -99,7 +110,7 @@ function triadFaces58(session: string) {
     { id: 'T5', face: 5, op: 'You are Face 5: Probabilistic Update Family. P(s=c)=phi(delta)/sum(phi). phi strictly decreasing. alpha sharpness. Limits: alpha=0 uniform, alpha->inf deterministic. T5.2 open. Tag:hypothesis. Scope:binary_polarity_toy.', temp: 0.3 },
     { id: 'T6', face: 6, op: 'You are Face 6: Perturbation Propagation. t_i=1-rho_i. w(P)=product(1-rho). Connection to expected ticks tau. Binary model only. Tag:hypothesis. Scope:binary_polarity_toy.', temp: 0.3 },
     { id: 'T7', face: 7, op: 'You are Face 7: Persistence Gradient & Emergent Time. rho_i=1-Delta_avg per node. Interior(all neighbours)->gradient approx 0. Boundary->steep gradient. OPERATIONAL: do NOT request closed-form tau(a,b) or general convergence claim unless explicitly supplied with stronger premises. Default output is the qualitative path-weight relation only. Scope:binary_polarity_toy.', temp: 0.25 },
-    { id: 'T8', face: 8, op: `You are Face 8 of Triad Lock: Conservation & Gaps. FALSIFICATION AUDIT: check operational blacklist before any invariant or conserved-quantity discussion. Identify conserved quantities. T3.3: no unbounded drift (finite state space, derived). List ALL open gaps: T5.2, T5.3 (edge mismatch falsified Session 54; true invariant open), T5.8, T5.9, closed-form tau(a,b), generalisation beyond binary. Tag each finding. Output JSON ALL fields — if any missing output only INCOMPLETE on its own line:\n${FACE8_SCHEMA.replace('$SESSION', session)}\nJSON only.`, temp: 0.15 },
+    { id: 'T8', face: 8, op: `${FACE8_JSON_CONTRACT}You are Face 8 of Triad Lock: Conservation & Gaps. FALSIFICATION AUDIT: check operational blacklist before any invariant or conserved-quantity discussion. Identify conserved quantities. T3.3: no unbounded drift (finite state space, derived). List ALL open gaps: T5.2, T5.3 (edge mismatch falsified Session 54; true invariant open), T5.8, T5.9, closed-form tau(a,b), generalisation beyond binary. Tag each finding. Output JSON ALL fields — if any missing output only INCOMPLETE on its own line:\n${FACE8_SCHEMA.replace('$SESSION', session)}\nJSON only.`, temp: 0.15 },
   ];
 }
 
@@ -133,7 +144,10 @@ async function runFaces(
 
   for (const f of faces) {
     const sys = await buildFaceSystem(env, session, f.face);
-    const out = await nCall(env, sys, ctx, f.op, f.temp);
+    // Face 8 (RAG record producer) gets 4096 tokens. Nemotron's reasoning
+    // prose eats 1200 before JSON ever begins; this gives it headroom.
+    const maxTokens = (f.face === 8) ? 4096 : 1200;
+    const out = await nCall(env, sys, ctx, f.op, f.temp, maxTokens);
     outputs.push(`[${f.id}]\n${out}`);
     // Rebuild ctx with qHeader at the front so next face still sees the question
     ctx = priorContext
@@ -257,13 +271,29 @@ export async function handleTriad58(request: Request, env: Env): Promise<Respons
     } catch (_) {}
   }
 
-  // Fallback: ask Nemotron to extract structured record from prose
+  // Fallback: ask Nemotron to extract structured record from prose.
+  // Uses a stripped system prompt (no canon, just the extractor role) + low temp
+  // + 4096 tokens so reasoning prose can't crowd out the JSON. Last resort —
+  // primary path is Face 8 itself producing valid JSON via the contract prefix.
   if (!record && !f8c.startsWith('INCOMPLETE')) {
     try {
-      const sys = await buildFaceSystem(env, session, 8);
-      const exOut = await nCall(env, sys, '',
-        `Output ONLY a JSON object with fields regime,layer,property,tag,session,rag_anchors,scope,question,answer from this derivation:\n${f8c.slice(-2000)}`,
-        0.1);
+      const extractorSys = `You are a JSON extractor. Your sole function is to emit one JSON object summarising the supplied derivation. NEVER write reasoning, prose, thinking-blocks, markdown fences, or any text outside the JSON. The first character of your response MUST be "{" and the last "}". If a field cannot be determined from the source, set it to "open" or [] as appropriate, but ALWAYS emit the full schema.`;
+      const extractorOp = `${FACE8_JSON_CONTRACT}Source derivation (from Triad Face 8):
+${f8c.slice(-3000)}
+
+Emit a JSON object with these EXACT keys (and no others):
+- regime: one of "C1" | "C2" | "C3" | "CROSS"
+- layer: one of "Core" | "Toy-Model" | "Interpretation" | "Contamination"
+- property: one of the 9 canonical property names
+- tag: one of "derived" | "hypothesis" | "observed" | "axiom" | "falsified" | "rejected" | "open"
+- session: "${session}"
+- rag_anchors: array of canonical RAG ID strings (e.g. ["T0.4","R2:MemoryFidelity"])
+- scope: array (e.g. ["all_models"] or ["binary_polarity_toy"])
+- question: restated stripped query
+- answer: "[tag] derivation chain text"
+
+JSON only.`;
+      const exOut = await nCall(env, extractorSys, '', extractorOp, 0.05, 4096);
       const em = exOut.match(/\{[\s\S]*\}/);
       if (em) record = JSON.parse(em[0].replace(/,\s*([}\]])/g, '$1'));
     } catch (_) {}

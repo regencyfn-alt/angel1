@@ -1301,7 +1301,17 @@ async function callPipeline(path, body) {
     var t = await r.text();
     throw new Error(path + ' returned ' + r.status + ': ' + t.slice(0, 300));
   }
-  return r.json();
+  var data = await r.json();
+  // Worker may return HTTP 200 with body { ok: false, stage, reason } when a
+  // soft failure happens (Face 8 unparseable JSON, gate rejection, etc.).
+  // Without this check the chain continues with empty records, producing
+  // misleading 'DERIVED' badges on failed runs (Manus's report, 30 April).
+  if (data && data.ok === false) {
+    var stage = data.stage || 'unknown';
+    var reason = data.reason || data.error || (data.raw ? data.raw.slice(0, 200) : JSON.stringify(data).slice(0, 200));
+    throw new Error(path + ' soft-failed at ' + stage + ': ' + reason);
+  }
+  return data;
 }
 
 function markFacesRunning(id, faceIds) {
