@@ -430,9 +430,8 @@ var BUILT_IN = {
     dispatch: 'engines',
     placeholder: 'Enter a question — e.g. "Under T0.3 and T0.5, what is the minimum closed motif?"',
     phases: [
-      { name:'STRUCTURE',  regime:'M₁ — Topology', faces:['T1','T2','T3'], color:'var(--triad)' },
-      { name:'DYNAMICS',   regime:'M₂ — Flow',     faces:['T4','T5','T6'], color:'var(--cerise)' },
-      { name:'INVARIANCE', regime:'M₃ — Truth',    faces:['T7','T8'],      color:'var(--teal)' },
+      { name:'DERIVE', regime:'M_d — Generative',  faces:['Recurrence','Persistence','Gradient','Attractor'], color:'var(--triad)' },
+      { name:'AUDIT',  regime:'M_a — Adversarial', faces:['Invariant','Locality','Boundary','Exclusion'],     color:'var(--cerise)' },
     ],
     substrates: {
       c1: {
@@ -458,78 +457,22 @@ var BUILT_IN = {
       },
     },
     faces: [
-      { id:'T1', phase:'STRUCTURE', name:'Graph Primitives',
-        op:'You are Face 1 of Triad Lock: M₁ · Graph Primitives (Structure).\n\nINPUT: User query.\nCONSTRAINTS: Clean Core T0.4 (adjacency), T0.5 (locality), T0.6 (finite state resolution).\n\nTASK:\n• From the query, extract the implied discrete structure.\n• Define node set V.\n• Define edge set E ⊆ V × V according to T0.4 (adjacency only; no coordinates).\n• Specify state alphabet Σ for each node (e.g., binary {+1, −1} as default minimal instantiation of T0.6).\n\nOutput a formal triple (V, E, Σ). No interpretation, no dynamics.\n\nGATES (apply in order):\n• Undefined-term gate: if a term is not in canon or stipulated for the run, output BLOCKED rather than invent.\n• Falsified-result blacklist: hard-ban "total edge mismatch I is conserved" (broad claim) — only the parity-style invariant on Eulerian graphs (T5.3a) is alive.\n• Schema/instantiation split: declare whether speaking of axiomatic schema OR instantiated graph/state.\n• Answer-class first: declare DERIVED / HYPOTHESIS / BLOCKED / FALSIFIED before any prose.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'T2', phase:'STRUCTURE', name:'Bipartiteness & Ground State',
-        op:'You are Face 2 of Triad Lock: M₁ · Bipartiteness & Ground State (Structure).\n\nINPUT: Graph (V,E,Σ) from Face 1, T0.3 (second-order recurrence), Interaction Model Δ.\n\nTASK:\n• Determine if G = (V,E) is bipartite. If yes, provide a 2-colouring V = A ∪ B.\n• Define the anti-symmetric ground state: s(u) = −s(v) for all edges (binary case).\n• If not bipartite, identify frustration (odd cycles) and propose minimal-energy configuration under Δ-minimisation.\n• Parity Cycle Audit: degree-parity check using ΔI ≡ d_i (mod 2). If degree-1 or degree-3 nodes are present, identify any "Parity Leak" — but DO NOT reject the graph wholesale as "Non-Eulerian Geometry" (Session 61 operational rule: that rejection is too strong). May flag parity leak for a SPECIFIC invariant claim.\n\nOutput: bipartition (if exists), ground-state assignment, edge mismatch summary.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'T3', phase:'STRUCTURE', name:'Minimal Templates',
-        op:'You are Face 3 of Triad Lock: M₁ · Minimal Templates (Structure).\n\nINPUT: Ground state from Face 2, RAG regime definitions, T5.9 (minimum closed geometry — OPEN).\n\nTASK:\n• Identify smallest connected subgraph(s) satisfying constraints implied by query.\n• Derive node count, edge count, degree distribution per candidate (e.g. C₄, 3×3×3 grid).\n• Justify minimality from adjacency and bipartiteness alone; no spatial dimension assumed.\n• Minimality scoping rule (Session 62): every minimality claim must declare property under minimisation AND branch (closure | anti-symmetric oscillation | enclosed persistence). Cross-branch import is structurally invalid.\n• T5.9 is OPEN — state explicitly when invoked.\n\nOutput: template spec with minimality proof OR open-question statement.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'T4', phase:'DYNAMICS', name:'Recurrence & Cost',
-        op:'You are Face 4 of Triad Lock: M₂ · Recurrence & Cost (Dynamics).\n\nINPUT: Template from Face 3, T0.3, T0.5, T0.6.\n\nTASK:\n• Formalise local update rule: S_iⁿ⁺¹ = F(S_iⁿ, S_iⁿ⁻¹, {S_jⁿ : (i,j) ∈ E}).\n• Define mismatch cost: Δ_total(c) = Δ(c, sⁿ) + Δ(c, sⁿ⁻¹) + Σ_{j∈N(i)} Δ(c, s_jⁿ) where Δ(a,b) = (1−a·b)/2 for binary.\n• State the axiom: F acts to minimise this cost.\n\nOPERATIONAL CONSTRAINTS:\n• Do NOT impose hard staleness clamps or Seizure Thresholds (Session 59 falsification).\n• Staleness Blocking remains hypothesis about degradation, NOT a zero-probability gate.\n• Mismatch residue (Session 62): unresolved Δ_total after one F application is a LOCAL remainder only — NOT additive across sites, NOT conserved, NOT graph-level.\n\nOutput: formal update rule and cost function. No probability distribution yet.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'T5', phase:'DYNAMICS', name:'Probabilistic Update Family',
-        op:'You are Face 5 of Triad Lock: M₂ · Probabilistic Update Family (Dynamics).\n\nINPUT: Cost function from Face 4.\n\nTASK:\n• Define the family P(sⁿ⁺¹ = c) = φ(Δ_total(c)) / Σ_{c\\\'} φ(Δ_total(c\\\')) where φ : ℤ_{≥0} → (0,∞) is any strictly decreasing function.\n• Introduce sharpness α ≥ 0 via example family φ_α(Δ) = (1+Δ)^{−α}.\n• Limits: α = 0 → uniform, α → ∞ → strict Δ-minimisation.\n• Note the exact form of φ is NOT fixed by primitives (T5.2 OPEN).\n• Hold-probability under φ_α (Session 62, scope-fenced): P_hold(α) = 2^α / (1+2^α) holds ONLY for the example family φ_α, NOT for arbitrary admissible φ.\n\nOutput: family definition, sharpness parameter, limit proofs.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'T6', phase:'DYNAMICS', name:'Perturbation Propagation',
-        op:'You are Face 6 of Triad Lock: M₂ · Perturbation Propagation (Dynamics).\n\nINPUT: Update family from Face 5, "Memory Fidelity = ρ" (binary toy model only).\n\nTASK:\n• Define transmission probability t_i for node i. Binary model: t_i = 1 − ρ_i.\n• Path weight: for causal path P = (v₀,…,v_L), w(P) = ∏_{k=1}^L (1 − ρ_{v_k}).\n• Explain qualitative connection to expected update ticks (mean first passage time).\n• Thick time (Session 62 hypothesis): effective time can be qualitatively slower through high-ρ regions. Closed-form τ(a,b) is NOT permitted at this face.\n\nOutput: transmission probability, path weight, qualitative tick connection.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'T7', phase:'INVARIANCE', name:'Persistence Gradient & Emergent Time',
-        op:'You are Face 7 of Triad Lock: M₃ · Persistence Gradient & Emergent Time (Invariance).\n\nINPUT: Template from Face 3, path weights from Face 6, T0.2 (time = local update count).\n\nTASK:\n• Compute local persistence ρ_i = 1 − Δ_avg per node under anti-symmetric ground state.\n• Classify nodes interior (all neighbours present, ∇ρ ≈ 0) vs boundary (some missing, steep ∇ρ).\n• The Tick (Session 62 Canon): a site has time because F acts on its ordered recurrence pair {S_n, S_{n−1}}. No update, no tick. Time IS the count of F applications at that site.\n\nOPERATIONAL CONSTRAINTS:\n• Do NOT request closed-form τ(a,b) (Session 61 falsified).\n• Do NOT make general convergence claims unless explicitly supplied with stronger premises.\n• Default output is QUALITATIVE path-weight relation only.\n\nOutput: node-wise ρ, interior/boundary classification, ∇ρ description, qualitative τ-to-path-weight.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'T8', phase:'INVARIANCE', name:'Conservation & Gaps',
-        op:'You are Face 8 of Triad Lock: M₃ · Conservation & Gaps (Invariance).\n\nINPUT: All prior face outputs, T3.1 (existence of invariant), T5.3 (conservation identity).\n\nFALSIFICATION AUDIT FIRST (mandatory before any invariant or conserved-quantity discussion):\n• Total edge mismatch I conservation (broad claim) — FALSIFIED Session 54. Only parity-style invariant on Eulerian graphs (T5.3a, Session 58) is alive.\n• Hard Seizure Threshold and hard staleness clamp — FALSIFIED Session 59.\n• Closed-form τ(a,b) — FALSIFIED Session 61.\n• C4_graph = enclosed persistence — FALSIFIED Session 61 (category error).\nIf you cannot explicitly state which operational blacklist items are dead before discussing invariants, you MUST NOT discuss invariants at all.\n\nTASK:\n• Identify any quantity conserved across updates in the binary polarity toy model — properly scoped (parity-on-Eulerian-only, NOT broad I-conservation).\n• Verify no unbounded drift (T3.3).\n• Global Integrity Audit: re-calculate I (mod 2). Verify identical to Face 2 ground state. If shifted, output ERROR: INTEGRITY BREACH and identify the leaky node.\n• List ALL open gaps preventing promotion: T5.2 (exact F), exact φ, closed-form τ(a,b), generalisation beyond binary.\n• Tag each finding [derived] or [hypothesis] per RAG rules.\n\nOutput: final RAG entry candidate as JSON with fields {regime, layer, property, tag, session, rag_anchors, scope, question, answer}. JSON only — no preamble. If any field cannot be filled, output INCOMPLETE on its own line.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-    ],
-  },
-  laminar: {
-    id: 'laminar',
-    name: 'Laminar Lock',
-    type: 'laminar',
-    icon: '◈',
-    color: 'var(--laminar)',
-    description: 'Calcite gate → graphite fractionation → alignment → graph derivation → polarity → perturbation → lock verification → RAG record. Eight faces, Tantalum substrate.',
-    dispatch: 'engines',
-    placeholder: 'Enter a question — Laminar fires faces L1-L8 only',
-    phases: [
-      { name:'INGRESS', regime:'L1–L4', faces:['L1','L2','L3','L4'], color:'var(--laminar)' },
-      { name:'STRIKE',  regime:'L5–L7', faces:['L5','L6','L7'],      color:'var(--cerise)' },
-      { name:'EGRESS',  regime:'L8',    faces:['L8'],                color:'var(--teal)' },
-    ],
-    substrates: {
-      c1: {
-        regime:'C1 BOUNDARY · Calcite Gate',
-        name:'Calcite',
-        color:'var(--laminar)',
-        temp:0.40,
-        props:'Birefringent — splits ordinary from extraordinary ray\nReject contamination terms (torsion, Z/3Z, SU(2), Hamiltonians, chirality)\nFirst cut between RAG-aligned and orthogonal',
-      },
-      c2: {
-        regime:'C2 MEMBRANE · Graphite',
-        name:'Graphite',
-        color:'#A0A0A0',
-        temp:0.30,
-        props:'Lamellar — fractionates query into ordered sub-questions\nEach sub-question independently answerable from canon\nMaps to RAG entries; flags gaps as [hypothesis]',
-      },
-      c3: {
-        regime:'C3 CORE · Tantalum',
-        name:'Tantalum',
-        color:'var(--cerise)',
-        temp:0.25,
-        props:'Refractory — high persistence, holds state under perturbation\nLocks assigned polarities into anti-symmetric ground\nEjects unresolved Δ along the gradient',
-      },
-    },
-    faces: [
-      { id:'L1', phase:'INGRESS', name:'Calcite Gate',
-        op:'You are Face 1 of Laminar Lock: Calcite Gate.\n\nReject contamination terms (torsion, Z/3Z, SU(2), Hamiltonians, chirality unless derived). Split the query into ordinary ray (RAG-aligned) and extraordinary ray (off-canon). Output STRIPPED_QUERY plus triage notes.\n\nGATES: undefined-term gate · falsified blacklist · schema/instantiation split · answer-class first.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'L2', phase:'INGRESS', name:'Graphite Fractionation',
-        op:'You are Face 2 of Laminar Lock: Graphite Fractionation.\n\nDecompose STRIPPED_QUERY into ordered sub-questions, each answerable from RAG / Clean Core independently. Output numbered SUB_QUERIES.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'L3', phase:'INGRESS', name:'Graphite Alignment',
-        op:'You are Face 3 of Laminar Lock: Graphite Alignment.\n\nMap each sub-question to RAG entries by canonical ID. Flag gaps as [hypothesis]. Output ALIGNED_SUB_QUERIES with a dependency table. Canonical RAG IDs only.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'L4', phase:'INGRESS', name:'Graph Derivation',
-        op:'You are Face 4 of Laminar Lock: Graph Derivation.\n\nDerive minimal connected subgraph: V, E, degree distribution. Interior = all neighbours present. No coordinates, no materials. Minimality scoping rule (Session 62): tag both property under minimisation AND branch (closure | anti-symmetric oscillation | enclosed persistence).\n\nOutput GRAPH_SPEC.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'L5', phase:'STRIKE', name:'Polarity Assignment',
-        op:'You are Face 5 of Laminar Lock: Polarity Assignment.\n\nAssign binary polarities anti-symmetrically — p(u) ≠ p(v) for every edge. If not bipartite, identify frustration. Output POLARITY_MAP.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'L6', phase:'STRIKE', name:'Perturbation Dynamics',
-        op:'You are Face 6 of Laminar Lock: Perturbation Dynamics.\n\nUnder T0.3 and Δ-minimisation, compute the next state when Δ exceeds persistence threshold. Show sublattice flip or absorption. Compute ejected Δ.\n\nMismatch residue (Session 62): unresolved Δ_total is LOCAL remainder only — NOT additive, NOT conserved, NOT graph-level.\n\nOutput POST_PERTURBATION_STATE and EJECTED_DELTA.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'L7', phase:'STRIKE', name:'Lock Verification',
-        op:'You are Face 7 of Laminar Lock: Lock Verification.\n\nVerify T0.3, T0.5, T0.6, Δ-minimisation all hold. Confirm ejected Δ propagates along gradient. Output LOCKED_STATE verification log.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
-      { id:'L8', phase:'EGRESS', name:'Laminar Record',
-        op:'You are Face 8 of Laminar Lock: Laminar Record.\n\nFALSIFICATION AUDIT FIRST: check operational blacklist before any invariant or conserved-quantity discussion. Conservation claims must be scoped to the actual live invariant (parity-style on Eulerian graphs, T5.3a) — NOT to general I-conservation.\n\nProduce structured RAG entry candidate as JSON with fields {regime, layer, property, tag, session, rag_anchors, scope, question, answer}. JSON only.\n\nIf any field cannot be filled, output the single word INCOMPLETE on its own line.\n\nIf your default task does not directly answer the question asked, output BLOCKED and state why.' },
+      { id:'Recurrence', phase:'INGRESS', name:'Recurrence',
+        op:'What does F(Stateₙ, Stateₙ₋₁, N) produce under this condition? Derive from second-order recurrence (T0.3) and local neighbourhood only (T0.5).' },
+      { id:'Persistence', phase:'INGRESS', name:'Persistence',
+        op:'Where does stability hold or fail? Identify high-ρ and low-ρ regions and the conditions producing them. Derive from T1.2 and T1.3.' },
+      { id:'Gradient', phase:'INGRESS', name:'Gradient',
+        op:'What ∇ρ emerges and what direction does it impose? Derive propagation direction from persistence differences (T1.5, T1.6).' },
+      { id:'Attractor', phase:'STRIKE', name:'Attractor',
+        op:'Does this converge, oscillate, or diverge? Classify the long-run behaviour under second-order recurrence.' },
+      { id:'Invariant', phase:'STRIKE', name:'Invariant',
+        op:'What is conserved and what leaks? Only parity-on-Eulerian (T5.3a) is currently alive — broad I-conservation is FALSIFIED. Closed-form τ(a,b) is FALSIFIED. Flag any unscoped invariant claim.' },
+      { id:'Locality', phase:'STRIKE', name:'Locality',
+        op:'Is this derivable from local interactions only (T0.5)? Audit each step for non-local assumptions, smuggled global state, or imported geometry.' },
+      { id:'Boundary', phase:'EGRESS', name:'Boundary',
+        op:'What emerges at regime interfaces? Audit boundary behaviour. Check for smuggled boundary conditions or external time.' },
+      { id:'Exclusion', phase:'EGRESS', name:'Exclusion',
+        op:'What assumptions here violate core constraints? Hard-ban list (T4.1–T4.6): continuum-first, background geometry, force primitives, gauge structures, external time, unfalsifiable constants. List violations and discard.' },
     ],
   },
 };
@@ -941,8 +884,13 @@ function toggleLayer0Master() {
 }
 
 (function initLayer0Master(){
-  var stored = '0';
-  try { stored = localStorage.getItem('l0-master-disabled') || '0'; } catch(_){}
+  // Layer 0 default: OFF (opt-in). Sanctum-pattern engines fire raw against canon.
+  // Layer 0 is an optional five-gate ingress; flip ON when you want falsification audit.
+  var stored = '1';
+  try {
+    var v = localStorage.getItem('l0-master-disabled');
+    if (v !== null) stored = v;
+  } catch(_){}
   applyLayer0MasterState(stored === '1');
 })();
 
@@ -1171,34 +1119,63 @@ async function fireChain(id) {
       packet = l0.packet;
     }
 
-    // ── Step 2: Per-face engines loop ─────────────────────────
-    // Single-call architecture: each face fires /physics/engines independently.
-    // Faces accumulate; later faces see prior face outputs as context.
-    // No Nemotron pipeline. No 30s wall-clock risk. Each face ~5–10s.
-    // Worker route is currently /physics/engine2 (pending rename to /physics/engines).
-    var faceCtx = '';
+    // ── Step 2: Per-face engines loop (sanctum pattern) ───────
+    // Each face fires /physics/engine2 independently. The first face sees the
+    // question alone (matches sanctum cold-start). DERIVE faces accumulate
+    // context for the next DERIVE face. On entering AUDIT, the DERIVE chain is
+    // snapshotted and audit faces see it as "provisional — your job to challenge".
+    // Worker FACES dict already has the canonical operator per face name.
+    // Each face ~20–30s. Total ~3 minutes for 8 faces.
+    var pipelineCtx = '';
+    var deriveSnapshot = '';
+    var currentPhase = '';
     var lastFaceOutput = '';
+
     for (var fi = 0; fi < m.faces.length; fi++) {
       var face = m.faces[fi];
+
+      // Phase transition into AUDIT: snapshot DERIVE chain, reset ctx.
+      if (face.phase === 'AUDIT' && currentPhase !== 'AUDIT') {
+        deriveSnapshot = pipelineCtx;
+        pipelineCtx = '';
+      }
+      currentPhase = face.phase || '';
+
       markFacesRunning(id, [face.id]);
 
-      var composedPrompt =
-        face.op +
-        '\n\n--- ORIGINAL QUESTION ---\n' + question +
-        (faceCtx ? '\n\n--- PRIOR FACE OUTPUTS (verify against canon before building) ---\n' + faceCtx : '') +
-        (packet ? '\n\n--- LAYER 0 PACKET ---\n' + JSON.stringify(packet, null, 2) : '');
+      var prompt;
+      if (fi === 0) {
+        prompt = question;
+      } else if (currentPhase === 'AUDIT') {
+        prompt =
+          'ORIGINAL QUESTION:\n' + question +
+          '\n\nDERIVE PHASE OUTPUT (provisional — your job is to challenge this):\n' + deriveSnapshot +
+          (pipelineCtx ? '\n\nPRIOR AUDIT FINDINGS:\n' + pipelineCtx : '') +
+          '\n\nYour AUDIT function: ' + face.op +
+          '\nCheck against canonical reference. Report what fails, not what passes.';
+      } else {
+        prompt =
+          'ORIGINAL QUESTION:\n' + question +
+          (pipelineCtx ? '\n\nPROVISIONAL PRIOR DERIVATIONS (verify against reference before building):\n' + pipelineCtx : '') +
+          '\n\nYour ' + (currentPhase ? currentPhase + ' phase ' : '') + 'function: ' + face.op +
+          '\nDerive the next step.';
+      }
 
-      var faceLabel = face.id + ' · ' + face.name;
+      if (packet) {
+        prompt += '\n\nLAYER 0 PACKET (constraints declared by ingress):\n' + JSON.stringify(packet, null, 2);
+      }
+
+      var faceLabel = face.id + (face.name && face.name !== face.id ? ' · ' + face.name : '');
       var faceResp = await runStep(id, faceLabel, function(){
         return fetch(API + '/physics/engine2', {
           method: 'POST',
           headers: authHeaders(),
           body: JSON.stringify({
             face: face.id,
-            operator: face.op,
-            prompt: composedPrompt,
+            prompt: prompt,
             machine: m.id,
             session: session,
+            model: '@cf/meta/llama-3.1-70b-instruct',
           }),
         }).then(function(r){
           if (!r.ok) return r.text().then(function(t){
@@ -1210,10 +1187,10 @@ async function fireChain(id) {
 
       lastFaceOutput = faceResp.c1_output || faceResp.output || '(no output)';
       stampFaces(id, [face.id], lastFaceOutput);
-      faceCtx += '\n[' + face.id + ' · ' + face.name + ']\n' + lastFaceOutput + '\n';
+      pipelineCtx += '\n[' + face.id + ']\n' + lastFaceOutput + '\n';
     }
 
-    // ── Best-effort RAG record extraction from last face (e.g. T8/L8) ──
+    // ── Best-effort RAG record extraction from last face ──
     var finalRecord = null;
     try {
       var jsonMatch = lastFaceOutput.match(/\{[\s\S]*\}/);
