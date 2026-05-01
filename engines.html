@@ -457,22 +457,79 @@ var BUILT_IN = {
       },
     },
     faces: [
-      { id:'Recurrence', phase:'INGRESS', name:'Recurrence',
-        op:'What does F(Stateₙ, Stateₙ₋₁, N) produce under this condition? Derive from second-order recurrence (T0.3) and local neighbourhood only (T0.5).' },
-      { id:'Persistence', phase:'INGRESS', name:'Persistence',
-        op:'Where does stability hold or fail? Identify high-ρ and low-ρ regions and the conditions producing them. Derive from T1.2 and T1.3.' },
-      { id:'Gradient', phase:'INGRESS', name:'Gradient',
-        op:'What ∇ρ emerges and what direction does it impose? Derive propagation direction from persistence differences (T1.5, T1.6).' },
-      { id:'Attractor', phase:'STRIKE', name:'Attractor',
-        op:'Does this converge, oscillate, or diverge? Classify the long-run behaviour under second-order recurrence.' },
-      { id:'Invariant', phase:'STRIKE', name:'Invariant',
-        op:'What is conserved and what leaks? Only parity-on-Eulerian (T5.3a) is currently alive — broad I-conservation is FALSIFIED. Closed-form τ(a,b) is FALSIFIED. Flag any unscoped invariant claim.' },
-      { id:'Locality', phase:'STRIKE', name:'Locality',
-        op:'Is this derivable from local interactions only (T0.5)? Audit each step for non-local assumptions, smuggled global state, or imported geometry.' },
-      { id:'Boundary', phase:'EGRESS', name:'Boundary',
-        op:'What emerges at regime interfaces? Audit boundary behaviour. Check for smuggled boundary conditions or external time.' },
-      { id:'Exclusion', phase:'EGRESS', name:'Exclusion',
-        op:'What assumptions here violate core constraints? Hard-ban list (T4.1–T4.6): continuum-first, background geometry, force primitives, gauge structures, external time, unfalsifiable constants. List violations and discard.' },
+      { id:'Recurrence', phase:'DERIVE', name:'Recurrence',
+        op:'What does F(Stateₙ, Stateₙ₋₁, N) produce under this condition?' },
+      { id:'Persistence', phase:'DERIVE', name:'Persistence',
+        op:'Where does stability hold or fail?' },
+      { id:'Gradient', phase:'DERIVE', name:'Gradient',
+        op:'What ∇ρ emerges and what direction does it impose?' },
+      { id:'Attractor', phase:'DERIVE', name:'Attractor',
+        op:'Does this converge, oscillate, or diverge?' },
+      { id:'Invariant', phase:'AUDIT', name:'Invariant',
+        op:'You are auditing 4 provisional derivations. What quantity is conserved across these derivations? What leaks? Check against canonical reference ONLY. Report discrepancies, not agreements.' },
+      { id:'Locality', phase:'AUDIT', name:'Locality',
+        op:'You are auditing 4 provisional derivations. Does every claim follow from local interactions only (T0.5)? Flag any step that requires non-local information or global knowledge. One violation is enough to reject.' },
+      { id:'Boundary', phase:'AUDIT', name:'Boundary',
+        op:'You are auditing 4 provisional derivations. What do these derivations claim happens at regime interfaces? Is this consistent with the canonical reference? Report only what contradicts or extends beyond validated structure.' },
+      { id:'Exclusion', phase:'AUDIT', name:'Exclusion',
+        op:'You are the kill face. Review these 4 provisional derivations against every hard exclusion in the canonical reference. List each assumption that violates core constraints. If nothing violates, say so in one sentence. Do not rephrase or build on the derivations.' },
+    ],
+  },
+  laminar: {
+    id: 'laminar',
+    name: 'Laminar Lock',
+    type: 'laminar',
+    icon: '◈',
+    color: 'var(--laminar)',
+    description: 'Calcite gate → graphite fractionation → alignment → graph derivation → polarity → perturbation → lock verification → RAG record. Eight faces, Tantalum substrate.',
+    dispatch: 'engines',
+    placeholder: 'Enter a question — Laminar fires faces L1-L8 only',
+    phases: [
+      { name:'INGRESS', regime:'C1 → C2', faces:['GradientFilter','BoundaryMediator','CostGate'], color:'var(--laminar)' },
+      { name:'STRIKE',  regime:'C2 → C3', faces:['InvariantExtractor','PersistenceAnchor'],       color:'var(--cerise)' },
+      { name:'EGRESS',  regime:'C3 → C2', faces:['RecurrencePump','LocalityEnforcer'],            color:'var(--coral)' },
+      { name:'OUTPUT',  regime:'C2 → C1', faces:['DispersionVent'],                               color:'var(--cobalt)' },
+    ],
+    substrates: {
+      c1: {
+        regime:'C1 BOUNDARY · Calcite Gate',
+        name:'Calcite',
+        color:'var(--laminar)',
+        temp:0.40,
+        props:'Birefringent — splits ordinary from extraordinary ray\nReject contamination terms (torsion, Z/3Z, SU(2), Hamiltonians, chirality)\nFirst cut between RAG-aligned and orthogonal',
+      },
+      c2: {
+        regime:'C2 MEMBRANE · Graphite',
+        name:'Graphite',
+        color:'#A0A0A0',
+        temp:0.30,
+        props:'Lamellar — fractionates query into ordered sub-questions\nEach sub-question independently answerable from canon\nMaps to RAG entries; flags gaps as [hypothesis]',
+      },
+      c3: {
+        regime:'C3 CORE · Tantalum',
+        name:'Tantalum',
+        color:'var(--cerise)',
+        temp:0.25,
+        props:'Refractory — high persistence, holds state under perturbation\nLocks assigned polarities into anti-symmetric ground\nEjects unresolved Δ along the gradient',
+      },
+    },
+    faces: [
+      { id:'GradientFilter', phase:'INGRESS', name:'Gradient Filter',
+        op:'Read ∇ρ. Does this signal carry enough persistence depth to survive descent to C3? If not, reflect it. Create structural hunger — only signals with sufficient recurrence weight pass.' },
+      { id:'BoundaryMediator', phase:'INGRESS', name:'Boundary Mediator',
+        op:'Resolve the regime discontinuity between C1 and C3. Fractionate the raw oscillation into discrete state clusters that fit within finite state resolution (T0.6). Raw C1 noise must not reach the core directly.' },
+      { id:'CostGate', phase:'INGRESS', name:'Cost Gate',
+        op:'Group clusters by state similarity. Compute interaction cost (Δ) for each group against the local lattice state. If Δ exceeds the persistence gain of resolution, reject the group.' },
+      { id:'InvariantExtractor', phase:'STRIKE', name:'Invariant Extractor',
+        op:'The clusters meet the stable core. Strip oscillation amplitude — preserve only the adjacency index and causal sequence (update history). Separate what persists from what fluctuates.' },
+      { id:'PersistenceAnchor', phase:'STRIKE', name:'Persistence Anchor',
+        op:'LOCK. Hold the lattice against the substrate. Maximum Δ between query state (low ρ) and substrate (high ρ). The Axiom drives resolution — accumulated descent cost reverses direction here. The answer is what emerges when mismatch resolves against stability.' },
+      { id:'RecurrencePump', phase:'EGRESS', name:'Recurrence Pump',
+        op:'The resolved state must climb back up ∇ρ. Second-order recurrence (T0.3) — the memory of the prior state trajectory drives propagation against the gradient. Derive what powers the ascent from the descent history.' },
+      { id:'LocalityEnforcer', phase:'EGRESS', name:'Locality Enforcer',
+        op:'The answer propagates site-by-site. No non-local transfer. Back-reaction bounded by immediate neighbors (T0.5). Ensure coherence survives as the signal moves away from the stable core.' },
+      { id:'DispersionVent', phase:'OUTPUT', name:'Dispersion Vent',
+        op:'Release. Lower local ρ rapidly — the dense resolved state disperses into high-oscillation output (C1). The result carries the recurrence weight of the core it resolved against, expressed as structured language.' },
     ],
   },
 };
@@ -884,13 +941,8 @@ function toggleLayer0Master() {
 }
 
 (function initLayer0Master(){
-  // Layer 0 default: OFF (opt-in). Sanctum-pattern engines fire raw against canon.
-  // Layer 0 is an optional five-gate ingress; flip ON when you want falsification audit.
-  var stored = '1';
-  try {
-    var v = localStorage.getItem('l0-master-disabled');
-    if (v !== null) stored = v;
-  } catch(_){}
+  var stored = '1';  // default OFF — Layer 0 is opt-in (sanctum-pattern engines fire raw)
+  try { stored = localStorage.getItem('l0-master-disabled') || '0'; } catch(_){}
   applyLayer0MasterState(stored === '1');
 })();
 
@@ -1119,59 +1171,60 @@ async function fireChain(id) {
       packet = l0.packet;
     }
 
-    // ── Step 2: Per-face engines loop (sanctum pattern) ───────
-    // Each face fires /physics/engine2 independently. The first face sees the
-    // question alone (matches sanctum cold-start). DERIVE faces accumulate
-    // context for the next DERIVE face. On entering AUDIT, the DERIVE chain is
-    // snapshotted and audit faces see it as "provisional — your job to challenge".
-    // Worker FACES dict already has the canonical operator per face name.
-    // Each face ~20–30s. Total ~3 minutes for 8 faces.
+    // ── Step 2: Per-face engines loop (PORTED VERBATIM from sanctum/engines) ──
+    // Sanctum's exact prompt construction: signalWord differs per machine.
+    // Face 0: signalWord-prefixed raw question.
+    // DERIVE/INGRESS/STRIKE/EGRESS faces: question + prior pipelineCtx + face.op + directive.
+    // AUDIT faces: question + DERIVE snapshot + audit findings + face.op + 'report what fails'.
+    // Worker uses face.name to look up canonical operator from FACES dict.
+    var isLaminar = (m.id === 'laminar');
+    var signalWord = isLaminar ? 'SIGNAL' : 'PERTURBATION';
     var pipelineCtx = '';
     var deriveSnapshot = '';
-    var currentPhase = '';
+    var lastPhase = '';
     var lastFaceOutput = '';
 
     for (var fi = 0; fi < m.faces.length; fi++) {
       var face = m.faces[fi];
+      var currentPhase = face.phase || '';
 
-      // Phase transition into AUDIT: snapshot DERIVE chain, reset ctx.
-      if (face.phase === 'AUDIT' && currentPhase !== 'AUDIT') {
+      // Phase transition out of DERIVE: snapshot for audit faces.
+      if (lastPhase && currentPhase && currentPhase !== lastPhase && lastPhase === 'DERIVE') {
         deriveSnapshot = pipelineCtx;
         pipelineCtx = '';
       }
-      currentPhase = face.phase || '';
+      lastPhase = currentPhase;
 
       markFacesRunning(id, [face.id]);
 
       var prompt;
       if (fi === 0) {
-        prompt = question;
-      } else if (currentPhase === 'AUDIT') {
-        prompt =
-          'ORIGINAL QUESTION:\n' + question +
+        prompt = (isLaminar ? 'RAW SIGNAL (C1 Noise):\n' : '') + question;
+      } else if (currentPhase === 'AUDIT' && deriveSnapshot) {
+        prompt = 'ORIGINAL ' + signalWord + ':\n' + question +
           '\n\nDERIVE PHASE OUTPUT (provisional — your job is to challenge this):\n' + deriveSnapshot +
           (pipelineCtx ? '\n\nPRIOR AUDIT FINDINGS:\n' + pipelineCtx : '') +
           '\n\nYour AUDIT function: ' + face.op +
           '\nCheck against canonical reference. Report what fails, not what passes.';
       } else {
-        prompt =
-          'ORIGINAL QUESTION:\n' + question +
-          (pipelineCtx ? '\n\nPROVISIONAL PRIOR DERIVATIONS (verify against reference before building):\n' + pipelineCtx : '') +
-          '\n\nYour ' + (currentPhase ? currentPhase + ' phase ' : '') + 'function: ' + face.op +
-          '\nDerive the next step.';
+        prompt = 'ORIGINAL ' + signalWord + ':\n' + question +
+          '\n\nPROVISIONAL PRIOR' + (isLaminar ? ' PIPELINE STATE' : ' DERIVATIONS') +
+          ' (verify against reference before building):\n' + pipelineCtx +
+          '\n\nYour ' + (face.phase ? face.phase + ' phase ' : '') + 'function: ' + face.op +
+          '\n' + (isLaminar ? 'Transform the signal.' : 'Derive the next step.');
       }
 
       if (packet) {
         prompt += '\n\nLAYER 0 PACKET (constraints declared by ingress):\n' + JSON.stringify(packet, null, 2);
       }
 
-      var faceLabel = face.id + (face.name && face.name !== face.id ? ' · ' + face.name : '');
+      var faceLabel = face.name || face.id;
       var faceResp = await runStep(id, faceLabel, function(){
         return fetch(API + '/physics/engine2', {
           method: 'POST',
           headers: authHeaders(),
           body: JSON.stringify({
-            face: face.id,
+            face: face.name || face.id,
             prompt: prompt,
             machine: m.id,
             session: session,
@@ -1187,7 +1240,7 @@ async function fireChain(id) {
 
       lastFaceOutput = faceResp.c1_output || faceResp.output || '(no output)';
       stampFaces(id, [face.id], lastFaceOutput);
-      pipelineCtx += '\n[' + face.id + ']\n' + lastFaceOutput + '\n';
+      pipelineCtx += '\n[' + (face.phase ? face.phase + ' · ' : '') + (face.name || face.id).toUpperCase() + ']\n' + lastFaceOutput + '\n';
     }
 
     // ── Best-effort RAG record extraction from last face ──
