@@ -1310,18 +1310,22 @@ function stampFaces(id, faceIds, fullOutput) {
     if (faceEl) { faceEl.classList.remove('running'); faceEl.classList.add('done'); }
     if (stat) stat.textContent = 'done';
     if (out) {
-      // Try to extract this face's section from the chain output
-      var marker = '[' + fid;
-      var idx = fullOutput.indexOf(marker);
-      if (idx >= 0) {
-        var rest = fullOutput.slice(idx);
-        // Find next [X#] marker
-        var nextIdx = rest.indexOf('\n[', 1);
-        var section = nextIdx > 0 ? rest.slice(0, nextIdx) : rest;
-        out.textContent = section.trim().slice(0, 4000);
-      } else {
-        out.textContent = '(see chain output)';
+      var section = fullOutput;
+      // Legacy multi-face chain blobs (Nemotron pipeline) had per-face [Xn] markers.
+      // For single-face calls (engines per-face loop) the input is already this face's
+      // clean output — just write it.
+      if (faceIds.length > 1) {
+        var marker = '[' + fid;
+        var idx = fullOutput.indexOf(marker);
+        if (idx >= 0) {
+          var rest = fullOutput.slice(idx);
+          var nextIdx = rest.indexOf('\n[', 1);
+          section = nextIdx > 0 ? rest.slice(0, nextIdx) : rest;
+        } else {
+          section = '(see chain output)';
+        }
       }
+      out.textContent = section.trim().slice(0, 4000);
       out.classList.add('visible');
     }
   });
