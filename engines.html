@@ -361,7 +361,7 @@
   <div class="modal">
     <h2>+ New Machine</h2>
     <p style="font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.7;margin-bottom:8px">
-      Defines a new machine surface. Auto-wires to the canonical 4-call dispatch chain.<br>
+      Defines a new machine surface. Auto-wires to the engines dispatch (per-face Llama/Gemma + Opus D9 synthesis).<br>
       Triad Lock and Laminar Lock are built-in and protected.
     </p>
 
@@ -383,10 +383,7 @@
 
     <label>Dispatch</label>
     <select id="f-dispatch">
-      <option value="laminar+triad">laminar + triad (full 4-call chain)</option>
-      <option value="laminar">laminar only</option>
-      <option value="triad">triad only</option>
-      <option value="engine2">engine2 (single-face, legacy)</option>
+      <option value="engines">engines (per-face · Llama/Gemma + Opus D9)</option>
     </select>
 
     <div class="modal-actions">
@@ -429,8 +426,8 @@ var BUILT_IN = {
     type: 'triad',
     icon: '◇',
     color: 'var(--triad)',
-    description: 'Graph primitives → bipartiteness → minimal templates → recurrence → probabilistic update → perturbation propagation → persistence gradient → conservation. Eight faces over the abstract graph layer. Standalone — Laminar fires separately.',
-    dispatch: 'triad',
+    description: 'Graph primitives → bipartiteness → minimal templates → recurrence → probabilistic update → perturbation propagation → persistence gradient → conservation. Eight faces over the abstract graph layer.',
+    dispatch: 'engines',
     placeholder: 'Enter a question — e.g. "Under T0.3 and T0.5, what is the minimum closed motif?"',
     phases: [
       { name:'STRUCTURE',  regime:'M₁ — Topology', faces:['T1','T2','T3'], color:'var(--triad)' },
@@ -486,7 +483,7 @@ var BUILT_IN = {
     icon: '◈',
     color: 'var(--laminar)',
     description: 'Calcite gate → graphite fractionation → alignment → graph derivation → polarity → perturbation → lock verification → RAG record. Eight faces, Tantalum substrate.',
-    dispatch: 'laminar',
+    dispatch: 'engines',
     placeholder: 'Enter a question — Laminar fires faces L1-L8 only',
     phases: [
       { name:'INGRESS', regime:'L1–L4', faces:['L1','L2','L3','L4'], color:'var(--laminar)' },
@@ -610,7 +607,7 @@ function loadMachines() {
             icon: '⬡',
             color: 'var(--teal)',
             description: m.description || '',
-            dispatch: m.dispatch || 'laminar+triad',
+            dispatch: m.dispatch || 'engines',
             placeholder: 'Enter a question for ' + m.name,
             phases: parent.phases,
             faces: m.faces || JSON.parse(JSON.stringify(parent.faces)),
@@ -1174,72 +1171,54 @@ async function fireChain(id) {
       packet = l0.packet;
     }
 
-    // ── Step 2: Laminar 1-4 (skip if dispatch is triad-only) ───
-    var dispatch = m.dispatch || 'laminar+triad';
-    var laminar14Output = '';
-    if (dispatch === 'laminar+triad' || dispatch === 'laminar') {
-      markFacesRunning(id, ['L1','L2','L3','L4']);
-      var l14 = await runStep(id, 'Laminar 1-4', function(){
-        return callPipeline('/physics/laminar/1-4', {
-          question: question,
-          session: session,
-          layer0_packet: packet,
+    // ── Step 2: Per-face engines loop ─────────────────────────
+    // Single-call architecture: each face fires /physics/engines independently.
+    // Faces accumulate; later faces see prior face outputs as context.
+    // No Nemotron pipeline. No 30s wall-clock risk. Each face ~5–10s.
+    // Worker route is currently /physics/engine2 (pending rename to /physics/engines).
+    var faceCtx = '';
+    var lastFaceOutput = '';
+    for (var fi = 0; fi < m.faces.length; fi++) {
+      var face = m.faces[fi];
+      markFacesRunning(id, [face.id]);
+
+      var composedPrompt =
+        face.op +
+        '\n\n--- ORIGINAL QUESTION ---\n' + question +
+        (faceCtx ? '\n\n--- PRIOR FACE OUTPUTS (verify against canon before building) ---\n' + faceCtx : '') +
+        (packet ? '\n\n--- LAYER 0 PACKET ---\n' + JSON.stringify(packet, null, 2) : '');
+
+      var faceLabel = face.id + ' · ' + face.name;
+      var faceResp = await runStep(id, faceLabel, function(){
+        return fetch(API + '/physics/engine2', {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            face: face.id,
+            operator: face.op,
+            prompt: composedPrompt,
+            machine: m.id,
+            session: session,
+          }),
+        }).then(function(r){
+          if (!r.ok) return r.text().then(function(t){
+            throw new Error('/physics/engine2 ' + r.status + ': ' + t.slice(0, 300));
+          });
+          return r.json();
         });
       });
-      laminar14Output = l14.output || '';
-      stampFaces(id, ['L1','L2','L3','L4'], laminar14Output);
+
+      lastFaceOutput = faceResp.c1_output || faceResp.output || '(no output)';
+      stampFaces(id, [face.id], lastFaceOutput);
+      faceCtx += '\n[' + face.id + ' · ' + face.name + ']\n' + lastFaceOutput + '\n';
     }
 
-    // ── Step 3: Laminar 5-8 ────────────────────────────────────
-    var laminar58Output = '';
-    if (dispatch === 'laminar+triad' || dispatch === 'laminar') {
-      markFacesRunning(id, ['L5','L6','L7','L8']);
-      var l58 = await runStep(id, 'Laminar 5-8', function(){
-        return callPipeline('/physics/laminar/5-8', {
-          question: question,
-          session: session,
-          priorContext: laminar14Output,
-          layer0_packet: packet,
-        });
-      });
-      laminar58Output = l58.output || '';
-      stampFaces(id, ['L5','L6','L7','L8'], laminar58Output);
-    }
-
-    // ── Step 4: Triad 1-4 ──────────────────────────────────────
-    var triad14Output = '';
-    if (dispatch === 'laminar+triad' || dispatch === 'triad') {
-      markFacesRunning(id, ['T1','T2','T3','T4']);
-      // priorContext for triad/1-4 is laminar 5-8 if available, else laminar 1-4, else empty
-      var prior = laminar58Output || laminar14Output || '';
-      var t14 = await runStep(id, 'Triad 1-4', function(){
-        return callPipeline('/physics/triad/1-4', {
-          question: question,
-          session: session,
-          priorContext: prior,
-          layer0_packet: packet,
-        });
-      });
-      triad14Output = t14.output || '';
-      stampFaces(id, ['T1','T2','T3','T4'], triad14Output);
-    }
-
-    // ── Step 5: Triad 5-8 (final RAG record) ───────────────────
+    // ── Best-effort RAG record extraction from last face (e.g. T8/L8) ──
     var finalRecord = null;
-    if (dispatch === 'laminar+triad' || dispatch === 'triad') {
-      markFacesRunning(id, ['T5','T6','T7','T8']);
-      var t58 = await runStep(id, 'Triad 5-8', function(){
-        return callPipeline('/physics/triad/5-8', {
-          question: question,
-          session: session,
-          priorContext: triad14Output,
-          layer0_packet: packet,
-        });
-      });
-      stampFaces(id, ['T5','T6','T7','T8'], JSON.stringify(t58.record || t58.face8 || t58, null, 2));
-      finalRecord = t58.record;
-    }
-
+    try {
+      var jsonMatch = lastFaceOutput.match(/\{[\s\S]*\}/);
+      if (jsonMatch) finalRecord = JSON.parse(jsonMatch[0].replace(/,\s*([}\]])/g, '$1'));
+    } catch(_) {}
     STATE[id].record = finalRecord;
 
     // ── Step 6: D9 Synthesis ──────────────────────────────────
