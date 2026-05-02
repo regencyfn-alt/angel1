@@ -155,6 +155,13 @@ CONTAMINATION REGISTER (historical — never inject)
 [rejected] Graph-adjacency constraint conflated with topological memory — topological memory imports continuum topology (metric, curvature, deformation classes) and is [rejected]. Graph-adjacency constraint is combinatorial, derivable from T0.4 and T0.5, and is admissible. The word "topological" is overloaded — prefer "structural" or "adjacency-constraint" when discussing E. Session 58 clarification.
 [hypothesis] Ergodicity (assumed) — ergodic convergence to a unique stationary distribution requires (a) connectedness of the state-space graph under F and (b) aperiodicity. Neither is derivable from T0.3–T0.6 alone. Any derivation that claims "the system converges to π" without naming (a) and (b) as hypotheses is smuggling ergodicity. Under non-ergodic F the state space decomposes into multiple invariant components — different initial conditions relax to different distributions. Admissible as [hypothesis] when explicitly scoped, never as silent assumption. Session 58 addition (Green Dragon).
 
+[falsified | C4 spin-config parity decomposition] 8/8 parity-sector split on C4_graph: Claim that the 8 spin configurations on a 4-cycle decompose 4/4 into even-and-odd parity sectors, justifying an 8x8 transition matrix decomposition of T_α by parity. FALSIFIED. On C4 every spin configuration has an even number of sign changes by closure, therefore the edge-mismatch invariant I ∈ {0, 2, 4} only — there is no odd-parity sector. The claimed decomposition does not exist; any matrix dimension justified by "parity-sector decomposition on C4" is unsupported. Companion banned numerical claim: α* ≈ 1.2 derived from the falsified 8x8 matrix — must NOT be carried forward as a starting point or sanity check. Surviving question (the spectral-gap closure structure of T_α) is held as [hypothesis] under Session 65; the falsified construction is not. Session 65 audit (Shane).
+
+[falsified | terminology error] "Eulerian" applied to forward-only Rule 30 dependency graph: A forward-only Rule 30 computation graph is a DAG. A DAG is not Eulerian in the useful graph-theoretic sense. The structural facts are: each interior spine node has in-degree 3, each non-terminal spine node has out-degree 3, total local degree 6 in the directed graph or 6 in the underlying undirected graph if direction is forgotten. Those facts are admissible. The Eulerian framing is not. Future invocations using "Eulerian" of the Rule 30 forward-only DAG are flagged as terminology contamination. Session 65 audit (Shane).
+
+[falsified | scope overreach] "Linear treewidth implies no sublinear computation" on Rule 30: Treewidth growing linearly with depth blocks tree-decomposition and local state-compression methods. It does NOT rule out non-local algebraic or spectral shortcuts. The implication "linear treewidth ⇒ full computational irreducibility" is too strong and is FALSIFIED as a closure argument. Future invocations claiming "treewidth-linear ⇒ irreducible" must be rejected. The valid scope is held as [hypothesis] under Session 65 T5.5. Session 65 audit (Shane).
+
+
 SESSION 48 — 8 April 2026 (Sildar & Seraphina, Water Pod + Deep Ruby Machine)
 
 NEIGHBORHOOD DYNAMICS (Five Equations — agent work, mining for promotion)
@@ -423,3 +430,51 @@ No structural change to canon. Architecture (physics:canon vs physics:operationa
 ### Contamination register (Session 62 — re-confirmation only)
 
 No new entries. Session 61 register holds: Total I-conservation (broad), Hard Seizure Threshold / staleness clamp, Closed-form τ(a,b), C4_graph = enclosed persistence. Faces continuing to resurrect these under muddy ingress (especially Face 8 with I-conservation) is a documented operator failure — see audit notes file. Phase 2 candidate: harder priming on the falsified register at Layer 0 Gate 2, possibly injecting the falsified summary as a separate system message Face 8 cannot collapse. — Session 62.
+
+## SESSION 65 ADDITIONS — 2 May 2026 (Shane audit + Dragon ratification + Dream cut)
+
+T5.4 — α* SPECTRAL-GAP CLOSURE QUESTION (Session 65, Dream cut after submission falsified at Step 1)
+
+[hypothesis | memoryless C4 toy chain] α* spectral-gap closure existence: A finite α* may exist for the transition matrix T_α such that the spectral gap closes at α = α*. The structural posture of the question is well-formed — explicit T_α, continuity, irreducibility, aperiodicity, gap behaviour — but no construction has been ratified. Held as research direction, not as a derived result. Distinct from T5.2 (open: exact form of F) and Session 58 Parity Selection Rule. If demonstrated, would constrain the φ family in Session 58's Probabilistic Update Family entry.
+
+Conditions for promotion to [derived]:
+(1) Construction on the correct state space — either explicitly memoryless and labelled as a scoped toy-model claim, or with the second-order recurrence term included, in which case the state space is larger than 8 and its dimension must be derived not assumed.
+(2) Continuity of T_α in α, on the chosen state space — proven not asserted.
+(3) Irreducibility and aperiodicity of T_α at α* — proven not asserted.
+(4) Demonstration of gap closure at α* by argument or proof, not numerical fit alone.
+
+Provenance: Submission Session 65 falsified at Step 1 (8/8 C4 parity-sector split — see contamination register). Posture (proper T_α statement) judged sound and carried forward as hypothesis; specific numerical claim α* ≈ 1.2 NOT carried forward. — Session 65, Shane audit + Dream cut.
+
+T5.5 — RULE 30 LIGHT-CONE TREEWIDTH CONJECTURE (Session 65, Dream cut after submission falsified on grounding + scope)
+
+[hypothesis | Rule 30, undirected light-cone graph, local-compression scope] Rule 30 light-cone treewidth: The undirected light-cone graph of Rule 30 may have treewidth growing linearly with depth. If so, tree-decomposition and local state-compression methods cannot yield a sublinear algorithm for the centre bit. This does NOT by itself rule out non-local algebraic or spectral shortcuts to the centre bit; that question remains open and is a separate hypothesis class. Held as a structural note worth carrying, not as a closure result.
+
+Programme decomposition (kept as the right shape):
+(1) local dependency geometry — what the light-cone forces site-by-site
+(2) treewidth growth — whether tree-decomposition methods can compress it
+(3) non-local shortcut exclusion — a separate question, NOT settled by (2)
+
+Conditions for promotion to [derived]:
+(1) Formal proof that the undirected light-cone graph of Rule 30 has Ω(depth) treewidth.
+(2) Explicit statement that the result blocks tree-decomposition and local-compression methods only.
+(3) No claim about non-local shortcuts unless separately derived.
+
+Provenance: Submission Session 65 falsified on terminology ("Eulerian" applied to forward-only DAG) and scope ("treewidth linear ⇒ no sublinear computation"). Programme shape (1)(2)(3) judged sound; specific terminology and the closure overreach NOT carried forward. — Session 65, Shane audit + Dream cut.
+
+T5.6 — P4 BRIDGE C2 ASYMMETRY + LEXICON RATIFICATION FOR C2b
+
+C2b has been used informally across team work as the high-ρ C2 sub-state at C3 interfaces; this session earns its place in the formal lexicon by tying it to a derivation in the P4 bridge branch. The lexicon entry below, the structural derivation, and the attenuation hypothesis form one coherent ratification round. C2c remains informal — no derivation has earned it.
+
+[stipulated | lexicon v1 update — Session 65] C2b: high-ρ C2 sub-state. Specifically the C3-facing C2 node in the minimal C3–C2–C2–C3 bridge, distinguished from interior C2 (the lower-ρ sub-state) by its persistence band. Derivation pointer: T5.6 [derived | P4 bridge branch] entry below. Lexicon term entered formal canon Session 65 — prior informal usage retroactively ratified by this entry. C2c remains informal pending its own derivation; do not invoke C2c as ratified vocabulary. — Session 65, Dragon ratification.
+
+[derived | P4 bridge branch] C2 internal asymmetry on P4 bridge: In the minimal C3–C2–C2–C3 bridge (P4 motif), the two C2 nodes are persistence-asymmetric. The C3-facing C2 sits in a different local environment from the interior C2: bonding at the C2–C3 interface raises the persistence of the C3-facing C2 relative to the interior C2. Therefore the two C2 nodes occupy different persistence sub-bands within what was previously treated as one C2 regime. The C3-facing sub-band is the C2b sub-state (lexicon entry above); the interior sub-band is the lower-ρ C2 sub-state. Scope: P4 bridge branch only — does NOT claim the asymmetry generalises to longer chains, branched motifs, or non-bipartite graphs without separate derivation. Warrant: existing P4 bridge mechanism + persistence definition (ρ = local stability under update) + Δ-minimisation cost structure at the C2–C3 boundary. — Session 65, Dragon ratification.
+
+[hypothesis | attenuation mechanism, P4 bridge branch] Attenuation-induced provenance loss at receiving C3: The receiving C3 in a C3–C2b–C2–C3 bridge reads only the attenuated local remainder of any signal that traversed the C2 mediator. Because reading is bounded local mutual access (no payload crosses the edge — see Canon adjacency clarification), the receiving C3 cannot reconstruct whether the source C3 was intrinsically calm or whether the signal was filtered by the high-ρ C2b interface. This is the load-bearing reason C3-to-C3 propagation remains mediated rather than direct. Leans on hypothesis-level machinery: t = 1 − ρ (binary toy model), path-weight attenuation w(P), and the claim that bounded local reading destroys amplitude provenance. NOT to be invoked as derived until the mechanism is closed at the read-channel level. — Session 65.
+
+T5.6b — COMPOSITE OBJECT ARCHITECTURE (HYPOTHESIS — STRUCTURAL FAR-REACH)
+
+**Scope warning:** Composite-object architecture is a HYPOTHESIS about how stable structures are organised. Faces and downstream derivations must NOT cite this as a derived basis for further reasoning about specific stable objects until the hypothesis itself is promoted. Permitted use: framing conjectures, motivating new derivations. Forbidden use: deriving structural results that presuppose composite organisation. This fence exists because the hypothesis is structurally far-reaching — it touches every future derivation about stable structures — and accidental load-bearing use would let it become canon by stealth.
+
+[hypothesis | composite object architecture] Stable objects as nested distributions: Stable objects are not pure C3 throughout. They are likely composite — a deep C3 core, a C2 interfacial sheath (canon clarification below), and a looser outer mediation layer in C1 or loose-C2 regime. Direct C3-to-C3 coupling is therefore NOT the default physical branch; mediation through the sheath is load-bearing for stability. Memory is built from stabilised mismatch pinned at boundaries, not from elimination of mismatch everywhere. Scope: structural conjecture about regime composition; does NOT map to any specific physical particle (proton, electron, etc.) — those are analogies, not identities. Promotion conditions: explicit derivation that no purely-C3 region of nontrivial size is stable under F without sheath mediation; demonstration that the C2 sheath persistence band falls in the predicted range under the local update rule. — Session 65.
+
+[hypothesis | blended regime model] Regime-membership vector μ_i: Each site may carry a regime-membership vector μ_i = (μ_i^(1), μ_i^(2), μ_i^(3)) with Σ_a μ_i^(a) = 1. Core: μ^(3) dominant. Sheath: μ^(2) dominant with nonzero μ^(3) and μ^(1). Field: μ^(1) or loose C2 dominant. This is a richer modelling choice on top of the structural sheath definition (Canon clarification below) — it allows site-level mixing rather than hard regime classification, useful for percolation-mix work and for grid templates that hold combinations of C-regimes as single operators. Scope: modelling layer, not primitive structure. Companion to composite-object architecture hypothesis. — Session 65.
