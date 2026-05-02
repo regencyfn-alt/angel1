@@ -35,6 +35,18 @@ This file is appended in lockstep with the `[falsified]` register in `physics:ca
 
 ---
 
+[operational] Session 65 — C4 parity-sector decomposition ban: Faces must NOT split the 8 spin configurations on C4_graph into a 4/4 even/odd parity-sector decomposition. On C4 every spin configuration has even sign-changes; I ∈ {0,2,4}. Any T_α matrix decomposition justified by "parity-sector split on C4" must be rejected. Companion ban: the numerical value α* ≈ 1.2 derived from this falsified 8x8 matrix must NOT be carried forward as a starting point, sanity check, or initialisation. The α* spectral-gap closure question itself remains open as Session 65 T5.4 hypothesis — but only with construction on the correct state space and proven continuity/irreducibility/aperiodicity. — Session 65.
+
+[operational] Session 65 — "Eulerian" forward-DAG ban: Faces must NOT call the forward-only Rule 30 dependency graph "Eulerian." A forward-only DAG is not Eulerian. Admissible structural language: each interior spine node has in-degree 3, each non-terminal spine node has out-degree 3, total local degree 6 directed or 6 undirected if direction is forgotten. Any face producing the word "Eulerian" applied to a forward DAG is flagged as terminology contamination and the output is rejected. — Session 65.
+
+[operational] Session 65 — treewidth-irreducibility scope ban: Faces must NOT infer "computational irreducibility" or "no sublinear algorithm" from a treewidth-linear claim alone. Treewidth growing linearly with depth blocks tree-decomposition and local-compression methods only. Non-local algebraic or spectral shortcuts are a separate question and require their own derivation. Any face producing "treewidth ⇒ irreducible" or "treewidth ⇒ no sublinear computation" without explicit local-compression scoping must be rejected. The valid scoped statement (Session 65 T5.5 hypothesis) is: IF treewidth is linear, THEN tree-decomposition and local-compression methods cannot yield sublinear results. — Session 65.
+
+[operational] Session 65 — composite-object hypothesis scope fence: Faces must NOT cite the composite-object architecture (C3 core + C2 sheath + C1 field) as a derived basis when reasoning about specific stable objects. The architecture is hypothesis-tagged in canon. Permitted use: framing conjectures, motivating new derivations. Forbidden use: deriving structural results that presuppose composite organisation. Without this fence, structurally far-reaching hypotheses become load-bearing canon by stealth. The interfacial sheath is structurally defined in canon (Session 65 clarification) — the canon definition of "what the sheath IS" may be invoked freely; the hypothesis "stable objects ARE composite" may not be invoked as derived. — Session 65.
+
+[operational] Session 65 — C2c usage gate: Faces must NOT invoke C2c as ratified vocabulary. C2b earned its lexicon entry Session 65 via T5.6 derivation; C2c remains informal pending its own derivation. Faces using C2c without scope-fenced "informal / pending derivation" annotation must be rejected. — Session 65.
+
+---
+
 ## APPENDIX — HOW TO ADD ENTRIES
 
 New operational rules go here with `[operational]` tag and session attribution:
