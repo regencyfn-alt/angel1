@@ -170,6 +170,10 @@
   .ac-HYPOTHESIS { background:#FF7F5022; color:var(--hypothesis); border:1px solid #FF7F5066; }
   .ac-BLOCKED    { background:#DE316322; color:var(--blocked);    border:1px solid #DE316366; }
   .ac-FALSIFIED  { background:#8B000022; color:var(--falsified);  border:1px solid #8B000066; }
+  .ac-INCOMPLETE { background:#94A3B822; color:#94A3B8;            border:1px solid #94A3B866; }
+  .ac-TRUNCATED  { background:#FBBF2422; color:#FBBF24;            border:1px solid #FBBF2466; }
+  .ac-ERROR      { background:#DE316322; color:var(--blocked);    border:1px solid #DE316366; }
+  .bank-disabled { opacity:0.35; pointer-events:none; cursor:not-allowed !important; }
 
   /* D9 OUTPUT */
   .d9 { margin-top:14px; padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:6px;
@@ -680,7 +684,7 @@ function buildPanel(id) {
     '<div class="d9" id="' + id + '-d9">' +
       '<div class="d9-head">' +
         '<span class="d9-label">D9 Synthesis · Opus 4.6</span>' +
-        '<span class="answer-class ac-DERIVED" id="' + id + '-class">DERIVED</span>' +
+        '<span class="answer-class ac-INCOMPLETE" id="' + id + '-class">INCOMPLETE</span>' +
       '</div>' +
       '<div class="d9-text" id="' + id + '-d9-text"></div>' +
       '<div class="d9-actions">' +
@@ -1252,48 +1256,94 @@ async function fireChain(id) {
     STATE[id].record = finalRecord;
 
     // ── Step 6: D9 Synthesis ──────────────────────────────────
+    // D9 is the ONLY voice authorised to issue a verdict. Face 8's JSON tag
+    // is a candidate the synthesis can confirm or override, never a default.
+    // If D9 returns empty, truncated, or fails — the verdict is INCOMPLETE
+    // and BANK is gated. Dragon never sees a half-thought presented as derived.
     var faceOutputs = collectFaceOutputs(id);
     var d9resp = await runStep(id, 'D9 synthesis', function(){
-      return fetch(API + '/physics/d9', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ question: question, faces: faceOutputs }),
-      }).then(function(r){ return r.json(); });
+      // Route through callPipeline so Ruby's ok:false check fires on
+      // worker soft-failures (d9_synthesis empty, d9_truncated, etc.)
+      return callPipeline('/physics/d9', { question: question, faces: faceOutputs });
     });
 
     var d9 = document.getElementById(id + '-d9');
     var d9text = document.getElementById(id + '-d9-text');
     var ac = document.getElementById(id + '-class');
 
-    var synth = (d9resp && d9resp.synthesis) || '(no synthesis returned)';
-    d9text.textContent = synth;
-    d9.classList.add('visible');
+    // d9resp.ok === true is guaranteed here — callPipeline throws on ok:false.
+    // Worker has already gated empty + truncated responses to ok:false, so any
+    // response that reaches this point has real Opus-derived synthesis.
+    var synth = (d9resp && d9resp.synthesis && d9resp.synthesis.trim()) || '';
+    var stopReason = d9resp && d9resp.stop_reason;
 
-    // Determine answer class from the RAG record tag if present, else infer from synth
-    var cls = 'DERIVED';
-    if (finalRecord && finalRecord.tag) {
-      var t = String(finalRecord.tag).toUpperCase();
-      if (t.indexOf('FALSIFIED') >= 0) cls = 'FALSIFIED';
-      else if (t.indexOf('HYPOTHESIS') >= 0) cls = 'HYPOTHESIS';
-      else if (t.indexOf('DERIVED') >= 0) cls = 'DERIVED';
-      else if (t.indexOf('BLOCKED') >= 0) cls = 'BLOCKED';
+    // Defence-in-depth: even if worker missed something, never display a verdict
+    // on empty synthesis. The worker should have caught this — the UI catches it again.
+    if (!synth) {
+      d9text.textContent = 'D9 returned empty synthesis. Verdict cannot be assigned.\n\nstop_reason: ' + (stopReason || 'unknown');
+      d9.classList.add('visible');
+      ac.textContent = 'INCOMPLETE';
+      ac.className = 'answer-class ac-INCOMPLETE';
+      STATE[id].synthesis = '';
+      STATE[id].humanSummary = '';
+      STATE[id].answerClass = 'INCOMPLETE';
+      gateBankButton(id, false);
+    } else {
+      d9text.textContent = synth;
+      d9.classList.add('visible');
+
+      // Verdict is derived from D9's synthesis itself, with Face 8's RAG tag as
+      // a hint the synthesis can confirm. Synthesis missing => no verdict.
+      // Worker confirmed full output (stop_reason !== 'max_tokens'), so this is
+      // a complete thought, safe to badge.
+      var cls = 'DERIVED';
+      if (finalRecord && finalRecord.tag) {
+        var t = String(finalRecord.tag).toUpperCase();
+        if (t.indexOf('FALSIFIED') >= 0) cls = 'FALSIFIED';
+        else if (t.indexOf('HYPOTHESIS') >= 0) cls = 'HYPOTHESIS';
+        else if (t.indexOf('DERIVED') >= 0) cls = 'DERIVED';
+        else if (t.indexOf('BLOCKED') >= 0) cls = 'BLOCKED';
+      }
+      ac.textContent = cls;
+      ac.className = 'answer-class ac-' + cls;
+
+      STATE[id].synthesis = synth;
+      STATE[id].humanSummary = d9resp.humanSummary || '';
+      STATE[id].answerClass = cls;
+      // BANK only for real verdicts. INCOMPLETE/BLOCKED/ERROR cannot be banked.
+      gateBankButton(id, cls === 'DERIVED' || cls === 'FALSIFIED' || cls === 'HYPOTHESIS');
     }
-    ac.textContent = cls;
-    ac.className = 'answer-class ac-' + cls;
-
-    STATE[id].synthesis = synth;
-    STATE[id].humanSummary = d9resp.humanSummary || '';
-    STATE[id].answerClass = cls;
 
   } catch (err) {
     var d9 = document.getElementById(id + '-d9');
     var d9text = document.getElementById(id + '-d9-text');
     var ac = document.getElementById(id + '-class');
-    ac.textContent = 'ERROR';
-    ac.className = 'answer-class ac-BLOCKED';
     var step = err && err.failedStep ? err.failedStep : 'unknown step';
-    d9text.textContent = 'Pipeline failed at: ' + step + '\n\n' + (err && err.message ? err.message : String(err));
+    var msg = err && err.message ? err.message : String(err);
+
+    // Distinguish D9 truncation from other pipeline failures — partial synthesis
+    // is preserved but flagged TRUNCATED so it can be inspected without being
+    // mistaken for a complete derivation.
+    var isTruncated = step === 'D9 synthesis' && msg.indexOf('d9_truncated') >= 0;
+    if (isTruncated) {
+      ac.textContent = 'TRUNCATED';
+      ac.className = 'answer-class ac-TRUNCATED';
+      // Worker preserved partial synthesis in the error response — extract if available
+      var partial = '';
+      try {
+        var match = msg.match(/synthesis['":\s]+["']?([\s\S]+)$/);
+        if (match) partial = match[1].slice(0, 4000);
+      } catch(_) {}
+      d9text.textContent = 'D9 hit output cap before completing synthesis.\n' +
+        'Partial reasoning preserved below — DO NOT bank, re-fire with shorter question.\n\n' +
+        '─── partial ───\n' + (partial || '(see worker logs for partial)');
+    } else {
+      ac.textContent = 'ERROR';
+      ac.className = 'answer-class ac-ERROR';
+      d9text.textContent = 'Pipeline failed at: ' + step + '\n\n' + msg;
+    }
     d9.classList.add('visible');
+    gateBankButton(id, false);
   }
 
   fireBtn.disabled = false;
@@ -1392,8 +1442,25 @@ function downloadOutput(id) {
   URL.revokeObjectURL(url);
 }
 
+// Visually disable the BANK button when verdict isn't bankable.
+// Called from fireChain after D9 lands. INCOMPLETE / TRUNCATED / ERROR / BLOCKED
+// all return false. Only DERIVED / FALSIFIED / HYPOTHESIS get banked.
+function gateBankButton(id, allow) {
+  var btn = document.querySelector('#panel-' + id + ' .d9-actions button[onclick^="bankRecord"]');
+  if (!btn) return;
+  if (allow) btn.classList.remove('bank-disabled');
+  else btn.classList.add('bank-disabled');
+}
+
 function bankRecord(id) {
   var s = STATE[id] || {};
+  // Hard gate: verdict integrity — no banking incomplete/truncated/error/blocked records.
+  // The visual disable is defence-in-depth; this is the actual gate.
+  var cls = s.answerClass;
+  if (cls !== 'DERIVED' && cls !== 'FALSIFIED' && cls !== 'HYPOTHESIS') {
+    alert('Cannot bank — verdict is ' + (cls || 'INCOMPLETE') + '.\n\nOnly D9-confirmed verdicts (DERIVED, FALSIFIED, HYPOTHESIS) are bankable. Re-fire with a refined question if needed.');
+    return;
+  }
   if (!s.record) {
     alert('No final record to bank yet.');
     return;
