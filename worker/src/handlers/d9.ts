@@ -6,10 +6,24 @@
 // Reads canon only — D9 is upstream of the operational/canon split, it's the
 // synthesizer not a face. (Future: consider giving D9 dual-read for parity
 // with Face 8 — Layer 0 contract may evolve to require this.)
+//
+// === Session 64+ integrity hardening ===
+// Three rules, all verdict-defending:
+//   1. Face outputs capped at FACE_INPUT_CAP chars before reaching Opus, so D9's
+//      arsenal is never starved by verbose face prose. D9's own max_tokens stays
+//      at 2000 — non-negotiable, she gets her full output budget.
+//   2. Empty Anthropic response (no text content) → ok:false with stage flagged.
+//      UI must NEVER stamp DERIVED on empty synthesis.
+//   3. stop_reason === 'max_tokens' → ok:false stage='d9_truncated', partial
+//      synthesis preserved for UI display with TRUNCATED badge. Never quietly
+//      passes a cutoff thought as a finished verdict.
 
 import { Env } from '../types/env';
 import { jsonResponse, errorResponse, physicsAuth } from './_shared';
 import { loadCanonOnly } from './canon';
+
+const FACE_INPUT_CAP = 1500;        // chars per face output, applied at D9 ingress
+const D9_OUTPUT_MAX_TOKENS = 2000;  // Opus output budget — DO NOT REDUCE
 
 export async function handleD9(request: Request, env: Env): Promise<Response> {
   const auth = physicsAuth(request, env.PHYSICS_KEY);
@@ -26,7 +40,15 @@ export async function handleD9(request: Request, env: Env): Promise<Response> {
 
   const ragCtx = await loadCanonOnly(env);
 
-  const faceSummary = body.faces
+  // ── Cap face outputs at ingress — predictable input envelope, full D9 arsenal ──
+  const facesCapped = body.faces.map(f => ({
+    face: f.face,
+    output: (f.output || '').length > FACE_INPUT_CAP
+      ? (f.output || '').slice(0, FACE_INPUT_CAP) + '\n[truncated for D9 input budget — see full face output in pipe trace]'
+      : (f.output || ''),
+  }));
+
+  const faceSummary = facesCapped
     .map(f => `=== ${f.face.toUpperCase()} ===\n${f.output}`)
     .join('\n\n');
 
@@ -55,7 +77,7 @@ ${ragCtx}`;
     },
     body: JSON.stringify({
       model: 'claude-opus-4-6',
-      max_tokens: 2000,
+      max_tokens: D9_OUTPUT_MAX_TOKENS,
       system: d9System,
       messages: [{
         role: 'user',
@@ -70,11 +92,49 @@ ${ragCtx}`;
     return errorResponse('D9 API call failed', 502, { detail: errText.slice(0, 500) });
   }
 
-  const d9Result = await d9Resp.json() as { content: Array<{ type: string; text: string }>; usage?: any };
-  const synthesis = d9Result.content
+  const d9Result = await d9Resp.json() as {
+    content: Array<{ type: string; text: string }>;
+    stop_reason?: string;
+    usage?: any;
+  };
+  const synthesis = (d9Result.content || [])
     .filter((c: any) => c.type === 'text')
     .map((c: any) => c.text)
     .join('');
+  const stopReason = d9Result.stop_reason || 'unknown';
+
+  // ── Integrity gate 1: empty response ────────────────────────────────
+  // Anthropic returned 200 OK but no text content. Could be classifier
+  // intervention, refusal token at position 0, or response shape anomaly.
+  // Either way, UI MUST NOT stamp a verdict on this.
+  if (!synthesis || !synthesis.trim()) {
+    return jsonResponse({
+      ok: false,
+      stage: 'd9_synthesis',
+      reason: 'empty_response',
+      stop_reason: stopReason,
+      synthesis: '',
+      humanSummary: '',
+      model: 'claude-opus-4-6',
+      usage: d9Result.usage,
+    });
+  }
+
+  // ── Integrity gate 2: output cap hit ────────────────────────────────
+  // D9 ran out of room mid-synthesis. Partial reasoning is preserved but
+  // MUST NOT be presented as a complete verdict. UI shows TRUNCATED badge.
+  if (stopReason === 'max_tokens') {
+    return jsonResponse({
+      ok: false,
+      stage: 'd9_truncated',
+      reason: 'output_cap_reached',
+      stop_reason: stopReason,
+      synthesis,                  // partial — preserved for inspection
+      humanSummary: '',           // skip egress translation, partial isn't safe to summarize
+      model: 'claude-opus-4-6',
+      usage: d9Result.usage,
+    });
+  }
 
   // ── Llama egress — human-friendly summary ───────────────────────────
   let humanSummary = '';
@@ -94,6 +154,7 @@ ${ragCtx}`;
     ok: true,
     synthesis,
     humanSummary,
+    stop_reason: stopReason,
     model: 'claude-opus-4-6',
     usage: d9Result.usage,
   });
