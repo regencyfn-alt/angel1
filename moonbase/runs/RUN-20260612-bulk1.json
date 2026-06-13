@@ -1,0 +1,1003 @@
+{
+ "run": "BULK-1",
+ "date": "2026-06-12",
+ "engine": "moonbase v0 (pure python, stdlib)",
+ "calibration": {
+  "T1_parity_assertions": 12000,
+  "T2_C4_configs": 256,
+  "T2_I_values": [
+   0,
+   2,
+   4
+  ],
+  "T3_lambda_assertions": 2000
+ },
+ "experiment1_EDI_gauntlet": [
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C6 (even,bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "K5 (even4,NON-bipartite,connected)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "C4+C4 (even,DISCONNECTED)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C8(1,3) (even4)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "Circulant C10(2,3) (even4,non-bip)",
+   "all_even": true,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 4480,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 4534,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 4518,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 138,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 129,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 138,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 1330,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 1527,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 1470,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 2,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 1,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL P3 (odd ends)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 0,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 6827,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 6857,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 6646,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 19,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 54,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 29,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 301,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 300,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 339,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 1,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 2,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL K4 (3-regular odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 1,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 6826,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 7003,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 6818,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 173,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 208,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "power",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 177,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 11,
+   "parity_changes": 1827,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 23,
+   "parity_changes": 1918,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 1,
+   "seed": 47,
+   "parity_changes": 1857,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 11,
+   "parity_changes": 3,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 23,
+   "parity_changes": 2,
+   "ticks": 20000
+  },
+  {
+   "graph": "CTRL Star3 (odd)",
+   "all_even": false,
+   "family": "logistic",
+   "param": 4,
+   "seed": 47,
+   "parity_changes": 1,
+   "ticks": 20000
+  }
+ ],
+ "experiment2_S54_negative": {
+  "graph": "C4",
+  "ticks": 5000,
+  "distinct_I_values_observed": [
+   0,
+   2,
+   4
+  ],
+  "I_conserved_as_value": false,
+  "I_mod2_values": [
+   0
+  ]
+ },
+ "seconds": 9.3
+}

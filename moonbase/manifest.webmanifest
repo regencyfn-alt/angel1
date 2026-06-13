@@ -1,0 +1,16 @@
+{
+ "name":"MoonBase Workbench — CHR",
+ "short_name":"MoonBase",
+ "description":"CHR experimental surface — substrate primitives, 4F activation, melt rendering.",
+ "start_url":"./workbench.html",
+ "scope":"./",
+ "display":"standalone",
+ "orientation":"any",
+ "background_color":"#070a10",
+ "theme_color":"#ff8c42",
+ "icons":[
+  {"src":"./icon-192.png","sizes":"192x192","type":"image/png"},
+  {"src":"./icon-512.png","sizes":"512x512","type":"image/png"},
+  {"src":"./icon-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+ ]
+}
