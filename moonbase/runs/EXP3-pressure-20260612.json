@@ -1,0 +1,90 @@
+[
+ {
+  "shell": 0.0,
+  "flip": 0.031,
+  "frustration": 0.0,
+  "residue": 0.0,
+  "unfulfilled": 1.0,
+  "regime": "C3 interior"
+ },
+ {
+  "shell": 0.5,
+  "flip": 0.053,
+  "frustration": 0.0,
+  "residue": 0.0,
+  "unfulfilled": 2.25,
+  "regime": "C3 interior"
+ },
+ {
+  "shell": 1.0,
+  "flip": 0.034,
+  "frustration": 0.0,
+  "residue": 0.0,
+  "unfulfilled": 0.538,
+  "regime": "C3 interior"
+ },
+ {
+  "shell": 1.5,
+  "flip": 0.039,
+  "frustration": 0.0,
+  "residue": 0.0,
+  "unfulfilled": 0.786,
+  "regime": "C3 interior"
+ },
+ {
+  "shell": 2.0,
+  "flip": 0.041,
+  "frustration": 0.0,
+  "residue": 0.0,
+  "unfulfilled": 0.541,
+  "regime": "C3 interior"
+ },
+ {
+  "shell": 2.5,
+  "flip": 0.041,
+  "frustration": 0.001,
+  "residue": 0.0,
+  "unfulfilled": 0.664,
+  "regime": "C3/C2 seam"
+ },
+ {
+  "shell": 3.0,
+  "flip": 0.04,
+  "frustration": 0.0,
+  "residue": 0.0,
+  "unfulfilled": 2.106,
+  "regime": "C3/C2 seam"
+ },
+ {
+  "shell": 3.5,
+  "flip": 0.39,
+  "frustration": 0.087,
+  "residue": 0.264,
+  "unfulfilled": 5.297,
+  "regime": "C3/C2 seam"
+ },
+ {
+  "shell": 4.0,
+  "flip": 0.425,
+  "frustration": 0.108,
+  "residue": 0.288,
+  "unfulfilled": 5.725,
+  "regime": "C1 bulk"
+ },
+ {
+  "shell": 4.5,
+  "flip": 0.442,
+  "frustration": 0.121,
+  "residue": 0.416,
+  "unfulfilled": 4.689,
+  "regime": "C1 bulk"
+ },
+ {
+  "shell": 5.0,
+  "flip": 0.451,
+  "frustration": 0.122,
+  "residue": 0.369,
+  "unfulfilled": 3.786,
+  "regime": "C1 bulk"
+ }
+]
