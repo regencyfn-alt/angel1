@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MoonBase Geometry Room — C1c crystal definition</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--bg:#070a10;--ink:#cfe;--mut:#7a93a8;--acc:#ff8c42;--cy:#10b0ff;--line:#1b2a3a}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'SF Mono',Menlo,monospace;font-size:12px;overflow:hidden}
+#wrap{display:grid;grid-template-columns:248px 1fr;height:100vh}
+#panel{background:linear-gradient(135deg,#111b26,#0c131c);border-right:1px solid #2c3e52;padding:14px 14px 20px;overflow:auto}
+#stage{position:relative;background:#05070d}
+.ph{color:var(--acc);font-weight:700;letter-spacing:.08em;font-size:11px;margin:14px 0 7px;text-transform:uppercase}
+.ph:first-child{margin-top:0}
+.row{display:flex;gap:8px;align-items:center;margin:7px 0}
+.row .lab{width:78px;color:var(--mut);font-size:10px}
+input[type=range]{flex:1}
+.val{width:34px;text-align:right;color:var(--ink)}
+.sub{color:var(--mut);font-size:10px;line-height:1.55;margin:6px 0}
+.tog{display:inline-block;padding:4px 9px;border:1px solid var(--line);border-radius:5px;cursor:pointer;color:var(--mut);margin:3px 4px 3px 0}
+.tog.on{border-color:var(--acc);color:var(--acc);background:#1a1208}
+#hud{position:absolute;top:12px;left:14px;color:var(--mut);font-size:11px;line-height:1.6;pointer-events:none}
+#hud b{color:var(--acc)}
+#brk{position:absolute;bottom:12px;left:14px;right:14px;color:var(--mut);font-size:10px;line-height:1.6;background:#0008;border:1px solid var(--line);border-radius:6px;padding:8px 10px;max-width:520px}
+#brk b{color:var(--cy)}
+h1{font-size:13px;color:var(--acc);letter-spacing:.1em;margin:0 0 4px}
+</style></head><body><div id="wrap">
+ <div id="panel">
+   <h1>GEOMETRY ROOM</h1>
+   <div style="margin:0 0 8px"><a href="./workbench.html" style="color:var(--cy);text-decoration:none;margin-right:12px">⬡ Workbench</a><a href="./reef.html" style="color:var(--cy);text-decoration:none">▦ Reef</a></div>
+   <div class="sub">Define the basic unit before it enters the experiment. This is the C1c motion motif — <b style="color:var(--acc)">twelve shards in an octahedron</b> — rendered as a real crystal, not a husk.</div>
+   <div class="ph">Base cell</div>
+   <span class="tog on" data-base="octa">Octahedron</span>
+   <div class="sub">Twelve shards = one blade per octahedral edge, meeting at the core. (Other bases wire in once this is confirmed.)</div>
+   <div class="ph">Husk — nodes &amp; rods (fixed)</div>
+   <div class="row"><span class="lab">node Ø</span><input type="range" id="nr" min="0.02" max="0.16" step="0.005" value="0.06"><span class="val" id="nrv">.06</span></div>
+   <div class="row"><span class="lab">rod Ø</span><input type="range" id="rr" min="0.01" max="0.08" step="0.003" value="0.022"><span class="val" id="rrv">.022</span></div>
+   <div class="sub">Fixed throughout — every node and rod is the same gauge across the whole unit. They do not swell.</div>
+   <div class="ph">Crystal — the shards</div>
+   <div class="row"><span class="lab">shards</span><input type="range" id="ns" min="4" max="12" step="1" value="12"><span class="val" id="nsv">12</span></div>
+   <div class="row"><span class="lab">facet op.</span><input type="range" id="op" min="0.05" max="0.95" step="0.05" value="0.42"><span class="val" id="opv">.42</span></div>
+   <div class="row"><span class="lab">core rise</span><input type="range" id="cr" min="0" max="0.6" step="0.02" value="0.18"><span class="val" id="crv">.18</span></div>
+   <div class="sub">Core rise lifts each blade off the centre so the shards read as crystal facets, not flat fins.</div>
+   <div class="ph">Show</div>
+   <span class="tog on" id="t-husk">Husk</span><span class="tog on" id="t-facet">Facets</span><span class="tog on" id="t-edge">Shard edges</span><span class="tog on" id="t-node">Nodes (qubits)</span><span class="tog" id="t-spin">Spin</span>
+   <div class="sub">Each node = one qubit; colour = phase. Drag to rotate · scroll to zoom · R resets.</div>
+ </div>
+ <div id="stage">
+   <div id="hud"></div>
+   <div id="brk"></div>
+ </div></div>
+<script>
+const stage=document.getElementById('stage');
+const sc=new THREE.Scene();sc.background=new THREE.Color(0x05070d);
+const cam=new THREE.PerspectiveCamera(50,1,0.1,2000);cam.position.set(0,0,6);
+const rn=new THREE.WebGLRenderer({antialias:true});stage.appendChild(rn.domElement);
+sc.add(new THREE.AmbientLight(0x99a6b8,0.85));
+const dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(1,1.4,1.2);cam.add(dl);
+const dl2=new THREE.DirectionalLight(0x6fb6ff,0.35);dl2.position.set(-1,-0.6,-0.8);cam.add(dl2);sc.add(cam);
+const pivot=new THREE.Group();sc.add(pivot);
+
+// ---- octahedron base ----
+const A=1.5;
+const VERT=[[A,0,0],[-A,0,0],[0,A,0],[0,-A,0],[0,0,A],[0,0,-A]];
+// edges: every non-antipodal vertex pair  → 12 edges
+const ANTI={0:1,1:0,2:3,3:2,4:5,5:4};
+const EDGES=[];for(let i=0;i<6;i++)for(let j=i+1;j<6;j++)if(ANTI[i]!==j)EDGES.push([i,j]);
+// qubit phase colour per node (around a wheel)
+function phaseColor(k){const c=new THREE.Color();c.setHSL((k/6)%1,0.62,0.6);return c;}
+
+let husk=null,nodes=null,facets=null,sedges=null;
+const opt={nr:0.06,rr:0.022,shards:12,op:0.42,rise:0.18,husk:1,facet:1,edge:1,node:1,spin:0};
+
+function clear(){[husk,nodes,facets,sedges].forEach(m=>{if(m){pivot.remove(m);m.geometry&&m.geometry.dispose&&m.geometry.dispose();}});husk=nodes=facets=sedges=null;}
+const up=new THREE.Vector3(0,1,0),dmy=new THREE.Object3D();
+
+function build(){
+ clear();
+ // ---- husk rods (fixed gauge) ----
+ const rg=new THREE.CylinderGeometry(opt.rr,opt.rr,1,8);
+ husk=new THREE.InstancedMesh(rg,new THREE.MeshPhongMaterial({color:0x9fb4c8,shininess:40}),EDGES.length);
+ EDGES.forEach((e,k)=>{const a=VERT[e[0]],b=VERT[e[1]];const dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2],len=Math.hypot(dx,dy,dz);
+   dmy.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);dmy.scale.set(1,len,1);
+   dmy.quaternion.setFromUnitVectors(up,new THREE.Vector3(dx,dy,dz).normalize());dmy.updateMatrix();husk.setMatrixAt(k,dmy.matrix);});
+ husk.visible=!!opt.husk;pivot.add(husk);
+ // ---- nodes (qubits) fixed gauge ----
+ nodes=new THREE.InstancedMesh(new THREE.SphereGeometry(opt.nr,16,12),new THREE.MeshPhongMaterial({shininess:70}),6);
+ for(let i=0;i<6;i++){dmy.position.set(VERT[i][0],VERT[i][1],VERT[i][2]);dmy.scale.setScalar(1);dmy.quaternion.identity();dmy.updateMatrix();nodes.setMatrixAt(i,dmy.matrix);nodes.setColorAt(i,phaseColor(i));}
+ nodes.visible=!!opt.node;pivot.add(nodes);
+ // ---- crystal shards: blade per edge, apex lifted off centre ----
+ const use=EDGES.slice(0,opt.shards);
+ const pos=[];
+ use.forEach(e=>{const a=VERT[e[0]],b=VERT[e[1]];
+   // mid of edge, pull the apex outwards along the edge-mid direction by 'rise'
+   const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,mz=(a[2]+b[2])/2;const ml=Math.hypot(mx,my,mz)||1;
+   const ap=[mx/ml*opt.rise,my/ml*opt.rise,mz/ml*opt.rise]; // apex near core, lifted toward the edge
+   pos.push(a[0],a[1],a[2], b[0],b[1],b[2], ap[0],ap[1],ap[2]);});
+ const fg=new THREE.BufferGeometry();fg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));fg.computeVertexNormals();
+ facets=new THREE.Mesh(fg,new THREE.MeshPhongMaterial({color:0x59c8ff,emissive:0x0a2740,shininess:90,transparent:true,opacity:opt.op,side:THREE.DoubleSide}));
+ facets.visible=!!opt.facet;pivot.add(facets);
+ // ---- bright shard edges ----
+ const lp=[];use.forEach(e=>{const a=VERT[e[0]],b=VERT[e[1]];const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,mz=(a[2]+b[2])/2;const ml=Math.hypot(mx,my,mz)||1;const ap=[mx/ml*opt.rise,my/ml*opt.rise,mz/ml*opt.rise];
+   lp.push(a[0],a[1],a[2],ap[0],ap[1],ap[2], b[0],b[1],b[2],ap[0],ap[1],ap[2]);});
+ const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));
+ sedges=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0xbfe8ff,transparent:true,opacity:0.8}));
+ sedges.visible=!!opt.edge;pivot.add(sedges);
+ hud();
+}
+function hud(){
+ document.getElementById('hud').innerHTML='C1c motif · <b>'+opt.shards+' shards in an octahedron</b><br>6 nodes (qubits) · 12 edges · '+opt.shards+' crystal blades<br>node Ø '+opt.nr.toFixed(3)+' · rod Ø '+opt.rr.toFixed(3)+' — fixed gauge';
+ document.getElementById('brk').innerHTML='<b>BREAKING POINT (edge rupture)</b> — an edge ruptures when its sustained F-charge q_e exceeds what the seam can vent in one closure cycle:<br>&nbsp;&nbsp;q_e &gt; Λ_b = c·τ·H_node ,&nbsp; with conduction c=0.18, cycle τ=3 ticks (2/3 build · 3/3 release), H_node = nodal vent capacity.<br>Influx faster than c·Λ_b ⇒ charge accumulates ⇒ seam overloads ⇒ <b>rupture → dead zone</b>. Constant Λ_b pinned by a calibration run (the differential at which edges first fail to equalise).';
+}
+// controls
+function bindRange(id,key,fmt){const el=document.getElementById(id),v=document.getElementById(id+'v');el.oninput=()=>{opt[key]=+el.value;v.textContent=fmt(+el.value);build();};}
+bindRange('nr','nr',x=>x.toFixed(3).slice(1));bindRange('rr','rr',x=>x.toFixed(3).slice(1));
+bindRange('ns','shards',x=>''+x);bindRange('op','op',x=>x.toFixed(2).slice(1));bindRange('cr','rise',x=>x.toFixed(2).slice(1));
+function bindTog(id,key){const el=document.getElementById(id);el.onclick=()=>{opt[key]=opt[key]?0:1;el.classList.toggle('on');if(key==='spin')return;build();};}
+bindTog('t-husk','husk');bindTog('t-facet','facet');bindTog('t-edge','edge');bindTog('t-node','node');bindTog('t-spin','spin');
+// trackball
+let drag=false,px,py;const RX=new THREE.Vector3(1,0,0),RY=new THREE.Vector3(0,1,0);
+rn.domElement.addEventListener('pointerdown',e=>{drag=1;px=e.clientX;py=e.clientY;});
+addEventListener('pointerup',()=>drag=0);
+addEventListener('pointermove',e=>{if(!drag)return;pivot.rotateOnWorldAxis(RY,(e.clientX-px)*0.006);pivot.rotateOnWorldAxis(RX,(e.clientY-py)*0.006);px=e.clientX;py=e.clientY;});
+addEventListener('keydown',e=>{if(e.code==='KeyR')pivot.quaternion.identity();});
+stage.addEventListener('wheel',e=>{cam.position.z=Math.max(2.5,Math.min(40,cam.position.z+e.deltaY*0.01));e.preventDefault();});
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;rn.setSize(w,h);rn.setPixelRatio(devicePixelRatio);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);
+function loop(){requestAnimationFrame(loop);if(opt.spin)pivot.rotateOnWorldAxis(RY,0.004);cam.lookAt(0,0,0);rn.render(sc,cam);}
+resize();build();loop();
+</script></body></html>

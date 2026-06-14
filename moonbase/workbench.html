@@ -9,13 +9,20 @@
 *{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'SF Mono',Menlo,monospace;font-size:12px;overflow:hidden}
 .panel{background:linear-gradient(135deg,#111b26,#0c131c);border-top:1px solid #2c3e52;border-left:1px solid #2c3e52;border-right:1px solid #060a0f;border-bottom:1px solid #060a0f;border-radius:7px;padding:10px 12px}
 .ph{color:var(--acc);font-weight:700;letter-spacing:.08em;font-size:11px;margin-bottom:7px;text-transform:uppercase}
-#wrap{display:grid;grid-template-columns:212px 1fr;grid-template-rows:46px 1fr 232px;gap:8px;height:100vh;padding:8px}
+#wrap{display:grid;grid-template-columns:212px 1fr;grid-template-rows:46px 1fr;gap:8px;height:100vh;padding:8px}
 #phasebar{grid-column:1/3;display:flex;align-items:center;gap:6px;overflow-x:auto}
-#left{grid-row:2/4;overflow:auto}
+#left{grid-row:2/3;overflow:auto}
+#floats{display:contents}
+.float{position:fixed;background:rgba(13,21,30,.92);border:1px solid #2c3e52;border-radius:7px;backdrop-filter:blur(3px);box-shadow:0 6px 22px #000a;z-index:20;display:flex;flex-direction:column;max-height:42vh}
+.fh{cursor:grab;user-select:none;background:#13202c;border-bottom:1px solid #2c3e52;border-radius:7px 7px 0 0;padding:6px 10px;color:var(--acc);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.fh button{padding:2px 7px;font-size:10px;margin-left:auto}
+.float textarea{flex:1;margin:8px;width:auto;min-height:50px}
+.float .row{margin:6px 8px}.float #latex{margin:0 8px 8px}
 #stage{position:relative;border-radius:7px;overflow:hidden;background:#05070d;border-top:1px solid #2c3e52;border-left:1px solid #2c3e52;border-right:1px solid #060a0f;border-bottom:1px solid #060a0f}
 #qa{grid-column:2;display:grid;grid-template-columns:1fr 1fr;gap:8px}#qbox,#abox{min-height:0}
 .chip{padding:5px 11px;border-radius:14px;border:1px solid var(--line);background:#0c131c;color:var(--mut);cursor:pointer;white-space:nowrap;font-size:11px}
 .chip.on{border-color:var(--acc);color:var(--acc);background:#1a1208}.chip.add{color:var(--cy);border-color:#1d3a4a}
+a.chip{text-decoration:none}.chip.navcur{border-color:var(--cy);color:var(--cy);background:#08161f}
 label.prim,label.mode{display:block;padding:5px 8px;border-radius:5px;cursor:pointer;border:1px solid transparent;font-size:11px}
 label.prim:hover,label.mode:hover{background:#0e1825}label.on{background:#15202e;border-color:#2c3e52;color:var(--acc)}
 input[type=number]{width:64px;background:#0a1018;border:1px solid var(--line);color:var(--ink);border-radius:4px;padding:4px 6px;font-family:inherit}
@@ -31,10 +38,10 @@ button.activate{background:#2a1500;border-color:var(--acc);color:var(--acc);font
 .barh{display:inline-block;width:150px;height:9px;background:linear-gradient(90deg,#2a6cff,#10b0ff,#ff8c20,#ff2010);border-radius:2px;vertical-align:middle}
 #transport{position:absolute;bottom:8px;right:10px;display:flex;gap:6px;align-items:center;background:#0009;padding:6px 10px;border:1px solid var(--line);border-radius:6px}
 #meltplot{position:absolute;top:8px;right:10px;background:#0009;border:1px solid var(--line);border-radius:6px}
-@media(max-width:820px){#wrap{grid-template-columns:1fr;grid-template-rows:none;grid-auto-rows:max-content;height:auto;min-height:100vh;overflow:auto}#phasebar{order:0}#qbox{order:1}#left{order:2}#stage{order:3;min-height:48vh;height:48vh}#abox{order:4}#qa{display:contents}body{overflow:auto}}
+@media(max-width:820px){#wrap{grid-template-columns:1fr;grid-template-rows:none;grid-auto-rows:max-content;height:auto;min-height:100vh;overflow:auto}#phasebar{order:0}#left{order:2}#stage{order:3;min-height:48vh;height:48vh}#floats{display:flex;flex-direction:column;order:4}.float{position:static!important;left:auto!important;top:auto!important;width:auto!important;max-height:none;margin:0 0 8px}body{overflow:auto}}
 </style></head><body><div id="wrap">
  <div id="phasebar" class="panel" style="padding:6px 10px"><span class="ph" style="margin:0 6px 0 2px">PHASES</span>
-   <span class="chip on" data-exp="EXP5-melt">EXP-5 melt</span><span class="chip" data-exp="EXP1">EXP-1 gauntlet</span><span class="chip" data-exp="EXP3">EXP-3 pressure</span><span class="chip add" id="addphase">+ phase</span></div>
+   <span class="chip on" data-exp="EXP5-melt">EXP-5 melt</span><span class="chip" data-exp="EXP1">EXP-1 gauntlet</span><span class="chip" data-exp="EXP3">EXP-3 pressure</span><span class="chip add" id="addphase">+ phase</span><span style="margin-left:auto;display:flex;gap:6px"><a class="chip navcur" href="./workbench.html">⬡ Workbench</a><a class="chip" href="./geometry.html">◆ Geometry</a><a class="chip" href="./reef.html">▦ Reef</a></span></div>
  <div id="left" class="panel">
    <div class="ph">Substrate primitive</div>
    <div id="prims">
@@ -55,6 +62,8 @@ button.activate{background:#2a1500;border-color:var(--acc);color:var(--acc);font
    <div class="ph">Activation — 4F</div>
    <button class="activate" id="activate">⚡ ACTIVATE 4F</button>
    <div class="row"><span class="sub">length t</span><input type="number" id="len" value="120" min="10" max="5000"><span class="sub">T-max</span><input type="number" id="tmax" value="2.6" step="0.1" style="width:48px"></div>
+   <div class="row"><span class="sub" style="width:46px">F drive</span><input type="range" id="fdrive" min="0.15" max="2" step="0.05" value="0.8"><span class="sub" id="fval" style="width:30px">0.80</span></div>
+   <div class="sub">low F = flow without melt (ecology band) · high F = melt. floor keeps dumb chatter alive.</div>
    <div class="sub" id="actmsg">press ACTIVATE: 4F fires at every node at once; heat blooms; melt tracked.</div>
    <hr style="border-color:var(--line)">
    <button id="install" style="width:100%;margin-bottom:6px;display:none">⬇ Install app</button><button id="snap" style="width:100%;margin-bottom:6px">📸 Snapshot render + message</button><button id="saveDragon" style="width:100%">⬢ Save assembly for Dragon</button><div class="sub" id="savemsg" style="margin-top:6px"></div>
@@ -62,15 +71,14 @@ button.activate{background:#2a1500;border-color:var(--acc);color:var(--acc);font
  <div id="stage"><div id="hud" class="sub"></div><div class="legend sub">cold <span class="barh"></span> hot &nbsp; heat = 4F activity</div>
    <canvas id="meltplot" width="150" height="58"></canvas>
    <div id="transport"><button id="play">▶</button><input type="range" id="scrub" min="0" max="0" value="0" style="width:180px"><span class="sub" id="tcount">t 0</span></div></div>
- <div id="qa">
-   <div id="qbox" class="fld panel"><div class="ph">Question — plain English, code, or maths <span class="sub">(linked to Icon)</span></div>
+ <div id="floats">
+   <div class="float" id="f-q" style="left:228px;top:54px;width:300px"><div class="fh">Question <span class="sub">→ Icon</span></div>
      <textarea id="q" placeholder="Ask the lab. e.g. 'At what T does the cube lattice melt, and where does heat nucleate?'"></textarea>
      <div class="row"><button class="go" id="send">→ Send to Icon</button><span class="sub" id="sendmsg"></span></div></div>
-   <div id="abox" class="fld panel"><div class="ph">Restatement <span class="sub">— Icon formalises / asks qualification</span></div><textarea id="restate"></textarea>
-     <div class="ph" style="margin-top:8px">Conditions — operations + goal</div><textarea id="cond" style="min-height:46px"></textarea>
-     <div class="ph" style="margin-top:8px">Answer — plain English</div><textarea id="ans" style="min-height:46px"></textarea>
-     <div class="row" style="margin-top:8px"><span class="ph" style="margin:0">LaTeX</span><input id="tex" class="box" style="flex:1" placeholder="4F_i = 4(\\mathrm{Mur}\\circ\\mathrm{Reg})"><button id="render">render</button></div>
-     <div id="latex"></div></div>
+   <div class="float" id="f-r" style="left:228px;top:214px;width:300px"><div class="fh">Restatement <span class="sub">Icon formalises</span></div><textarea id="restate"></textarea></div>
+   <div class="float" id="f-c" style="left:228px;top:344px;width:348px"><div class="fh">Conditions <span class="sub">live meters</span><button id="d9cond">⊢ D9 fill</button></div><textarea id="cond"></textarea></div>
+   <div class="float" id="f-a" style="left:228px;top:474px;width:300px"><div class="fh">Answer <span class="sub">plain English</span></div><textarea id="ans"></textarea></div>
+   <div class="float" id="f-x" style="left:228px;top:604px;width:348px"><div class="fh">LaTeX</div><div class="row"><input id="tex" class="box" style="flex:1" placeholder="4F_i = 4(\\mathrm{Mur}\\circ\\mathrm{Reg})"><button id="render">render</button></div><div id="latex"></div></div>
  </div></div>
 <script>
 const GEOM={"truncated_octahedron": {"verts": [[0, -1, -2], [0, -2, -1], [0, -2, 1], [2, 1, 0], [-1, 0, 2], [0, 2, -1], [0, 2, 1], [1, 0, -2], [2, 0, -1], [2, 0, 1], [-2, 1, 0], [0, 1, 2], [1, -2, 0], [2, -1, 0], [-2, 0, 1], [-2, 0, -1], [-1, 0, -2], [0, 1, -2], [-2, -1, 0], [-1, -2, 0], [0, -1, 2], [1, 2, 0], [-1, 2, 0], [1, 0, 2]], "indices": [12, 1, 0, 12, 0, 7, 12, 7, 8, 12, 8, 13, 15, 16, 0, 15, 0, 1, 15, 1, 19, 15, 19, 18, 17, 7, 0, 17, 0, 16, 19, 1, 12, 19, 12, 2, 18, 19, 2, 18, 2, 20, 18, 20, 4, 18, 4, 14, 23, 20, 2, 23, 2, 12, 23, 12, 13, 23, 13, 9, 5, 21, 3, 5, 3, 8, 5, 8, 7, 5, 7, 17, 23, 9, 3, 23, 3, 21, 23, 21, 6, 23, 6, 11, 8, 3, 9, 8, 9, 13, 10, 14, 4, 10, 4, 11, 10, 11, 6, 10, 6, 22, 11, 4, 20, 11, 20, 23, 21, 5, 22, 21, 22, 6, 10, 22, 5, 10, 5, 17, 10, 17, 16, 10, 16, 15, 14, 10, 15, 14, 15, 18], "scale": 0.3}, "truncated_dodecahedron": {"verts": [[0.618034, -1.618034, 3.236068], [0.618034, -1.618034, -3.236068], [0.618034, -3.618034, 0], [0, -0.618034, 3.618034], [-2, 2.618034, -1.618034], [0, -0.618034, -3.618034], [-2.618034, 1.618034, -2], [1.618034, -2, -2.618034], [-2.618034, -1.618034, 2], [3.618034, 0, -0.618034], [2.618034, 1.618034, 2], [-3.236068, -0.618034, -1.618034], [2, -2.618034, 1.618034], [1.618034, 3.236068, 0.618034], [-1.618034, 3.236068, -0.618034], [-0.618034, 3.618034, 0], [-1.618034, -2, 2.618034], [-0.618034, 1.618034, -3.236068], [2.618034, -1.618034, 2], [-0.618034, 1.618034, 3.236068], [-3.618034, 0, 0.618034], [2, -2.618034, -1.618034], [1.618034, 2, -2.618034], [1.618034, -3.236068, 0.618034], [-1.618034, -3.236068, -0.618034], [3.236068, 0.618034, 1.618034], [-2.618034, -1.618034, -2], [-1.618034, 2, 2.618034], [2.618034, 1.618034, -2], [-2, -2.618034, 1.618034], [3.236068, 0.618034, -1.618034], [2.618034, -1.618034, -2], [3.618034, 0, 0.618034], [-2, 2.618034, 1.618034], [1.618034, -2, 2.618034], [-2, -2.618034, -1.618034], [0, 0.618034, 3.618034], [1.618034, 3.236068, -0.618034], [-1.618034, 3.236068, 0.618034], [-0.618034, -1.618034, -3.236068], [-3.236068, 0.618034, 1.618034], [-1.618034, -2, -2.618034], [3.236068, -0.618034, 1.618034], [-0.618034, -1.618034, 3.236068], [-0.618034, -3.618034, 0], [2, 2.618034, 1.618034], [-3.236068, 0.618034, -1.618034], [0, 0.618034, -3.618034], [-3.618034, 0, -0.618034], [0.618034, 3.618034, 0], [0.618034, 1.618034, -3.236068], [1.618034, -3.236068, -0.618034], [-2.618034, 1.618034, 2], [0.618034, 1.618034, 3.236068], [1.618034, 2, 2.618034], [-1.618034, -3.236068, 0.618034], [3.236068, -0.618034, -1.618034], [-1.618034, 2, -2.618034], [2, 2.618034, -1.618034], [-3.236068, -0.618034, 1.618034]], "indices": [2, 23, 12, 2, 12, 34, 2, 34, 0, 2, 0, 43, 2, 43, 16, 2, 16, 29, 2, 29, 55, 2, 55, 44, 54, 53, 36, 54, 36, 3, 54, 3, 0, 54, 0, 34, 54, 34, 18, 54, 18, 42, 54, 42, 25, 54, 25, 10, 43, 0, 3, 24, 35, 41, 24, 41, 39, 24, 39, 1, 24, 1, 7, 24, 7, 21, 24, 21, 51, 24, 51, 2, 24, 2, 44, 28, 30, 56, 28, 56, 31, 28, 31, 7, 28, 7, 1, 28, 1, 5, 28, 5, 47, 28, 47, 50, 28, 50, 22, 5, 1, 39, 23, 2, 51, 59, 8, 16, 59, 16, 43, 59, 43, 3, 59, 3, 36, 59, 36, 19, 59, 19, 27, 59, 27, 52, 59, 52, 40, 52, 33, 38, 52, 38, 14, 52, 14, 4, 52, 4, 6, 52, 6, 46, 52, 46, 48, 52, 48, 20, 52, 20, 40, 6, 4, 57, 58, 22, 50, 58, 50, 17, 58, 17, 57, 58, 57, 4, 58, 4, 14, 58, 14, 15, 58, 15, 49, 58, 49, 37, 6, 57, 17, 6, 17, 47, 6, 47, 5, 6, 5, 39, 6, 39, 41, 6, 41, 26, 6, 26, 11, 6, 11, 46, 21, 7, 31, 26, 35, 24, 26, 24, 55, 26, 55, 29, 26, 29, 8, 26, 8, 59, 26, 59, 20, 26, 20, 48, 26, 48, 11, 16, 8, 29, 45, 10, 25, 45, 25, 32, 45, 32, 9, 45, 9, 30, 45, 30, 28, 45, 28, 58, 45, 58, 37, 45, 37, 13, 51, 21, 31, 51, 31, 56, 51, 56, 9, 51, 9, 32, 51, 32, 42, 51, 42, 18, 51, 18, 12, 51, 12, 23, 30, 9, 56, 54, 10, 45, 46, 11, 48, 34, 12, 18, 27, 19, 53, 27, 53, 54, 27, 54, 45, 27, 45, 13, 27, 13, 49, 27, 49, 15, 27, 15, 38, 27, 38, 33, 49, 13, 37, 15, 14, 38, 47, 17, 50, 53, 19, 36, 40, 20, 59, 28, 22, 58, 55, 24, 44, 32, 25, 42, 35, 26, 41, 52, 27, 33], "scale": 0.11}};
@@ -120,7 +128,7 @@ function rebuild(){
  L=buildLattice(prim,count); const POS=L.POS, EE=L.EE; NN=POS.length; NE=EE.length;
  cen=[0,0,0]; POS.forEach(p=>{cen[0]+=p[0];cen[1]+=p[1];cen[2]+=p[2];}); cen=cen.map(x=>x/NN);
  maxb=Math.max(...POS.map(p=>Math.max(Math.abs(p[0]-cen[0]),Math.abs(p[1]-cen[1]),Math.abs(p[2]-cen[2]))));
- const RN=0.06*cellSize(prim), RE=RN/3;   // node Ø3 : edge Ø1
+ const RN=0.038*cellSize(prim), RE=RN/2.4;   // fixed thin gauge — node : rod
  nodeM=new THREE.InstancedMesh(new THREE.SphereGeometry(RN,10,8),new THREE.MeshLambertMaterial({transparent:true,opacity:+document.getElementById('op').value}),NN);
  for(let i=0;i<NN;i++){dmy.position.set(POS[i][0]-cen[0],POS[i][1]-cen[1],POS[i][2]-cen[2]);dmy.scale.setScalar(1);dmy.quaternion.identity();dmy.updateMatrix();nodeM.setMatrixAt(i,dmy.matrix);nodeM.setColorAt(i,heatColor(0));}
  edgeM=new THREE.InstancedMesh(new THREE.CylinderGeometry(RE,RE,1,6),new THREE.MeshLambertMaterial({transparent:true,opacity:+document.getElementById('op').value*0.9}),Math.max(1,NE));
@@ -147,7 +155,8 @@ function resetSim(){S=new Array(NN);H=new Array(NN).fill(0);adj=Array.from({leng
 }
 function mismatch(i){let m=0;for(const j of adj[i])if(S[j]!==S[i])m++;return m;}
 function step(t){const T=0.15+(TMAX-0.15)*t/Math.max(1,LEN-1);const news=S.slice();const inj=new Array(NN).fill(0);
- for(let i=0;i<NN;i++){const d=adj[i].length||1,m=mismatch(i);const pflip=1/(1+Math.exp(-(m-d/2)));const pth=1/(1+Math.exp(-(T-1)/0.25));const p=(1-pth)*pflip+pth*0.5;const f=Math.random()<p;if(f)news[i]=-S[i];inj[i]=4*(m/d)+(f?1:0);}
+ const FD=+document.getElementById('fdrive').value, PFLOOR=0.015;
+ for(let i=0;i<NN;i++){const d=adj[i].length||1,m=mismatch(i);const pflip=1/(1+Math.exp(-(m-d/2)));const pth=1/(1+Math.exp(-(T*FD-1)/0.25));const p=Math.max(PFLOOR,(1-pth)*pflip+pth*0.5);const f=Math.random()<p;if(f)news[i]=-S[i];inj[i]=FD*4*(m/d)+(f?1:0);}
  S=news; for(let i=0;i<NN;i++)H[i]=H[i]*0.6+inj[i];
  const cond=new Array(NN).fill(0);L.EE.forEach(e=>{const fl=0.18*(H[e[0]]-H[e[1]]);cond[e[0]]-=fl;cond[e[1]]+=fl;});
  for(let i=0;i<NN;i++)H[i]=Math.max(0,H[i]+cond[i]);
@@ -182,6 +191,8 @@ document.querySelectorAll('.prim').forEach(el=>el.onclick=()=>{document.querySel
 document.querySelectorAll('.mode').forEach(el=>el.onclick=()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('on'));el.classList.add('on');mode=el.dataset.m;applyMode();});
 document.getElementById('count').oninput=rebuild;
 document.getElementById('op').oninput=function(){if(nodeM)nodeM.material.opacity=+this.value;if(edgeM)edgeM.material.opacity=+this.value*0.9;};
+document.getElementById('fdrive').oninput=function(){document.getElementById('fval').textContent=(+this.value).toFixed(2);};
+document.getElementById('fdrive').onchange=function(){if(frames.length)activate();};
 // trackball
 let drag=false,px,py;const RX=new THREE.Vector3(1,0,0),RY=new THREE.Vector3(0,1,0),RZ=new THREE.Vector3(0,0,1);
 rn.domElement.addEventListener('pointerdown',e=>{drag=1;px=e.clientX;py=e.clientY;});addEventListener('pointerup',()=>drag=0);
@@ -197,6 +208,26 @@ document.getElementById('addphase').onclick=()=>{const n=prompt('Phase name:');i
 document.getElementById('send').onclick=()=>{const q=document.getElementById('q').value.trim();document.getElementById('sendmsg').textContent=q?'logged for Icon':'type a question';if(q&&!document.getElementById('restate').value)document.getElementById('restate').value='[Icon] formalising: '+q+'\n\n(awaiting conditions)';};
 function renderTex(){try{katex.render(document.getElementById('tex').value||'',document.getElementById('latex'),{throwOnError:false,displayMode:true});}catch(e){document.getElementById('latex').textContent=e.message;}}
 document.getElementById('render').onclick=renderTex;renderTex();
+// floating panels — drag by header (buttons inside the header still click)
+document.querySelectorAll('.float').forEach(fl=>{const h=fl.querySelector('.fh');let dx=0,dy=0,dr=false;
+ h.addEventListener('pointerdown',e=>{if(e.target.tagName==='BUTTON')return;dr=true;dx=e.clientX-fl.offsetLeft;dy=e.clientY-fl.offsetTop;h.style.cursor='grabbing';fl.style.zIndex=30;e.preventDefault();});
+ addEventListener('pointermove',e=>{if(!dr)return;fl.style.left=Math.max(0,Math.min(innerWidth-60,e.clientX-dx))+'px';fl.style.top=Math.max(46,Math.min(innerHeight-30,e.clientY-dy))+'px';});
+ addEventListener('pointerup',()=>{if(dr){dr=false;h.style.cursor='grab';}});});
+// D9 fills Conditions from the live meters — formal maths, runs locally (no API spend)
+document.getElementById('d9cond').onclick=()=>{
+ const t=pt|0, d=NN?(2*NE/NN):0, FD=+document.getElementById('fdrive').value;
+ let alive=0; if(frames.length){const f=frames[Math.min(t,frames.length-1)];L.EE.forEach(e=>{if(Math.abs(f[e[0]]-f[e[1]])>0.12)alive++;});}
+ const Tt=Tser.length?Tser[Math.min(t,Tser.length-1)]:null, sig=order.length?order[Math.min(t,order.length-1)]:null, pm=sig!=null?((1-sig)/2).toFixed(3):'—';
+ document.getElementById('cond').value=[
+  'G=(V,E): |V|='+NN+', |E|='+NE+', ⟨deg⟩='+d.toFixed(2)+'   ['+prim+', hollow frame]',
+  'Drive: F='+FD.toFixed(2)+',  p_flip ≥ p_min=0.015   (Δ_min>0, T1.3a floor)',
+  'Schedule: T(t)=0.15+(T_max−0.15)·t/(L−1),  T_max='+TMAX+',  L='+LEN,
+  'State t='+t+': T='+(Tt??'—')+',  σ=|2p_mis−1|='+(sig??'—')+',  p_mis='+pm,
+  'Contrast: alive edges (|ΔH|>0.12) = '+alive+' / '+NE+'   ('+(NE?(100*alive/NE).toFixed(0):0)+'% lit)',
+  'Melt onset: t*='+(meltTick??'—')+(meltTick!=null?' (T*='+Tser[meltTick]+'),  criterion σ<0.5σ₀+0.05':'')
+ ].join('\n');
+ document.getElementById('savemsg').textContent='D9 filled conditions from meters ✓';
+};
 
 document.getElementById('snap').onclick=()=>{
  const src=rn.domElement; const W=src.width, H=src.height;
